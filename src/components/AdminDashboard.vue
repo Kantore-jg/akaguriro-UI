@@ -1104,7 +1104,7 @@ function getMerchantById(id) {
               v-model="assignMerchantId"
               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 outline-none cursor-pointer"
             >
-              <option value="all_free">❌ Aucun occupant (Libérer la place)</option>
+              <option value="all_free"> Aucun occupant (Libérer la place)</option>
               <option v-for="m in merchants" :key="m.id" :value="m.id">{{ m.name }} ({{ m.category }})</option>
             </select>
           </div>

@@ -134,21 +134,21 @@ function handleManualSubmit(e) {
               @click="handleQuickLogin('COMMERCANT')"
               class="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 py-1.5 px-2.5 rounded-lg text-left transition-all"
             >
-              🏪 Commerçant (Anésie)
+               Commerçant (Anésie)
             </button>
             <button
               type="button"
               @click="handleQuickLogin('ADMIN_MARCHE')"
               class="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 py-1.5 px-2.5 rounded-lg text-left transition-all"
             >
-              🏢 Admin Marché (Pierre)
+               Admin Marché (Pierre)
             </button>
             <button
               type="button"
               @click="handleQuickLogin('SUPER_ADMIN')"
               class="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 py-1.5 px-2.5 rounded-lg text-left transition-all"
             >
-              🔑 Super Admin (Gilbert)
+               Super Admin (Gilbert)
             </button>
           </div>
         </div>
