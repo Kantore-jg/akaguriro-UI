@@ -1,0 +1,399 @@
+<!--
+  @license
+  SPDX-License-Identifier: Apache-2.0
+-->
+
+<script setup>
+import { ref, computed } from 'vue';
+import { useApp } from '../composables/useApp.js';
+import {
+  Search,
+  MapPin,
+  TrendingUp,
+  Store,
+  Users,
+  Package,
+  LayoutGrid,
+  ChevronRight,
+  CheckCircle,
+  Sparkles,
+} from 'lucide-vue-next';
+
+const {
+  markets,
+  products,
+  merchants,
+  setPublicTab,
+  setSelectedMarketId,
+  setSelectedProductId,
+} = useApp();
+
+const searchQuery = ref('');
+const searchCategory = ref('all');
+const searchMarket = ref('all');
+
+const totalMarketsCount = computed(() => markets.value.length);
+const totalMerchantsCount = computed(() => merchants.value.length);
+const totalProductsCount = computed(() => products.value.length);
+const totalAvailablePlaces = computed(() =>
+  markets.value.reduce((sum, m) => sum + (m.totalPlaces - m.occupiedPlaces), 0)
+);
+
+const categories = computed(() => [
+  { name: 'Poissons', icon: '🐟', count: products.value.filter(p => p.category === 'Poissons').length },
+  { name: 'Café & Thé', icon: '☕', count: products.value.filter(p => p.category === 'Café & Thé').length },
+  { name: 'Fruits & Légumes', icon: '🥑', count: products.value.filter(p => p.category === 'Fruits & Légumes').length },
+  { name: 'Vivres', icon: '🌾', count: products.value.filter(p => p.category === 'Vivres').length },
+  { name: 'Textiles', icon: '👕', count: products.value.filter(p => p.category === 'Textiles').length },
+]);
+
+function handleHeroSearchSubmit(e) {
+  e.preventDefault();
+  setPublicTab('products');
+}
+</script>
+
+<template>
+  <div class="space-y-16 pb-20">
+
+    <!-- 1. HERO SECTION -->
+    <!-- <section class="relative overflow-hidden bg-slate-900 text-white py-12 lg:py-24 px-4 sm:px-6 lg:px-8">
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,#000_70%,transparent_100%)] opacity-35" />
+
+      <div class="relative mx-auto max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+          <div class="lg:col-span-7 space-y-6">
+            
+
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] font-display">
+              Retrouvez facilement les <span class="bg-gradient-to-r from-emerald-400 to-teal-300 text-transparent bg-clip-text">produits</span> et <span class="bg-gradient-to-r from-teal-300 to-emerald-400 text-transparent bg-clip-text">commerçants</span> du Burundi
+            </h2>
+
+            <p class="text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
+              Akaguriro digitalise les marchés de Bujumbura, Gitega, Ngozi et Rumonge. Explorez l'emplacement exact des étals, comparez les prix nationaux en temps réel et contactez directement les marchands locaux.
+            </p>
+
+            <form @submit="handleHeroSearchSubmit" class="bg-slate-800/90 border border-slate-700/60 p-2 rounded-2xl shadow-2xl max-w-2xl flex flex-col sm:flex-row gap-2 transition-all">
+              <div class="flex-1 flex items-center gap-2 px-3 py-2 bg-slate-900/60 rounded-xl">
+                <Search class="w-5 h-5 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Chercher un produit (ex. Mukeke, Avocat...)"
+                  v-model="searchQuery"
+                  class="w-full bg-transparent border-0 text-white text-sm outline-none placeholder:text-slate-500"
+                />
+              </div>
+
+              <div class="sm:w-44 flex items-center gap-2 px-3 py-2 bg-slate-900/60 rounded-xl text-xs text-slate-300">
+                <MapPin class="w-4 h-4 text-emerald-400 shrink-0" />
+                <select
+                  v-model="searchMarket"
+                  class="bg-transparent border-0 outline-none w-full cursor-pointer text-slate-300 font-medium"
+                >
+                  <option value="all" class="bg-slate-800 text-white">Tous Marchés</option>
+                  <option v-for="m in markets" :key="m.id" :value="m.id" class="bg-slate-800 text-white">{{ m.city }}</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold px-6 py-3 rounded-xl text-slate-950 text-sm transition-all shadow-lg hover:scale-[1.01]"
+              >
+                Trouver
+              </button>
+            </form>
+
+            <div class="flex flex-wrap items-center gap-6 text-xs text-slate-400 pt-2 font-medium">
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Éclairage LED Intelligent</span>
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Plans Indoor Interactifs</span>
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Catalogues Commerçants Vérifiés</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 relative">
+            <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 blur-xl"></div>
+            <div class="relative rounded-2xl overflow-hidden border border-slate-700 aspect-[4/3] shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=650"
+                alt="Marché Africain Moderne"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section> -->
+
+    <!-- 2. CATEGORIES INSPIRATION BAR -->
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Filières Actives</h3>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Explorer par Catégories</h2>
+        </div>
+        <button
+          @click="setPublicTab('products')"
+          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+        >
+          Tous les produits
+          <ChevronRight class="w-4 h-4" />
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div
+          v-for="(cat, idx) in categories"
+          :key="idx"
+          @click="setPublicTab('products')"
+          class="bg-white hover:bg-emerald-50/40 p-4 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer shadow-sm flex flex-col items-center text-center group"
+        >
+          <span class="text-3xl mb-2.5 group-hover:scale-110 transition-transform duration-200">{{ cat.icon }}</span>
+          <h5 class="text-xs sm:text-sm font-bold text-slate-800">{{ cat.name }}</h5>
+          <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ cat.count }} articles en vente</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. POPULAR MARKETS SECTION -->
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Infrastructures du Pays</h3>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Nos Marchés Publics Connectés</h2>
+        </div>
+        <button
+          @click="setPublicTab('markets')"
+          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+        >
+          Afficher la liste complète
+          <ChevronRight class="w-4 h-4" />
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          v-for="m in markets"
+          :key="m.id"
+          class="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col group"
+        >
+          <div class="relative h-44 w-full overflow-hidden">
+            <img
+              :src="m.image"
+              :alt="m.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div class="absolute top-3 left-3 bg-slate-900/80 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+              <MapPin class="w-3 h-3 text-emerald-400" />
+              {{ m.city }}
+            </div>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <h4 class="text-base font-extrabold text-slate-900 tracking-tight leading-snug group-hover:text-emerald-600 transition-colors">
+                {{ m.name }}
+              </h4>
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                {{ m.description }}
+              </p>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <div class="grid grid-cols-2 gap-2 text-[11px] font-semibold text-slate-600 border-t border-slate-100 pt-3">
+                <div>
+                  <span class="text-slate-400 block text-[10px]">CO-LOCATAIRES :</span>
+                  <span class="text-slate-900 text-xs font-bold">{{ m.occupiedPlaces }} actifs</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10px]">PLACES LIBRES :</span>
+                  <span
+                    class="text-xs font-bold"
+                    :class="(m.totalPlaces - m.occupiedPlaces) > 0 ? 'text-emerald-600' : 'text-amber-600'"
+                  >
+                    {{ m.totalPlaces - m.occupiedPlaces }} dispos
+                  </span>
+                </div>
+              </div>
+
+              <button
+                @click="setSelectedMarketId(m.id); setPublicTab('markets')"
+                class="w-full bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-bold transition-all py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-100"
+              >
+                Visiter le Marché
+                <ChevronRight class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. STATISTICS PANEL -->
+    <section class="bg-slate-100/70 border-y border-slate-200/50 py-12 px-4">
+      <div class="mx-auto max-w-7xl">
+        <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
+          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Indicateurs Digitaux</h3>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">La Smart City en Chiffres</h2>
+          <p class="text-slate-500 text-xs sm:text-sm">
+            Suivi statistique réactif de nos places d'étalage et flux de produits nationaux.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/40 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+              <Store class="w-6 h-6" />
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block font-semibold uppercase">Marchés Digitalisés</span>
+              <span class="text-2xl font-extrabold text-slate-900">{{ totalMarketsCount }}</span>
+              <span class="text-[10px] text-emerald-500 block font-semibold">100% de fiabilité</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/40 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <Users class="w-6 h-6" />
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block font-semibold uppercase">Commerçants Enregistrés</span>
+              <span class="text-2xl font-extrabold text-slate-900">{{ totalMerchantsCount }}</span>
+              <span class="text-[10px] text-emerald-500 block font-semibold">+4 recrutés ce mois</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/40 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+              <Package class="w-6 h-6" />
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block font-semibold uppercase">Produits en Ligne</span>
+              <span class="text-2xl font-extrabold text-slate-900">{{ totalProductsCount }}</span>
+              <span class="text-[10px] text-emerald-500 block font-semibold">Mis à jour régulièrement</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/40 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+              <LayoutGrid class="w-6 h-6" />
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block font-semibold uppercase">Emplacements Libres</span>
+              <span class="text-2xl font-extrabold text-slate-900 text-emerald-600">{{ totalAvailablePlaces }}</span>
+              <span class="text-[10px] text-amber-500 block font-semibold">Disponibles à la demande</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TRENDING PRODUCTS SECTION -->
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <h3 class="text-sm font-bold text-teal-600 uppercase tracking-wider">Catalogue National</h3>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produits Tendances</h2>
+        </div>
+        <button
+          @click="setPublicTab('products')"
+          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+        >
+          Explorer tout le catalogue
+          <ChevronRight class="w-4 h-4" />
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div
+          v-for="p in products.slice(0, 4)"
+          :key="p.id"
+          @click="setSelectedProductId(p.id); setPublicTab('products')"
+          class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
+        >
+          <div class="relative rounded-xl overflow-hidden bg-slate-50 aspect-square">
+            <img
+              :src="p.image"
+              :alt="p.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <span
+              v-if="p.isTrending"
+              class="absolute top-2.5 left-2.5 bg-yellow-400 text-slate-900 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-0.5 shadow-sm"
+            >
+              <TrendingUp class="w-3 h-3" />
+              Tendance
+            </span>
+            <span
+              v-if="p.stock <= 5"
+              class="absolute bottom-2.5 right-2.5 bg-red-100 text-red-700 font-bold text-[9px] px-2 py-0.5 rounded border border-red-200"
+            >
+              Stock Faible
+            </span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">
+              {{ p.category }}
+            </span>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-emerald-600 transition-colors">
+              {{ p.name }}
+            </h4>
+            <p class="text-[11px] text-slate-400 font-medium">
+              {{ markets.find(m => m.id === p.marketId)?.city }} • Étale {{ p.placeNumber }}
+            </p>
+          </div>
+
+          <div class="border-t border-slate-50 pt-2.5 flex items-center justify-between">
+            <div>
+              <span class="text-xs sm:text-sm font-extrabold text-emerald-600">
+                {{ p.price.toLocaleString('fr-FR') }} BIF
+              </span>
+              <span class="text-[9.5px] text-slate-400 ml-1">/ {{ p.unit }}</span>
+            </div>
+            <span class="text-[10px] font-bold bg-slate-50 text-slate-600 px-2 py-1 rounded-lg hover:bg-emerald-55 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+              Détails
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PROMOTIONAL SUB-HERO FOR MERCHANTS -->
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-teal-900 to-emerald-900 rounded-3xl p-8 sm:p-12 relative overflow-hidden text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+
+        <div class="space-y-4 max-w-xl relative">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-emerald-400">Pour les Commerçants</h3>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-display">
+            Vous vendez sur les marchés du Burundi ?
+          </h2>
+          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+            Demandez un emplacement libre en ligne, enregistrez votre catalogue d'articles, obtenez des étiquettes LED intelligentes et offrez une immense visibilité nationale à vos produits gratuitement !
+          </p>
+        </div>
+
+        <div class="shrink-0 flex flex-col sm:flex-row gap-3 relative w-full sm:w-auto">
+          <button
+            @click="setPublicTab('request')"
+            class="bg-emerald-500 hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
+          >
+            Demander une place
+          </button>
+          <button
+            @click="setPublicTab('auth')"
+            class="bg-transparent hover:bg-slate-800/50 border border-slate-600 transition-all text-white font-bold px-5 py-3 rounded-xl text-xs sm:text-sm text-center"
+          >
+            Créer mon compte
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</template>
