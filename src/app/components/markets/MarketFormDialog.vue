@@ -1,9 +1,11 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
-import { Store } from 'lucide-vue-next';
+import { Store, Upload } from 'lucide-vue-next';
+import { useApp } from '../../../composables/useApp.js';
 import Button from '../ui/Button.vue';
 import Input from '../ui/Input.vue';
 import Label from '../ui/Label.vue';
+import ProductCategoryMultiSelect from './ProductCategoryMultiSelect.vue';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +29,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'submit']);
 
+const { productCategories } = useApp();
+
 const CITIES = ['Bujumbura', 'Gitega', 'Ngozi', 'Rumonge', 'Muyinga', 'Kirundo', 'Makamba'];
 
 const form = ref({
@@ -35,11 +39,24 @@ const form = ref({
   location: '',
   description: '',
   totalPlaces: 50,
-  image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600',
-  categoryTags: '',
+  productCategoryIds: [],
 });
 
+const imageFile = ref(null);
+const imagePreview = ref(null);
+
 const isEditing = computed(() => Boolean(props.market?.id));
+
+function resetImage(marketImage = null) {
+  imageFile.value = null;
+  imagePreview.value = marketImage || null;
+}
+
+function onImageChange(e) {
+  const file = e.target.files?.[0];
+  imageFile.value = file || null;
+  imagePreview.value = file ? URL.createObjectURL(file) : props.market?.image || null;
+}
 
 watch(
   () => props.open,
@@ -52,9 +69,9 @@ watch(
         location: props.market.location || '',
         description: props.market.description || '',
         totalPlaces: props.market.totalPlaces || 50,
-        image: props.market.image || '',
-        categoryTags: (props.market.categoryTags || []).join(', '),
+        productCategoryIds: [...(props.market.productCategoryIds || [])],
       };
+      resetImage(props.market.image || props.market.coverImage);
     } else {
       form.value = {
         name: '',
@@ -62,9 +79,9 @@ watch(
         location: '',
         description: '',
         totalPlaces: 50,
-        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600',
-        categoryTags: '',
+        productCategoryIds: [],
       };
+      resetImage();
     }
   },
 );
@@ -73,11 +90,7 @@ const close = () => emit('update:open', false);
 
 const handleSubmit = () => {
   if (!form.value.name.trim() || !form.value.location.trim()) return;
-
-  const categoryTags = form.value.categoryTags
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean);
+  if (!isEditing.value && !imageFile.value) return;
 
   emit('submit', {
     ...(props.market || {}),
@@ -86,9 +99,8 @@ const handleSubmit = () => {
     location: form.value.location.trim(),
     description: form.value.description.trim(),
     totalPlaces: Number(form.value.totalPlaces) || 0,
-    image: form.value.image.trim(),
-    coverImage: form.value.image.trim(),
-    categoryTags,
+    productCategoryIds: form.value.productCategoryIds,
+    imageFile: imageFile.value,
   });
   close();
 };
@@ -96,7 +108,7 @@ const handleSubmit = () => {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-lg">
+    <DialogContent class="sm:max-w-lg max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Store class="w-5 h-5 text-primary" />
@@ -150,18 +162,36 @@ const handleSubmit = () => {
         </div>
 
         <div class="space-y-2">
-          <Label for="market-tags">Catégories (séparées par virgule)</Label>
-          <Input id="market-tags" v-model="form.categoryTags" placeholder="Poissons, Vivres, Textiles" />
+          <Label>Types de produits (optionnel)</Label>
+          <ProductCategoryMultiSelect
+            v-model="form.productCategoryIds"
+            :options="productCategories"
+            placeholder="Choisir les catégories de produits..."
+          />
         </div>
 
         <div class="space-y-2">
-          <Label for="market-image">URL de l'image</Label>
-          <Input id="market-image" v-model="form.image" placeholder="https://..." />
+          <Label>Image du marché</Label>
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-xl bg-muted border overflow-hidden shrink-0">
+              <img v-if="imagePreview" :src="imagePreview" alt="Aperçu" class="w-full h-full object-cover" />
+            </div>
+            <label class="cursor-pointer">
+              <span class="inline-flex items-center gap-2 text-xs font-semibold text-primary border border-input px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                <Upload class="w-4 h-4" />
+                {{ isEditing ? 'Changer l\'image' : 'Sélectionner une image' }}
+              </span>
+              <input type="file" accept="image/*" class="hidden" @change="onImageChange" />
+            </label>
+          </div>
+          <p v-if="!isEditing && !imageFile" class="text-xs text-muted-foreground">Image requise pour la création</p>
         </div>
 
         <DialogFooter>
           <Button type="button" variant="outline" @click="close">Annuler</Button>
-          <Button type="submit">{{ isEditing ? 'Enregistrer' : 'Créer le marché' }}</Button>
+          <Button type="submit" :disabled="!isEditing && !imageFile">
+            {{ isEditing ? 'Enregistrer' : 'Créer le marché' }}
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>

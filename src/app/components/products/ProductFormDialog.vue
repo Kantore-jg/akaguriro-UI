@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
-import { Package } from 'lucide-vue-next';
+import { Package, Upload } from 'lucide-vue-next';
 import Button from '../ui/Button.vue';
 import Input from '../ui/Input.vue';
 import Label from '../ui/Label.vue';
@@ -41,12 +41,14 @@ const form = ref({
   unit: 'kg',
   description: '',
   stock: 50,
-  image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400',
   marketId: '',
   merchantId: '',
   available: true,
   isTrending: false,
 });
+
+const imageFile = ref(null);
+const imagePreview = ref(null);
 
 const isEditing = computed(() => Boolean(props.product?.id));
 
@@ -54,6 +56,17 @@ const merchantsForMarket = computed(() => {
   if (!form.value.marketId) return props.merchants;
   return props.merchants.filter((m) => m.activeMarketId === form.value.marketId);
 });
+
+function resetImage(productImage = null) {
+  imageFile.value = null;
+  imagePreview.value = productImage || null;
+}
+
+function onImageChange(e) {
+  const file = e.target.files?.[0];
+  imageFile.value = file || null;
+  imagePreview.value = file ? URL.createObjectURL(file) : props.product?.image || null;
+}
 
 watch(
   () => props.open,
@@ -67,12 +80,12 @@ watch(
         unit: props.product.unit,
         description: props.product.description || '',
         stock: props.product.stock,
-        image: props.product.image,
         marketId: props.product.marketId,
         merchantId: props.product.merchantId,
         available: props.product.available ?? true,
         isTrending: props.product.isTrending ?? false,
       };
+      resetImage(props.product.image);
     } else {
       const merchant = props.defaultMerchant;
       form.value = {
@@ -82,12 +95,12 @@ watch(
         unit: 'kg',
         description: '',
         stock: 50,
-        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400',
         marketId: merchant?.activeMarketId || props.defaultMarketId || props.markets[0]?.id || '',
         merchantId: merchant?.id || props.merchants[0]?.id || '',
         available: true,
         isTrending: false,
       };
+      resetImage();
     }
   },
 );
@@ -107,6 +120,7 @@ const close = () => emit('update:open', false);
 
 const handleSubmit = () => {
   if (!form.value.name.trim() || form.value.price <= 0) return;
+  if (!isEditing.value && !imageFile.value) return;
 
   const merchant = props.merchants.find((m) => m.id === form.value.merchantId);
   emit('submit', {
@@ -117,12 +131,12 @@ const handleSubmit = () => {
     unit: form.value.unit.trim(),
     description: form.value.description.trim(),
     stock: Number(form.value.stock),
-    image: form.value.image.trim(),
     marketId: form.value.marketId,
     merchantId: form.value.merchantId,
     placeNumber: merchant?.activePlaceId || 'A-01',
     available: form.value.available,
     isTrending: form.value.isTrending,
+    imageFile: imageFile.value,
   });
   close();
 };
@@ -220,13 +234,27 @@ const handleSubmit = () => {
         </div>
 
         <div class="space-y-2">
-          <Label for="p-image">URL image</Label>
-          <Input id="p-image" v-model="form.image" />
+          <Label>Image du produit</Label>
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-xl bg-muted border overflow-hidden shrink-0">
+              <img v-if="imagePreview" :src="imagePreview" alt="Aperçu" class="w-full h-full object-cover" />
+            </div>
+            <label class="cursor-pointer">
+              <span class="inline-flex items-center gap-2 text-xs font-semibold text-primary border border-input px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+                <Upload class="w-4 h-4" />
+                {{ isEditing ? 'Changer l\'image' : 'Sélectionner une image' }}
+              </span>
+              <input type="file" accept="image/*" class="hidden" @change="onImageChange" />
+            </label>
+          </div>
+          <p v-if="!isEditing && !imageFile" class="text-xs text-muted-foreground">Image requise pour la création</p>
         </div>
 
         <DialogFooter>
           <Button type="button" variant="outline" @click="close">Annuler</Button>
-          <Button type="submit">{{ isEditing ? 'Enregistrer' : 'Ajouter' }}</Button>
+          <Button type="submit" :disabled="!isEditing && !imageFile">
+            {{ isEditing ? 'Enregistrer' : 'Ajouter' }}
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>

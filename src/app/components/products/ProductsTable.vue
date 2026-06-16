@@ -51,7 +51,18 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
         <TableRow v-for="product in products" :key="product.id">
           <TableCell>
             <div class="flex items-center gap-3">
-              <img :src="product.image" class="w-9 h-9 rounded-lg object-cover" />
+              <img
+                v-if="product.image"
+                :src="product.image"
+                :alt="product.name"
+                class="w-9 h-9 rounded-lg object-cover bg-muted"
+              />
+              <div
+                v-else
+                class="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-[10px] text-muted-foreground font-bold"
+              >
+                N/A
+              </div>
               <div>
                 <p class="font-medium text-sm">{{ product.name }}</p>
                 <Badge v-if="product.isTrending" variant="secondary" class="text-[10px] mt-0.5">

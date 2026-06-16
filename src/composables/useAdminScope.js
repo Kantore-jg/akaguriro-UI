@@ -7,6 +7,7 @@ export function useAdminScope() {
     markets,
     merchants,
     places,
+    blocks,
     products,
     requests,
     receipts,
@@ -40,6 +41,12 @@ export function useAdminScope() {
   const scopedPlaces = computed(() =>
     places.value.filter(
       (p) => !assignedMarketId.value || p.marketId == assignedMarketId.value,
+    ),
+  );
+
+  const scopedBlocks = computed(() =>
+    blocks.value.filter(
+      (b) => !assignedMarketId.value || b.marketId == assignedMarketId.value,
     ),
   );
 
@@ -90,6 +97,7 @@ export function useAdminScope() {
     markets,
     merchants,
     places,
+    blocks,
     products,
     requests,
     receipts,
@@ -101,6 +109,7 @@ export function useAdminScope() {
     assignedMerchant,
     scopedMarkets,
     scopedPlaces,
+    scopedBlocks,
     scopedMerchants,
     scopedProducts,
     scopedRequests,

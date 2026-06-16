@@ -13,6 +13,7 @@ import {
   fetchProfile,
 } from '../api/services/auth.js';
 import {
+  fetchProductCategories,
   fetchMarkets,
   fetchPlaces,
   fetchMerchants,
@@ -22,8 +23,13 @@ import {
   createMarket,
   updateMarket as apiUpdateMarket,
   deleteMarketApi,
+  fetchBlocks,
+  createBlock,
+  updateBlockApi,
+  deleteBlockApi,
   createPlace,
   updatePlaceApi,
+  deletePlaceApi,
   assignPlaceChief,
   createProduct,
   updateProductApi,
@@ -52,6 +58,8 @@ export function createAppState() {
   const merchants = ref([]);
   const products = ref([]);
   const places = ref([]);
+  const blocks = ref([]);
+  const productCategories = ref([]);
   const requests = ref([]);
   const receipts = ref([]);
   const currentUser = ref(getStoredUser() || GUEST_USER);
@@ -92,17 +100,30 @@ export function createAppState() {
     }
   };
 
+  const loadBlocks = async (marketIds = null) => {
+    const ids = marketIds || markets.value.map((m) => m.id);
+    if (!ids.length) {
+      blocks.value = [];
+      return;
+    }
+    const results = await Promise.all(ids.map((id) => fetchBlocks(id)));
+    blocks.value = results.flat();
+  };
+
   const loadPublicData = async () => {
-    const [m, p, pr, pl] = await Promise.all([
+    const [m, p, pr, pl, tags] = await Promise.all([
       fetchMarkets(),
       fetchPlaces(),
       fetchProducts(),
       fetchMerchants(),
+      fetchProductCategories(),
     ]);
+    productCategories.value = tags;
     markets.value = m;
     places.value = p;
     products.value = pr;
     merchants.value = pl;
+    await loadBlocks(m.map((market) => market.id));
   };
 
   const loadAuthenticatedData = async () => {
@@ -265,11 +286,7 @@ export function createAppState() {
 
   const addMarket = async (market) => {
     try {
-      const created = await createMarket({
-        ...market,
-        coverImage: market.image,
-        categoryTags: market.categoryTags || [],
-      });
+      const created = await createMarket(market);
       markets.value = [created, ...markets.value];
       showToast(`Marché "${market.name}" créé avec succès`, 'success');
     } catch (error) {
@@ -299,6 +316,40 @@ export function createAppState() {
     }
   };
 
+  const addBlock = async (block) => {
+    try {
+      const created = await createBlock(block.marketId, block);
+      blocks.value = [...blocks.value, created];
+      showToast(`Bloc "${block.name}" créé`, 'success');
+      return created;
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      return null;
+    }
+  };
+
+  const updateBlock = async (block) => {
+    try {
+      const updated = await updateBlockApi(block.id, block);
+      blocks.value = blocks.value.map((b) => (b.id === block.id ? updated : b));
+      showToast(`Bloc "${block.name}" mis à jour`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const deleteBlock = async (id) => {
+    try {
+      await deleteBlockApi(id);
+      blocks.value = blocks.value.filter((b) => b.id !== id);
+      showToast('Bloc supprimé', 'success');
+      return true;
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      return false;
+    }
+  };
+
   const addPlace = async (place) => {
     try {
       const created = await createPlace(place);
@@ -307,6 +358,25 @@ export function createAppState() {
       showToast(`Emplacement ${place.id} ajouté`, 'success');
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const deletePlace = async (place) => {
+    if (!place?.placeId) {
+      showToast('Emplacement introuvable', 'error');
+      return false;
+    }
+    try {
+      await deletePlaceApi(place.placeId);
+      places.value = places.value.filter(
+        (p) => !(p.placeId === place.placeId || (p.id === place.id && p.marketId === place.marketId)),
+      );
+      await loadPublicData();
+      showToast(`Emplacement ${place.id} supprimé`, 'success');
+      return true;
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      return false;
     }
   };
 
@@ -346,6 +416,8 @@ export function createAppState() {
     merchants,
     products,
     places,
+    blocks,
+    productCategories,
     requests,
     receipts,
     currentUser,
@@ -361,6 +433,7 @@ export function createAppState() {
     register,
     logout,
     refreshAll,
+    loadBlocks,
     setCurrentUser,
     setViewState,
     setSelectedMarketId: (id) => { selectedMarketId.value = id; },
@@ -374,7 +447,11 @@ export function createAppState() {
     addMarket,
     updateMarket,
     deleteMarket,
+    addBlock,
+    updateBlock,
+    deleteBlock,
     addPlace,
+    deletePlace,
     addProduct,
     updateProduct,
     deleteProduct,

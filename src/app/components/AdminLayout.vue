@@ -173,11 +173,6 @@ const goToPortal = () => router.push('/');
         </div>
       </div>
 
-      <div class="px-4 py-3 border-b border-sidebar-border">
-        <p class="text-[10px] uppercase tracking-wider text-sidebar-foreground/50 mb-1">Session</p>
-        <p class="text-sm font-medium truncate">{{ currentUser.name }}</p>
-        <p class="text-[10px] text-primary font-semibold uppercase mt-0.5">{{ roleLabel }}</p>
-      </div>
 
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
         <button

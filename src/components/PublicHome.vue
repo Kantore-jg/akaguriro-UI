@@ -5,7 +5,10 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+
+const router = useRouter();
 import {
   Search,
   MapPin,
@@ -386,7 +389,7 @@ function handleHeroSearchSubmit(e) {
             Demander une place
           </button>
           <button
-            @click="setPublicTab('auth')"
+            @click="router.push('/login')"
             class="bg-transparent hover:bg-slate-800/50 border border-slate-600 transition-all text-white font-bold px-5 py-3 rounded-xl text-xs sm:text-sm text-center"
           >
             Créer mon compte

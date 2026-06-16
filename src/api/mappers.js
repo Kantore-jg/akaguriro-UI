@@ -1,3 +1,5 @@
+import { resolveStorageUrl } from './client.js';
+
 const PLACE_STATUS_TO_UI = {
   available: 'libre',
   occupied: 'occupée',
@@ -19,7 +21,22 @@ const REQUEST_STATUS_TO_UI = {
   assigned: 'approved',
 };
 
+export function mapProductCategory(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    icon: c.icon || null,
+    description: c.description || '',
+    isActive: c.is_active ?? true,
+  };
+}
+
 export function mapMarket(m) {
+  const categories = m.product_categories?.length
+    ? m.product_categories.map(mapProductCategory)
+    : [];
+
   return {
     id: m.id,
     name: m.name,
@@ -29,13 +46,29 @@ export function mapMarket(m) {
     description: m.description || '',
     totalPlaces: m.total_places ?? 0,
     occupiedPlaces: m.occupied_places ?? 0,
-    image: m.image,
-    coverImage: m.cover_image || m.image,
-    categoryTags: m.category_tags || [],
+    image: resolveStorageUrl(m.image),
+    coverImage: resolveStorageUrl(m.cover_image || m.image),
+    productCategories: categories.map((c) => c.name),
+    productCategoryIds: m.product_category_ids?.length
+      ? m.product_category_ids
+      : categories.map((c) => c.id).filter(Boolean),
     latitude: m.latitude,
     longitude: m.longitude,
     isActive: m.is_active ?? true,
     visitCount: m.visit_count ?? 0,
+  };
+}
+
+export function mapBlock(b) {
+  return {
+    id: b.id,
+    marketId: b.market_id,
+    name: b.name,
+    code: b.code || '',
+    description: b.description || '',
+    totalPlaces: b.total_places ?? b.places_count ?? 0,
+    placesCount: b.places_count ?? b.total_places ?? 0,
+    isActive: b.is_active ?? true,
   };
 }
 
@@ -45,7 +78,8 @@ export function mapPlace(p) {
     id: p.number || String(p.id),
     placeId: p.id,
     number: p.number,
-    blockName: p.block?.name || 'Bloc',
+    blockId: p.market_block_id || p.block?.id || null,
+    blockName: p.block?.name || '—',
     rowName: p.number || '',
     status,
     merchantId: p.chief?.id || null,
@@ -84,7 +118,7 @@ export function mapProduct(p) {
     price: Number(p.price),
     category: p.category?.name || 'Général',
     categoryId: p.category?.id || p.category_id,
-    image: primaryImage?.path || null,
+    image: resolveStorageUrl(primaryImage?.path) || null,
     marketId: p.market?.id || p.market_id,
     merchantId: p.merchant?.id || p.user_id,
     placeNumber: p.place?.number || '',
@@ -153,15 +187,25 @@ export function marketToApi(data) {
     location: data.location,
     description: data.description,
     total_places: data.totalPlaces,
-    category_tags: data.categoryTags,
+    product_category_ids: data.productCategoryIds || [],
     image: data.image,
     cover_image: data.coverImage || data.image,
+  };
+}
+
+export function blockToApi(data) {
+  return {
+    name: data.name,
+    code: data.code || null,
+    description: data.description || null,
+    is_active: data.isActive ?? true,
   };
 }
 
 export function placeToApi(data) {
   return {
     market_id: data.marketId,
+    market_block_id: data.blockId || null,
     number: data.id || data.number,
     status: PLACE_STATUS_TO_API[data.status] || data.status || 'available',
     category: data.category,

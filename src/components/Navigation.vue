@@ -79,7 +79,7 @@ const publicPaths = {
   markets: '/markets',
   products: '/products',
   merchants: '/merchants',
-  auth: '/auth',
+  auth: '/login',
   request: '/request',
 };
 
@@ -102,23 +102,6 @@ function goToLed() {
 
 <template>
   <header class="sticky top-0 z-50 w-full bg-slate-900 text-white shadow-md border-b border-slate-800">
-    <!-- Simulation Banner & Config Switcher -->
-    <div class="bg-emerald-600 text-[11.5px] font-medium tracking-wide py-1 text-center md:px-4 px-2 flex justify-between items-center select-none">
-      <div class="flex items-center gap-1">
-        <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
-        <span><strong>DÉMO INTERACTIVE :</strong> Mode Actuel: <strong>{{ currentUser.role }}</strong> ({{ currentUser.name }})</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <button
-          @click="roleSwitcherOpen = !roleSwitcherOpen"
-          class="bg-slate-900/40 hover:bg-slate-900/70 border border-white/20 transition-all rounded px-2 py-0.5 text-xs flex items-center gap-1 font-bold"
-        >
-          <ShieldAlert class="w-3 h-3 text-yellow-300" />
-          Changer de Rôle / Mode
-        </button>
-      </div>
-    </div>
-
     <!-- Role Switcher Floating Panel -->
     <div
       v-if="roleSwitcherOpen"

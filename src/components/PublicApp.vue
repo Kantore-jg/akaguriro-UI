@@ -7,7 +7,6 @@ import PublicHome from './PublicHome.vue';
 import PublicMarketsList from './PublicMarketsList.vue';
 import PublicMarketDetail from './PublicMarketDetail.vue';
 import PublicProductDetails from './PublicProductDetails.vue';
-import PublicAuth from './PublicAuth.vue';
 import PublicRequestPlace from './PublicRequestPlace.vue';
 import { Search, Star, MessageSquare, ShieldCheck } from 'lucide-vue-next';
 
@@ -238,7 +237,6 @@ const navigateHome = () => {
         </div>
       </div>
 
-      <PublicAuth v-if="publicTab === 'auth'" />
       <PublicRequestPlace v-if="publicTab === 'request'" />
     </main>
 

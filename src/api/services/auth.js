@@ -29,15 +29,30 @@ export async function login(email, password) {
   return user;
 }
 
-export async function register({ name, email, phone, password, password_confirmation }) {
-  const { data } = await apiClient.post('/register', {
-    name,
-    email,
-    phone,
-    password,
-    password_confirmation: password_confirmation || password,
-  });
-  const payload = extractData({ data });
+export async function register({ name, email, phone, password, password_confirmation, avatar }) {
+  let response;
+
+  if (avatar) {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    if (phone) formData.append('phone', phone);
+    formData.append('password', password);
+    formData.append('password_confirmation', password_confirmation || password);
+    formData.append('avatar', avatar);
+
+    response = await apiClient.post('/register', formData);
+  } else {
+    response = await apiClient.post('/register', {
+      name,
+      email,
+      phone,
+      password,
+      password_confirmation: password_confirmation || password,
+    });
+  }
+
+  const payload = extractData(response);
   const user = mapUser(payload.user);
   setToken(payload.token);
   saveUser(user);

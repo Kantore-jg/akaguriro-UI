@@ -12,6 +12,16 @@ const routes = [
     meta: { public: true },
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../components/LoginPage.vue'),
+    meta: { public: true, standalone: true },
+  },
+  {
+    path: '/auth',
+    redirect: '/login',
+  },
+  {
     path: '/admin',
     component: () => import('../app/components/AdminLayout.vue'),
     meta: { requiresAuth: true },
@@ -69,7 +79,6 @@ const routes = [
       { path: 'markets', name: 'Markets', meta: { tab: 'markets' } },
       { path: 'products', name: 'Products', meta: { tab: 'products' } },
       { path: 'merchants', name: 'Merchants', meta: { tab: 'merchants' } },
-      { path: 'auth', name: 'Auth', meta: { tab: 'auth' } },
       { path: 'request', name: 'Request', meta: { tab: 'request' } },
     ],
   },
@@ -87,7 +96,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.matched.some((r) => r.meta.requiresAuth)) {
     if (!hasToken || !role || role === 'VISITOR') {
-      next({ path: '/auth' });
+      next({ path: '/login' });
       return;
     }
 

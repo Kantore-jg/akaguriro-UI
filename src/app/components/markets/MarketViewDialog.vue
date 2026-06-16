@@ -76,9 +76,9 @@ const goToPlaces = () => {
           </div>
         </div>
 
-        <div v-if="market.categoryTags?.length" class="flex flex-wrap gap-2">
-          <Badge v-for="tag in market.categoryTags" :key="tag" variant="secondary">
-            {{ tag }}
+        <div v-if="market.productCategories?.length" class="flex flex-wrap gap-2">
+          <Badge v-for="category in market.productCategories" :key="category" variant="secondary">
+            {{ category }}
           </Badge>
         </div>
       </div>

@@ -1,12 +1,15 @@
 import { apiClient, extractData, extractList } from '../client.js';
 import {
   mapMarket,
+  mapProductCategory,
+  mapBlock,
   mapPlace,
   mapMerchant,
   mapProduct,
   mapPlaceRequest,
   mapReceipt,
   marketToApi,
+  blockToApi,
   placeToApi,
   productToApi,
   placeRequestToApi,
@@ -14,6 +17,64 @@ import {
 import { getStoredUser } from './auth.js';
 
 const PER_PAGE = 100;
+
+function appendScalar(formData, key, value) {
+  if (value === undefined || value === null || value === '') return;
+  formData.append(key, String(value));
+}
+
+function appendArray(formData, key, values) {
+  if (!Array.isArray(values)) return;
+  values.forEach((value, index) => {
+    if (value !== undefined && value !== null && value !== '') {
+      formData.append(`${key}[${index}]`, String(value));
+    }
+  });
+}
+
+function marketToFormData(market) {
+  const formData = new FormData();
+  const api = marketToApi(market);
+
+  appendScalar(formData, 'name', api.name);
+  appendScalar(formData, 'city', api.city);
+  appendScalar(formData, 'location', api.location);
+  appendScalar(formData, 'description', api.description);
+  appendScalar(formData, 'total_places', api.total_places);
+  appendArray(formData, 'product_category_ids', api.product_category_ids);
+
+  if (market.imageFile) {
+    formData.append('image', market.imageFile);
+    formData.append('cover_image', market.imageFile);
+  }
+
+  return formData;
+}
+
+function productToFormData(product) {
+  const formData = new FormData();
+  const api = productToApi(product);
+
+  Object.entries(api).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (typeof value === 'boolean') {
+      formData.append(key, value ? '1' : '0');
+    } else {
+      formData.append(key, String(value));
+    }
+  });
+
+  if (product.imageFile) {
+    formData.append('images[0]', product.imageFile);
+  }
+
+  return formData;
+}
+
+export async function fetchProductCategories() {
+  const { data } = await apiClient.get('/product-categories');
+  return extractList({ data }).map(mapProductCategory);
+}
 
 export async function fetchMarkets() {
   const { data } = await apiClient.get('/markets', { params: { per_page: PER_PAGE } });
@@ -60,17 +121,46 @@ export async function fetchReceipts() {
 }
 
 export async function createMarket(market) {
+  if (market.imageFile) {
+    const { data } = await apiClient.post('/markets', marketToFormData(market));
+    return mapMarket(extractData({ data }));
+  }
   const { data } = await apiClient.post('/markets', marketToApi(market));
   return mapMarket(extractData({ data }));
 }
 
 export async function updateMarket(id, market) {
+  if (market.imageFile) {
+    const formData = marketToFormData(market);
+    formData.append('_method', 'PUT');
+    const { data } = await apiClient.post(`/markets/${id}`, formData);
+    return mapMarket(extractData({ data }));
+  }
   const { data } = await apiClient.put(`/markets/${id}`, marketToApi(market));
   return mapMarket(extractData({ data }));
 }
 
 export async function deleteMarketApi(id) {
   await apiClient.delete(`/markets/${id}`);
+}
+
+export async function fetchBlocks(marketId) {
+  const { data } = await apiClient.get(`/markets/${marketId}/blocks`);
+  return extractList({ data }).map(mapBlock);
+}
+
+export async function createBlock(marketId, block) {
+  const { data } = await apiClient.post(`/markets/${marketId}/blocks`, blockToApi(block));
+  return mapBlock(extractData({ data }));
+}
+
+export async function updateBlockApi(id, block) {
+  const { data } = await apiClient.put(`/market-blocks/${id}`, blockToApi(block));
+  return mapBlock(extractData({ data }));
+}
+
+export async function deleteBlockApi(id) {
+  await apiClient.delete(`/market-blocks/${id}`);
 }
 
 export async function createPlace(place) {
@@ -83,17 +173,31 @@ export async function updatePlaceApi(placeId, payload) {
   return mapPlace(extractData({ data }));
 }
 
+export async function deletePlaceApi(placeId) {
+  await apiClient.delete(`/places/${placeId}`);
+}
+
 export async function assignPlaceChief(placeId, userId) {
   const { data } = await apiClient.post(`/places/${placeId}/assign-chief`, { user_id: userId });
   return mapPlace(extractData({ data }));
 }
 
 export async function createProduct(product) {
+  if (product.imageFile) {
+    const { data } = await apiClient.post('/products', productToFormData(product));
+    return mapProduct(extractData({ data }));
+  }
   const { data } = await apiClient.post('/products', productToApi(product));
   return mapProduct(extractData({ data }));
 }
 
 export async function updateProductApi(id, product) {
+  if (product.imageFile) {
+    const formData = productToFormData(product);
+    formData.append('_method', 'PUT');
+    const { data } = await apiClient.post(`/products/${id}`, formData);
+    return mapProduct(extractData({ data }));
+  }
   const { data } = await apiClient.put(`/products/${id}`, productToApi(product));
   return mapProduct(extractData({ data }));
 }
@@ -118,9 +222,7 @@ export async function rejectPlaceRequest(id, reason) {
 }
 
 export async function createReceipt(formData) {
-  const { data } = await apiClient.post('/receipts', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const { data } = await apiClient.post('/receipts', formData);
   return mapReceipt(extractData({ data }));
 }
 

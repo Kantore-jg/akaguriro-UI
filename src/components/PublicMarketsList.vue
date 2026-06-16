@@ -68,7 +68,7 @@ function resetFilters() {
             ? 'bg-slate-900 text-white border-slate-900'
             : 'bg-slate-50 text-slate-600 border-slate-200/50 hover:bg-slate-100'"
         >
-          {{ city === 'all' ? '🌍 Tous les Marchés' : city }}
+          {{ city === 'all' ? ' Tous les Marchés' : city }}
         </button>
       </div>
 
@@ -134,14 +134,14 @@ function resetFilters() {
               </div>
             </div>
 
-            <!-- Category tags -->
-            <div class="flex flex-wrap gap-1">
+            <!-- Product categories -->
+            <div v-if="m.productCategories?.length" class="flex flex-wrap gap-1">
               <span
-                v-for="(tag, i) in m.categoryTags"
+                v-for="(category, i) in m.productCategories"
                 :key="i"
                 class="text-[9.5px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100/50"
               >
-                {{ tag }}
+                {{ category }}
               </span>
             </div>
 

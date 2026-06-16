@@ -15,8 +15,23 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
+
+export function resolveStorageUrl(url) {
+  if (!url) return null;
+  if (!url.includes('/storage/')) return url;
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const origin = apiBase.replace(/\/api\/v1\/?$/, '');
+
+  return url
+    .replace(/^https?:\/\/localhost(?::\d+)?\/storage\//, `${origin}/storage/`)
+    .replace(/^https?:\/\/127\.0\.0\.1(?::\d+)?\/storage\//, `${origin}/storage/`);
+}
 
 apiClient.interceptors.response.use(
   (response) => response,
