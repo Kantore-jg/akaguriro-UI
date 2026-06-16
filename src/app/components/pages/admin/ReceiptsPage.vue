@@ -1,0 +1,194 @@
+<script setup>
+import { ref, computed } from 'vue';
+import { Coins, Plus, Search, ExternalLink } from 'lucide-vue-next';
+import { useApp } from '../../../../composables/useApp.js';
+import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import StatCard from '../../StatCard.vue';
+import ReceiptFormDialog from '../../receipts/ReceiptFormDialog.vue';
+import Badge from '../../ui/Badge.vue';
+import Button from '../../ui/Button.vue';
+import Input from '../../ui/Input.vue';
+import { Card, CardContent } from '../../ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
+
+const { addPaymentReceipt, updateReceiptStatus } = useApp();
+const {
+  isMerchant,
+  scopedReceipts,
+  assignedMerchant,
+  findMarket,
+} = useAdminScope();
+
+const searchQuery = ref('');
+const statusFilter = ref('all');
+const formOpen = ref(false);
+
+const filteredReceipts = computed(() =>
+  scopedReceipts.value.filter((r) => {
+    const q = searchQuery.value.toLowerCase();
+    const matchesQuery =
+      !q ||
+      r.merchantName.toLowerCase().includes(q) ||
+      r.month.toLowerCase().includes(q);
+    const matchesStatus = statusFilter.value === 'all' || r.status === statusFilter.value;
+    return matchesQuery && matchesStatus;
+  }),
+);
+
+const pendingCount = computed(() =>
+  scopedReceipts.value.filter((r) => r.status === 'pending').length,
+);
+
+const approvedTotal = computed(() =>
+  scopedReceipts.value
+    .filter((r) => r.status === 'approved')
+    .reduce((s, r) => s + r.amount, 0),
+);
+
+const pageTitle = computed(() =>
+  isMerchant.value ? 'Mes reçus de paiement' : 'Reçus de paiement',
+);
+
+const statusBadge = (status) => {
+  const map = {
+    pending: { label: 'En attente', variant: 'secondary' },
+    approved: { label: 'Validé', variant: 'default' },
+    rejected: { label: 'Rejeté', variant: 'destructive' },
+  };
+  return map[status] || { label: status, variant: 'secondary' };
+};
+
+const handleReceiptSubmit = (payload) => {
+  addPaymentReceipt(payload);
+};
+
+const merchantMarketName = computed(() => {
+  if (!assignedMerchant.value) return 'Marché';
+  return findMarket(assignedMerchant.value.activeMarketId)?.name || 'Marché';
+});
+</script>
+
+<template>
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold text-foreground">{{ pageTitle }}</h1>
+        <p class="text-sm text-muted-foreground mt-1">
+          Suivi des redevances mensuelles des commerçants
+        </p>
+      </div>
+      <Button v-if="isMerchant" @click="formOpen = true">
+        <Plus class="w-4 h-4 mr-2" />
+        Transmettre un reçu
+      </Button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <StatCard title="Reçus" :value="scopedReceipts.length" :icon="Coins" color="primary" />
+      <StatCard title="En attente" :value="pendingCount" :icon="Coins" color="warning" />
+      <StatCard
+        title="Montant validé"
+        :value="approvedTotal.toLocaleString('fr-FR') + ' BIF'"
+        :icon="Coins"
+        color="success"
+      />
+    </div>
+
+    <Card>
+      <CardContent class="p-4 flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input v-model="searchQuery" placeholder="Rechercher..." class="pl-9" />
+        </div>
+        <Select v-model="statusFilter">
+          <SelectTrigger class="w-full sm:w-44">
+            <SelectValue placeholder="Tous statuts" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous statuts</SelectItem>
+            <SelectItem value="pending">En attente</SelectItem>
+            <SelectItem value="approved">Validé</SelectItem>
+            <SelectItem value="rejected">Rejeté</SelectItem>
+          </SelectContent>
+        </Select>
+      </CardContent>
+    </Card>
+
+    <div class="rounded-lg border border-border bg-card">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Commerçant</TableHead>
+            <TableHead>Mois</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Justificatif</TableHead>
+            <TableHead>Statut</TableHead>
+            <TableHead v-if="!isMerchant" class="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-if="!filteredReceipts.length">
+            <TableCell :colspan="isMerchant ? 5 : 6" class="text-center py-8 text-muted-foreground">
+              Aucun reçu enregistré.
+            </TableCell>
+          </TableRow>
+          <TableRow v-for="r in filteredReceipts" :key="r.id">
+            <TableCell class="font-medium">{{ r.merchantName }}</TableCell>
+            <TableCell>{{ r.month }}</TableCell>
+            <TableCell>{{ r.amount.toLocaleString('fr-FR') }} BIF</TableCell>
+            <TableCell>
+              <a
+                :href="r.receiptImage"
+                target="_blank"
+                rel="noreferrer"
+                class="text-primary text-sm inline-flex items-center gap-1 hover:underline"
+              >
+                <ExternalLink class="w-3.5 h-3.5" />
+                Voir
+              </a>
+            </TableCell>
+            <TableCell>
+              <Badge :variant="statusBadge(r.status).variant">
+                {{ statusBadge(r.status).label }}
+              </Badge>
+            </TableCell>
+            <TableCell v-if="!isMerchant" class="text-right">
+              <div v-if="r.status === 'pending'" class="flex gap-2 justify-end">
+                <Button size="sm" variant="outline" @click="updateReceiptStatus(r.id, 'rejected')">
+                  Rejeter
+                </Button>
+                <Button size="sm" @click="updateReceiptStatus(r.id, 'approved')">
+                  Valider
+                </Button>
+              </div>
+              <span v-else class="text-xs text-muted-foreground">Traité</span>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+
+    <ReceiptFormDialog
+      v-if="isMerchant"
+      v-model:open="formOpen"
+      :merchant="assignedMerchant"
+      :market-name="merchantMarketName"
+      :market-id="assignedMerchant?.activeMarketId"
+      @submit="handleReceiptSubmit"
+    />
+  </div>
+</template>

@@ -20,13 +20,21 @@ const candidateName = ref(currentUser.value?.name || '');
 const candidatePhone = ref(currentUser.value?.phone || '');
 const activity = ref('');
 const category = ref('Poissonnerie');
-const targetMarketId = ref('m1');
+const targetMarketId = ref(markets.value[0]?.id ?? null);
 const description = ref('');
 
 function handleSubmit(e) {
   e.preventDefault();
+  if (!currentUser.value?.id || currentUser.value.role === 'VISITOR') {
+    showToast('Connectez-vous pour soumettre une demande.', 'error');
+    return;
+  }
   if (!candidateName.value || !candidatePhone.value || !activity.value || !description.value) {
     showToast('Veuillez remplir l\'intégralité des champs obligatoires.', 'error');
+    return;
+  }
+  if (!targetMarketId.value) {
+    showToast('Aucun marché disponible.', 'error');
     return;
   }
 

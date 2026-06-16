@@ -1,0 +1,66 @@
+import { apiClient, extractData, setToken } from '../client.js';
+import { mapUser } from '../mappers.js';
+
+const USER_KEY = 'akaguriro_user';
+
+export function getStoredUser() {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveUser(user) {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(USER_KEY);
+  }
+}
+
+export async function login(email, password) {
+  const { data } = await apiClient.post('/login', { email, password });
+  const payload = extractData({ data });
+  const user = mapUser(payload.user);
+  setToken(payload.token);
+  saveUser(user);
+  return user;
+}
+
+export async function register({ name, email, phone, password, password_confirmation }) {
+  const { data } = await apiClient.post('/register', {
+    name,
+    email,
+    phone,
+    password,
+    password_confirmation: password_confirmation || password,
+  });
+  const payload = extractData({ data });
+  const user = mapUser(payload.user);
+  setToken(payload.token);
+  saveUser(user);
+  return user;
+}
+
+export async function logout() {
+  try {
+    await apiClient.post('/logout');
+  } finally {
+    setToken(null);
+    saveUser(null);
+  }
+}
+
+export async function fetchProfile() {
+  const { data } = await apiClient.get('/profile');
+  const user = mapUser(extractData({ data }));
+  saveUser(user);
+  return user;
+}
+
+export function clearSession() {
+  setToken(null);
+  saveUser(null);
+}

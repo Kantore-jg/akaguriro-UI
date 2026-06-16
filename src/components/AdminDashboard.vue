@@ -4,8 +4,14 @@
 -->
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+
+const props = defineProps({
+  embedded: { type: Boolean, default: false },
+  tab: { type: String, default: null },
+});
 import {
   LayoutDashboard,
   Store,
@@ -24,9 +30,9 @@ import {
   Menu,
 } from 'lucide-vue-next';
 
+const router = useRouter();
 const {
   currentUser,
-  setViewState,
   markets,
   merchants,
   products,
@@ -43,8 +49,19 @@ const {
   showToast,
 } = useApp();
 
-const activeTab = ref('dashboard');
+const activeTab = ref(props.tab || 'dashboard');
 const mobileSidebarOpen = ref(false);
+
+watch(
+  () => props.tab,
+  (newTab) => {
+    if (newTab) activeTab.value = newTab;
+  },
+);
+
+onMounted(() => {
+  if (props.tab) activeTab.value = props.tab;
+});
 
 const productModalOpen = ref(false);
 const currentEditingProduct = ref(null);
@@ -276,10 +293,16 @@ function getMerchantById(id) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 flex flex-col lg:flex-row relative text-xs font-semibold text-slate-700">
+  <div
+    :class="[
+      'relative text-xs font-semibold text-slate-700',
+      embedded ? 'w-full' : 'min-h-screen bg-slate-50 flex flex-col lg:flex-row',
+    ]"
+  >
 
     <!-- 1. SIDEBAR FOR ADMINISTRATION (Dashboard theme: Stripe/Metronic) -->
     <aside
+      v-if="!embedded"
       :class="[
         'w-full lg:w-64 bg-slate-900 text-slate-100 shrink-0 border-r border-slate-800 p-5 flex flex-col justify-between absolute lg:relative z-30 lg:z-10 h-full lg:h-auto min-h-screen transition-transform duration-300',
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
@@ -449,7 +472,7 @@ function getMerchantById(id) {
       <!-- Bottom utility exits -->
       <div class="space-y-3 pt-6 border-t border-slate-800">
         <button
-          @click="setViewState('PUBLIC')"
+          @click="router.push('/')"
           class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-1.5"
         >
           <Eye class="w-4 h-4" />
@@ -464,10 +487,18 @@ function getMerchantById(id) {
     </aside>
 
     <!-- 2. DYNAMIC WORKSPACE BAR -->
-    <main class="flex-1 p-4 sm:p-8 space-y-8 overflow-y-auto max-w-full">
+    <main
+      :class="[
+        'space-y-8 overflow-y-auto max-w-full',
+        embedded ? 'w-full' : 'flex-1 p-4 sm:p-8',
+      ]"
+    >
 
       <!-- Mobile top header -->
-      <div class="lg:hidden flex items-center justify-between bg-white border border-slate-100 p-3 rounded-2xl shadow-sm mb-4">
+      <div
+        v-if="!embedded"
+        class="lg:hidden flex items-center justify-between bg-white border border-slate-100 p-3 rounded-2xl shadow-sm mb-4"
+      >
         <div class="flex items-center gap-2">
           <button
             @click="mobileSidebarOpen = true"
@@ -483,7 +514,7 @@ function getMerchantById(id) {
       </div>
 
       <!-- Tab #1: SUMMARY DASHBOARD VIEW -->
-      <div v-if="activeTab === 'dashboard'" class="space-y-8 animate-fadeIn">
+      <div v-if="activeTab === 'dashboard' && !embedded" class="space-y-8 animate-fadeIn">
 
         <!-- Greeting with administrative notes -->
         <div class="space-y-1.5">

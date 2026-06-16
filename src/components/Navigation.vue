@@ -4,7 +4,8 @@
 -->
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import {
   Building2,
@@ -18,11 +19,12 @@ import {
   Tv,
 } from 'lucide-vue-next';
 
+const route = useRoute();
+const router = useRouter();
 const {
-  viewState,
-  setViewState,
   currentUser,
-  setCurrentUser,
+  login,
+  logout,
   publicTab,
   setPublicTab,
   setSelectedMarketId,
@@ -30,51 +32,71 @@ const {
   showToast,
 } = useApp();
 
+const isAdminRoute = computed(() => route.path.startsWith('/admin'));
+const isLedRoute = computed(() => route.path === '/led');
+const isPublicRoute = computed(() => !isAdminRoute.value && !isLedRoute.value);
+
 const mobileMenuOpen = ref(false);
 const globalSearchRaw = ref('');
 const roleSwitcherOpen = ref(false);
 
-function handleRoleChange(role) {
-  let mockName = 'Gilbert Nkurunziza';
-  let mockPhone = '+257 79 000 111';
-  let merchantId = undefined;
-  let marketId = undefined;
+const DEMO_EMAILS = {
+  SUPER_ADMIN: 'admin@akaguriro.bi',
+  ADMIN_MARCHE: 'admin.bujumbura@akaguriro.bi',
+  COMMERCANT: 'commercant@akaguriro.bi',
+};
 
-  if (role === 'COMMERCANT') {
-    mockName = 'Anésie Ndayishimiye';
-    mockPhone = '+257 79 384 102';
-    merchantId = 'mer1';
-  } else if (role === 'ADMIN_MARCHE') {
-    mockName = 'Pierre Nkurikiye';
-    mockPhone = '+257 61 454 987';
-    marketId = 'm1';
+async function handleRoleChange(role) {
+  roleSwitcherOpen.value = false;
+
+  if (role === 'VISITOR') {
+    await logout();
+    router.push('/');
+    setPublicTab('home');
+    return;
   }
 
-  setCurrentUser({
-    id: `u_${role.toLowerCase()}`,
-    name: mockName,
-    phone: mockPhone,
-    role,
-    merchantId,
-    marketId,
-  });
+  const email = DEMO_EMAILS[role];
+  if (!email) return;
 
-  roleSwitcherOpen.value = false;
+  try {
+    await login(email, 'password');
+    router.push('/admin');
+  } catch {
+    showToast('Connexion API impossible — vérifiez que le backend est démarré', 'error');
+  }
 }
 
 function handleLogoClick() {
-  setViewState('PUBLIC');
+  router.push('/');
   setPublicTab('home');
   setSelectedMarketId(null);
   setSelectedProductId(null);
 }
 
+const publicPaths = {
+  home: '/',
+  markets: '/markets',
+  products: '/products',
+  merchants: '/merchants',
+  auth: '/auth',
+  request: '/request',
+};
+
 function handlePublicNav(tab) {
-  setViewState('PUBLIC');
+  router.push(publicPaths[tab] || '/');
   setPublicTab(tab);
   setSelectedMarketId(null);
   setSelectedProductId(null);
   mobileMenuOpen.value = false;
+}
+
+function goToAdmin() {
+  router.push('/admin');
+}
+
+function goToLed() {
+  router.push('/led');
 }
 </script>
 
@@ -113,33 +135,33 @@ function handlePublicNav(tab) {
       </p>
       <div class="space-y-1.5 text-xs">
         <button
-          @click="handleRoleChange('VISITOR'); setViewState('PUBLIC'); setPublicTab('home')"
+          @click="handleRoleChange('VISITOR')"
           class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'VISITOR' && viewState === 'PUBLIC' ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
+          :class="currentUser.role === 'VISITOR' && isPublicRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
         >
           <span>👤 Visiteur Public (Anonyme)</span>
           <span v-if="currentUser.role === 'VISITOR'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
         </button>
         <button
-          @click="handleRoleChange('COMMERCANT'); setViewState('DASHBOARD')"
+          @click="handleRoleChange('COMMERCANT')"
           class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'COMMERCANT' && viewState === 'DASHBOARD' ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
+          :class="currentUser.role === 'COMMERCANT' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
         >
           <span>🏪 Commerçant (Anésie N.)</span>
           <span v-if="currentUser.role === 'COMMERCANT'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
         </button>
         <button
-          @click="handleRoleChange('ADMIN_MARCHE'); setViewState('DASHBOARD')"
+          @click="handleRoleChange('ADMIN_MARCHE')"
           class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'ADMIN_MARCHE' && viewState === 'DASHBOARD' ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
+          :class="currentUser.role === 'ADMIN_MARCHE' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
         >
           <span>🏢 Admin Marché (Pierre N.)</span>
           <span v-if="currentUser.role === 'ADMIN_MARCHE'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
         </button>
         <button
-          @click="handleRoleChange('SUPER_ADMIN'); setViewState('DASHBOARD')"
+          @click="handleRoleChange('SUPER_ADMIN')"
           class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'SUPER_ADMIN' && viewState === 'DASHBOARD' ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
+          :class="currentUser.role === 'SUPER_ADMIN' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
         >
           <span>🔑 Super Administrateur (Gilbert)</span>
           <span v-if="currentUser.role === 'SUPER_ADMIN'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
@@ -150,25 +172,25 @@ function handlePublicNav(tab) {
         <span class="text-[11px] text-slate-300 font-medium">Bascule rapide d'écran :</span>
         <div class="flex gap-1">
           <button
-            @click="setViewState('PUBLIC'); roleSwitcherOpen = false"
+            @click="router.push('/'); roleSwitcherOpen = false"
             class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="viewState === 'PUBLIC' ? 'text-emerald-400 font-bold' : ''"
+            :class="isPublicRoute ? 'text-emerald-400 font-bold' : ''"
             title="Secteur Public"
           >
             <ShoppingBag class="w-4 h-4 inline" />
           </button>
           <button
-            @click="setViewState('DASHBOARD'); roleSwitcherOpen = false"
+            @click="goToAdmin(); roleSwitcherOpen = false"
             class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="viewState === 'DASHBOARD' ? 'text-emerald-400 font-bold' : ''"
+            :class="isAdminRoute ? 'text-emerald-400 font-bold' : ''"
             title="Espace Admin"
           >
             <LayoutDashboard class="w-4 h-4 inline" />
           </button>
           <button
-            @click="setViewState('LED'); roleSwitcherOpen = false"
+            @click="goToLed(); roleSwitcherOpen = false"
             class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="viewState === 'LED' ? 'text-emerald-400 font-bold' : ''"
+            :class="isLedRoute ? 'text-emerald-400 font-bold' : ''"
             title="Écran LED Public"
           >
             <Tv class="w-4 h-4 inline" />
@@ -198,28 +220,28 @@ function handlePublicNav(tab) {
         <button
           @click="handlePublicNav('home')"
           class="transition-colors py-1 hover:text-emerald-400"
-          :class="viewState === 'PUBLIC' && publicTab === 'home' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
+          :class="isPublicRoute && publicTab === 'home' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
         >
           Accueil
         </button>
         <button
           @click="handlePublicNav('markets')"
           class="transition-colors py-1 hover:text-emerald-400"
-          :class="viewState === 'PUBLIC' && publicTab === 'markets' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
+          :class="isPublicRoute && publicTab === 'markets' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
         >
           Marchés
         </button>
         <button
           @click="handlePublicNav('products')"
           class="transition-colors py-1 hover:text-emerald-400"
-          :class="viewState === 'PUBLIC' && publicTab === 'products' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
+          :class="isPublicRoute && publicTab === 'products' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
         >
           Produits
         </button>
         <button
           @click="handlePublicNav('merchants')"
           class="transition-colors py-1 hover:text-emerald-400"
-          :class="viewState === 'PUBLIC' && publicTab === 'merchants' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
+          :class="isPublicRoute && publicTab === 'merchants' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
         >
           Commerçants
         </button>
@@ -235,15 +257,15 @@ function handlePublicNav(tab) {
         <template v-else>
           <div class="flex items-center gap-2 pl-4 border-l border-slate-800">
             <button
-              @click="setViewState('DASHBOARD')"
+              @click="goToAdmin"
               class="transition-all px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-              :class="viewState === 'DASHBOARD' ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
+              :class="isAdminRoute ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
             >
               <LayoutDashboard class="w-3.5 h-3.5 text-emerald-500" />
               Mon Espace Admin
             </button>
             <button
-              @click="setCurrentUser({ id: 'u_guest', name: 'Visiteur Public', phone: '', role: 'VISITOR' }); setViewState('PUBLIC'); setPublicTab('home')"
+              @click="handleRoleChange('VISITOR')"
               class="p-1.5 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
               title="Se déconnecter"
             >
@@ -256,9 +278,9 @@ function handlePublicNav(tab) {
       <!-- Global actions: Screen Toggle & Mobile Menu -->
       <div class="flex items-center gap-2">
         <button
-          @click="setViewState(viewState === 'LED' ? 'PUBLIC' : 'LED')"
+          @click="isLedRoute ? router.push('/') : goToLed()"
           class="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all"
-          :class="viewState === 'LED' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:bg-slate-800'"
+          :class="isLedRoute ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:bg-slate-800'"
           title="Affichage Écran LED Public"
         >
           <Tv class="w-3.5 h-3.5" />
@@ -291,35 +313,35 @@ function handlePublicNav(tab) {
         <button
           @click="handlePublicNav('home')"
           class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="viewState === 'PUBLIC' && publicTab === 'home' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
+          :class="isPublicRoute && publicTab === 'home' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
         >
           Accueil du portail
         </button>
         <button
           @click="handlePublicNav('markets')"
           class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="viewState === 'PUBLIC' && publicTab === 'markets' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
+          :class="isPublicRoute && publicTab === 'markets' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
         >
           Marchés du Burundi
         </button>
         <button
           @click="handlePublicNav('products')"
           class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="viewState === 'PUBLIC' && publicTab === 'products' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
+          :class="isPublicRoute && publicTab === 'products' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
         >
           Produits en vente
         </button>
         <button
           @click="handlePublicNav('merchants')"
           class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="viewState === 'PUBLIC' && publicTab === 'merchants' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
+          :class="isPublicRoute && publicTab === 'merchants' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
         >
           Commerçants actifs
         </button>
         <button
-          @click="setViewState('LED'); mobileMenuOpen = false"
+          @click="goToLed(); mobileMenuOpen = false"
           class="w-full py-2.5 px-3 rounded-lg text-left font-medium flex items-center gap-2 border border-slate-800 text-blue-400"
-          :class="viewState === 'LED' ? 'bg-slate-800' : 'hover:bg-slate-800'"
+          :class="isLedRoute ? 'bg-slate-800' : 'hover:bg-slate-800'"
         >
           <Tv class="w-4 h-4" />
           Écran publicitaire LED de marché
@@ -338,14 +360,14 @@ function handlePublicNav(tab) {
         <template v-else>
           <div class="space-y-2">
             <button
-              @click="setViewState('DASHBOARD'); mobileMenuOpen = false"
+              @click="goToAdmin(); mobileMenuOpen = false"
               class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
             >
               <LayoutDashboard class="w-4 h-4" />
               Aller au Dashboard Administratif
             </button>
             <button
-              @click="setCurrentUser({ id: 'u_guest', name: 'Visiteur Public', phone: '', role: 'VISITOR' }); setViewState('PUBLIC'); setPublicTab('home'); mobileMenuOpen = false; showToast('Session déconnectée', 'info')"
+              @click="handleRoleChange('VISITOR'); mobileMenuOpen = false"
               class="w-full bg-red-950/20 text-red-400 hover:bg-red-950/40 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
             >
               <LogOut class="w-3.5 h-3.5" />

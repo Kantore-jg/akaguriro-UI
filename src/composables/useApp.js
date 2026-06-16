@@ -3,31 +3,67 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ref, computed, watch, provide, inject } from 'vue';
-import { getStoredData, saveStoredData } from '../data.js';
+import { ref, computed, watch, provide, inject, onMounted } from 'vue';
+import {
+  getStoredUser,
+  saveUser,
+  login as apiLogin,
+  register as apiRegister,
+  logout as apiLogout,
+  fetchProfile,
+} from '../api/services/auth.js';
+import {
+  fetchMarkets,
+  fetchPlaces,
+  fetchMerchants,
+  fetchProducts,
+  fetchPlaceRequests,
+  fetchReceipts,
+  createMarket,
+  updateMarket as apiUpdateMarket,
+  deleteMarketApi,
+  createPlace,
+  updatePlaceApi,
+  assignPlaceChief,
+  createProduct,
+  updateProductApi,
+  deleteProductApi,
+  createPlaceRequest,
+  approvePlaceRequest,
+  rejectPlaceRequest,
+  createReceipt,
+  approveReceipt,
+  rejectReceipt,
+} from '../api/services/data.js';
+import { getErrorMessage } from '../api/client.js';
 
 const APP_KEY = Symbol('app');
 
+const GUEST_USER = {
+  id: null,
+  name: 'Visiteur Public',
+  phone: '',
+  email: '',
+  role: 'VISITOR',
+};
+
 export function createAppState() {
-  const data = ref(getStoredData());
+  const markets = ref([]);
+  const merchants = ref([]);
+  const products = ref([]);
+  const places = ref([]);
+  const requests = ref([]);
+  const receipts = ref([]);
+  const currentUser = ref(getStoredUser() || GUEST_USER);
+  const loading = ref(false);
+  const initialized = ref(false);
+
   const viewState = ref('PUBLIC');
   const selectedMarketId = ref(null);
   const selectedProductId = ref(null);
   const publicTab = ref('home');
   const adminActiveTab = ref('dashboard');
   const toast = ref(null);
-
-  watch(data, (newData) => {
-    saveStoredData(newData.value ?? newData);
-  }, { deep: true });
-
-  const markets = computed(() => data.value.markets);
-  const merchants = computed(() => data.value.merchants);
-  const products = computed(() => data.value.products);
-  const places = computed(() => data.value.places);
-  const requests = computed(() => data.value.requests);
-  const receipts = computed(() => data.value.receipts);
-  const currentUser = computed(() => data.value.currentUser);
 
   const showToast = (message, type = 'success') => {
     toast.value = { message, type };
@@ -56,162 +92,256 @@ export function createAppState() {
     }
   };
 
+  const loadPublicData = async () => {
+    const [m, p, pr, pl] = await Promise.all([
+      fetchMarkets(),
+      fetchPlaces(),
+      fetchProducts(),
+      fetchMerchants(),
+    ]);
+    markets.value = m;
+    places.value = p;
+    products.value = pr;
+    merchants.value = pl;
+  };
+
+  const loadAuthenticatedData = async () => {
+    const [req, rec] = await Promise.all([
+      fetchPlaceRequests(),
+      fetchReceipts(),
+    ]);
+    requests.value = req;
+    receipts.value = rec;
+  };
+
+  const refreshAll = async () => {
+    loading.value = true;
+    try {
+      await loadPublicData();
+      if (currentUser.value?.role && currentUser.value.role !== 'VISITOR') {
+        await loadAuthenticatedData();
+      } else {
+        requests.value = [];
+        receipts.value = [];
+      }
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Erreur de chargement des données'), 'error');
+    } finally {
+      loading.value = false;
+      initialized.value = true;
+    }
+  };
+
   const setCurrentUser = (user) => {
-    data.value = { ...data.value, currentUser: user };
-    showToast(`Session active : rôle ${user.role}`, 'info');
+    currentUser.value = user || GUEST_USER;
+    saveUser(user?.role === 'VISITOR' ? null : user);
+    if (user?.role && user.role !== 'VISITOR') {
+      refreshAll();
+    }
   };
 
-  const addPlaceRequest = (req) => {
-    const newReq = {
-      id: `req_${Date.now()}`,
-      ...req,
-      submittedDate: new Date().toISOString().split('T')[0],
-      status: 'pending',
-    };
-    data.value = {
-      ...data.value,
-      requests: [newReq, ...data.value.requests],
-    };
-    showToast('Demande d\'octroi de place envoyée avec succès', 'success');
+  const login = async (email, password) => {
+    const user = await apiLogin(email, password);
+    currentUser.value = user;
+    await refreshAll();
+    showToast(`Connexion réussie — ${user.name}`, 'success');
+    return user;
   };
 
-  const addPaymentReceipt = (rec) => {
-    const newRec = {
-      id: `rec_${Date.now()}`,
-      ...rec,
-      submittedDate: new Date().toISOString().split('T')[0],
-      status: 'pending',
-    };
-    data.value = {
-      ...data.value,
-      receipts: [newRec, ...data.value.receipts],
-    };
-    showToast('Reçu téléversé avec succès pour validation', 'success');
+  const register = async (payload) => {
+    const user = await apiRegister(payload);
+    currentUser.value = user;
+    await refreshAll();
+    showToast('Inscription réussie', 'success');
+    return user;
   };
 
-  const updateRequestStatus = (reqId, status) => {
-    const prev = data.value;
-    const requests = prev.requests.map((r) => {
-      if (r.id === reqId) return { ...r, status };
-      return r;
-    });
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch {
+      // session may already be invalid
+    }
+    currentUser.value = GUEST_USER;
+    requests.value = [];
+    receipts.value = [];
+    showToast('Session déconnectée', 'info');
+  };
 
-    let places = [...prev.places];
-    let merchants = [...prev.merchants];
-    const reqObj = prev.requests.find((r) => r.id === reqId);
+  const addPlaceRequest = async (req) => {
+    try {
+      const created = await createPlaceRequest(req);
+      requests.value = [created, ...requests.value];
+      showToast('Demande d\'octroi de place envoyée avec succès', 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-    if (status === 'approved' && reqObj) {
-      const freePlaceIdx = places.findIndex(
-        (p) => p.marketId === reqObj.requestedMarketId && p.status === 'libre'
+  const addPaymentReceipt = async (rec) => {
+    try {
+      const formData = new FormData();
+      if (rec.file) {
+        formData.append('file', rec.file);
+      }
+      if (rec.marketId) formData.append('market_id', rec.marketId);
+      formData.append('amount', rec.amount || 35000);
+      if (rec.reference) formData.append('reference', rec.reference);
+
+      const created = await createReceipt(formData);
+      receipts.value = [created, ...receipts.value];
+      showToast('Reçu téléversé avec succès pour validation', 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const updateRequestStatus = async (reqId, status, reason = '') => {
+    try {
+      let updated;
+      if (status === 'approved') {
+        updated = await approvePlaceRequest(reqId);
+      } else {
+        updated = await rejectPlaceRequest(reqId, reason || 'Demande non conforme');
+      }
+      requests.value = requests.value.map((r) => (r.id === reqId ? updated : r));
+      if (status === 'approved') {
+        await refreshAll();
+      }
+      showToast(
+        `Demande ${status === 'approved' ? 'approuvée' : 'rejetée'}`,
+        status === 'approved' ? 'success' : 'error',
       );
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-      if (freePlaceIdx !== -1) {
-        const place = places[freePlaceIdx];
-        const newMerchantId = `mer_${Date.now()}`;
+  const updateReceiptStatus = async (recId, status, reason = '') => {
+    try {
+      const updated =
+        status === 'approved'
+          ? await approveReceipt(recId)
+          : await rejectReceipt(recId, reason || 'Justificatif non conforme');
+      receipts.value = receipts.value.map((r) => (r.id === recId ? updated : r));
+      showToast(
+        `Reçu ${status === 'approved' ? 'validé' : 'rejeté'}`,
+        status === 'approved' ? 'success' : 'error',
+      );
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-        const newMerchant = {
-          id: newMerchantId,
-          name: reqObj.merchantName,
-          phone: reqObj.merchantPhone,
-          image: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 900000)}?auto=format&fit=crop&q=80&w=200`,
-          category: reqObj.category || 'Commerce Général',
-          rating: 5.0,
-          activePlaceId: place.id,
-          activeMarketId: reqObj.requestedMarketId,
-          joinedDate: new Date().toISOString().split('T')[0],
-          verified: true,
-          bio: reqObj.description
-        };
+  const addProduct = async (product) => {
+    try {
+      const created = await createProduct(product);
+      products.value = [created, ...products.value];
+      showToast(`Produit "${product.name}" ajouté avec succès`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-        merchants.push(newMerchant);
-        places[freePlaceIdx] = {
-          ...place,
-          status: 'occupée',
-          merchantId: newMerchantId,
-          category: reqObj.category
-        };
+  const updateProduct = async (product) => {
+    try {
+      const updated = await updateProductApi(product.id, product);
+      products.value = products.value.map((p) => (p.id === product.id ? updated : p));
+      showToast(`Produit "${product.name}" mis à jour`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-        const markets = prev.markets.map(m => {
-          if (m.id === reqObj.requestedMarketId) {
-            return { ...m, occupiedPlaces: Math.min(m.totalPlaces, m.occupiedPlaces + 1) };
-          }
-          return m;
-        });
+  const deleteProduct = async (id) => {
+    try {
+      await deleteProductApi(id);
+      products.value = products.value.filter((p) => p.id !== id);
+      showToast('Produit retiré du catalogue', 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
 
-        data.value = { ...prev, requests, places, merchants, markets };
-        showToast(`Demande de place ${status === 'approved' ? 'approuvée' : 'rejetée'}`, status === 'approved' ? 'success' : 'error');
-        return;
+  const addMarket = async (market) => {
+    try {
+      const created = await createMarket({
+        ...market,
+        coverImage: market.image,
+        categoryTags: market.categoryTags || [],
+      });
+      markets.value = [created, ...markets.value];
+      showToast(`Marché "${market.name}" créé avec succès`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const updateMarket = async (market) => {
+    try {
+      const updated = await apiUpdateMarket(market.id, market);
+      markets.value = markets.value.map((m) => (m.id === market.id ? updated : m));
+      showToast(`Marché "${market.name}" mis à jour`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const deleteMarket = async (id) => {
+    try {
+      await deleteMarketApi(id);
+      markets.value = markets.value.filter((m) => m.id !== id);
+      showToast('Marché retiré du registre', 'success');
+      return true;
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Impossible de supprimer ce marché'), 'error');
+      return false;
+    }
+  };
+
+  const addPlace = async (place) => {
+    try {
+      const created = await createPlace(place);
+      places.value = [...places.value, created];
+      await loadPublicData();
+      showToast(`Emplacement ${place.id} ajouté`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const updatePlaceStatus = async (placeNumber, marketId, status, merchantId) => {
+    const place = places.value.find((p) => p.id === placeNumber && p.marketId === marketId);
+    if (!place?.placeId) {
+      showToast('Emplacement introuvable', 'error');
+      return;
+    }
+    try {
+      const statusMap = { libre: 'available', occupée: 'occupied', maintenance: 'maintenance', réservée: 'reserved' };
+      await updatePlaceApi(place.placeId, { status: statusMap[status] || status });
+      if (merchantId && status === 'occupée') {
+        await assignPlaceChief(place.placeId, merchantId);
+      }
+      await loadPublicData();
+      showToast(`Emplacement ${placeNumber} mis à jour`, 'info');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  onMounted(async () => {
+    await refreshAll();
+    if (getStoredUser()) {
+      try {
+        const profile = await fetchProfile();
+        currentUser.value = profile;
+      } catch {
+        currentUser.value = GUEST_USER;
       }
     }
-
-    data.value = { ...prev, requests };
-    showToast(`Demande de place ${status === 'approved' ? 'approuvée' : 'rejetée'}`, status === 'approved' ? 'success' : 'error');
-  };
-
-  const updateReceiptStatus = (recId, status) => {
-    data.value = {
-      ...data.value,
-      receipts: data.value.receipts.map((r) => (r.id === recId ? { ...r, status } : r)),
-    };
-    showToast(`Reçu de paiement ${status === 'approved' ? 'validé' : 'rejeté'}`, status === 'approved' ? 'success' : 'error');
-  };
-
-  const addProduct = (product) => {
-    const newProduct = {
-      id: `prod_${Date.now()}`,
-      ...product,
-    };
-    data.value = {
-      ...data.value,
-      products: [newProduct, ...data.value.products],
-    };
-    showToast(`Produit "${product.name}" ajouté avec succès`, 'success');
-  };
-
-  const updateProduct = (product) => {
-    data.value = {
-      ...data.value,
-      products: data.value.products.map((p) => (p.id === product.id ? product : p)),
-    };
-    showToast(`Produit "${product.name}" mis à jour`, 'success');
-  };
-
-  const deleteProduct = (id) => {
-    data.value = {
-      ...data.value,
-      products: data.value.products.filter((p) => p.id !== id),
-    };
-    showToast('Produit retiré du catalogue', 'success');
-  };
-
-  const updatePlaceStatus = (placeId, marketId, status, merchantId) => {
-    const prev = data.value;
-    const places = prev.places.map((p) => {
-      if (p.id === placeId && p.marketId === marketId) {
-        return {
-          ...p,
-          status,
-          merchantId: status === 'libre' ? undefined : merchantId || p.merchantId,
-          category: status === 'libre' ? undefined : p.category
-        };
-      }
-      return p;
-    });
-
-    const countOccupied = places.filter(p => p.marketId === marketId && p.status === 'occupée').length;
-    const markets = prev.markets.map(m => {
-      if (m.id === marketId) {
-        return { ...m, occupiedPlaces: countOccupied };
-      }
-      return m;
-    });
-
-    data.value = { ...prev, places, markets };
-    showToast(`Emplacement ${placeId} mis à jour : ${status.toUpperCase()}`, 'info');
-  };
+  });
 
   return {
-    data,
     markets,
     merchants,
     products,
@@ -219,12 +349,18 @@ export function createAppState() {
     requests,
     receipts,
     currentUser,
+    loading,
+    initialized,
     viewState,
     selectedMarketId,
     selectedProductId,
     publicTab,
     adminActiveTab,
     toast,
+    login,
+    register,
+    logout,
+    refreshAll,
     setCurrentUser,
     setViewState,
     setSelectedMarketId: (id) => { selectedMarketId.value = id; },
@@ -235,6 +371,10 @@ export function createAppState() {
     addPaymentReceipt,
     updateRequestStatus,
     updateReceiptStatus,
+    addMarket,
+    updateMarket,
+    deleteMarket,
+    addPlace,
     addProduct,
     updateProduct,
     deleteProduct,
