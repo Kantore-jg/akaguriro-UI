@@ -75,6 +75,34 @@ export async function fetchProfile() {
   return user;
 }
 
+export async function updateProfile({ name, email, phone, avatar }) {
+  let response;
+
+  if (avatar) {
+    const formData = new FormData();
+    if (name !== undefined) formData.append('name', name);
+    if (email !== undefined) formData.append('email', email);
+    if (phone !== undefined) formData.append('phone', phone || '');
+    formData.append('avatar', avatar);
+    formData.append('_method', 'PUT');
+    response = await apiClient.post('/profile', formData);
+  } else {
+    response = await apiClient.put('/profile', { name, email, phone });
+  }
+
+  const user = mapUser(extractData(response));
+  saveUser(user);
+  return user;
+}
+
+export async function updatePassword({ current_password, password, password_confirmation }) {
+  await apiClient.put('/password', {
+    current_password,
+    password,
+    password_confirmation: password_confirmation || password,
+  });
+}
+
 export function clearSession() {
   setToken(null);
   saveUser(null);

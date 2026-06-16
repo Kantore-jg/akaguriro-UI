@@ -8,6 +8,7 @@ import PublicMarketsList from './PublicMarketsList.vue';
 import PublicMarketDetail from './PublicMarketDetail.vue';
 import PublicProductDetails from './PublicProductDetails.vue';
 import PublicRequestPlace from './PublicRequestPlace.vue';
+import ProfilePage from './ProfilePage.vue';
 import { Search, Star, MessageSquare, ShieldCheck } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -78,14 +79,16 @@ const navigateHome = () => {
     <Navigation />
 
     <main class="flex-1">
-      <PublicHome v-if="publicTab === 'home'" />
+      <ProfilePage v-if="publicTab === 'profile'" />
 
-      <template v-if="publicTab === 'markets'">
+      <PublicHome v-else-if="publicTab === 'home'" />
+
+      <template v-else-if="publicTab === 'markets'">
         <PublicMarketDetail v-if="selectedMarketId" />
         <PublicMarketsList v-else />
       </template>
 
-      <template v-if="publicTab === 'products'">
+      <template v-else-if="publicTab === 'products'">
         <PublicProductDetails v-if="selectedProductId" />
         <div v-else class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
           <div class="space-y-1.5">
@@ -168,7 +171,7 @@ const navigateHome = () => {
         </div>
       </template>
 
-      <div v-if="publicTab === 'merchants'" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      <div v-else-if="publicTab === 'merchants'" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
         <div class="space-y-1.5">
           <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-600">Habilités par Mairies</h3>
           <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
@@ -237,7 +240,7 @@ const navigateHome = () => {
         </div>
       </div>
 
-      <PublicRequestPlace v-if="publicTab === 'request'" />
+      <PublicRequestPlace v-else-if="publicTab === 'request'" />
     </main>
 
     <footer class="bg-slate-900 text-slate-200 border-t border-slate-800 py-12 px-4 select-none">

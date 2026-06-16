@@ -32,9 +32,18 @@ const {
   showToast,
 } = useApp();
 
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
+
 const isAdminRoute = computed(() => route.path.startsWith('/admin'));
 const isLedRoute = computed(() => route.path === '/led');
-const isPublicRoute = computed(() => !isAdminRoute.value && !isLedRoute.value);
+const isProfileRoute = computed(() => route.path === '/profile');
+const isPublicRoute = computed(() => !isAdminRoute.value && !isLedRoute.value && !isProfileRoute.value);
+const isLoggedIn = computed(() => Boolean(currentUser.value?.id));
+const canAccessAdmin = computed(() => ADMIN_ROLES.includes(currentUser.value?.role));
+const userInitials = computed(() => {
+  const name = currentUser.value?.name || 'U';
+  return name.substring(0, 2).toUpperCase();
+});
 
 const mobileMenuOpen = ref(false);
 const globalSearchRaw = ref('');
@@ -97,6 +106,11 @@ function goToAdmin() {
 
 function goToLed() {
   router.push('/led');
+}
+
+function goToProfile() {
+  router.push('/profile');
+  mobileMenuOpen.value = false;
 }
 </script>
 
@@ -229,7 +243,7 @@ function goToLed() {
           Commerçants
         </button>
 
-        <template v-if="currentUser.role === 'VISITOR'">
+        <template v-if="!isLoggedIn">
           <button
             @click="handlePublicNav('auth')"
             class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-1.5 rounded-lg text-xs transition-all shadow shadow-emerald-700/30"
@@ -240,6 +254,15 @@ function goToLed() {
         <template v-else>
           <div class="flex items-center gap-2 pl-4 border-l border-slate-800">
             <button
+              @click="goToProfile"
+              class="transition-all px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
+              :class="isProfileRoute ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
+            >
+              <User class="w-3.5 h-3.5 text-emerald-500" />
+              Mon profil
+            </button>
+            <button
+              v-if="canAccessAdmin"
               @click="goToAdmin"
               class="transition-all px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
               :class="isAdminRoute ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
@@ -270,10 +293,32 @@ function goToLed() {
           Écran LED
         </button>
 
-        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700/60 text-xs">
-          <User class="w-3.5 h-3.5 text-emerald-400" />
+        <button
+          v-if="isLoggedIn"
+          @click="goToProfile"
+          class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700/60 text-xs hover:bg-slate-700/80 transition-colors"
+        >
+          <img
+            v-if="currentUser.avatar"
+            :src="currentUser.avatar"
+            :alt="currentUser.name"
+            class="w-5 h-5 rounded-full object-cover"
+          />
+          <span
+            v-else
+            class="w-5 h-5 rounded-full bg-emerald-600 text-[9px] font-bold flex items-center justify-center text-white"
+          >
+            {{ userInitials }}
+          </span>
           <span class="max-w-[70px] truncate hidden sm:inline text-slate-300">{{ currentUser.name.split(' ')[0] }}</span>
           <span class="px-1 text-[9px] font-bold bg-slate-900 rounded text-emerald-400 uppercase tracking-tight">{{ currentUser.role.replace('_', ' ') }}</span>
+        </button>
+        <div
+          v-else
+          class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700/60 text-xs"
+        >
+          <User class="w-3.5 h-3.5 text-emerald-400" />
+          <span class="hidden sm:inline text-slate-400">Visiteur</span>
         </div>
 
         <button
@@ -332,7 +377,7 @@ function goToLed() {
       </div>
 
       <div class="border-t border-slate-800 pt-3">
-        <template v-if="currentUser.role === 'VISITOR'">
+        <template v-if="!isLoggedIn">
           <button
             @click="handlePublicNav('auth')"
             class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-center text-xs block transition-all"
@@ -343,6 +388,14 @@ function goToLed() {
         <template v-else>
           <div class="space-y-2">
             <button
+              @click="goToProfile"
+              class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
+            >
+              <User class="w-4 h-4" />
+              Mon profil
+            </button>
+            <button
+              v-if="canAccessAdmin"
               @click="goToAdmin(); mobileMenuOpen = false"
               class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
             >

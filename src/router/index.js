@@ -80,6 +80,12 @@ const routes = [
       { path: 'products', name: 'Products', meta: { tab: 'products' } },
       { path: 'merchants', name: 'Merchants', meta: { tab: 'merchants' } },
       { path: 'request', name: 'Request', meta: { tab: 'request' } },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../components/ProfilePage.vue'),
+        meta: { requiresToken: true, tab: 'profile' },
+      },
     ],
   },
 ];
@@ -94,8 +100,15 @@ router.beforeEach((to, from, next) => {
   const role = user?.role;
   const hasToken = Boolean(getToken());
 
+  if (to.matched.some((r) => r.meta.requiresToken)) {
+    if (!hasToken || !user?.id) {
+      next({ path: '/login', query: { redirect: to.fullPath } });
+      return;
+    }
+  }
+
   if (to.matched.some((r) => r.meta.requiresAuth)) {
-    if (!hasToken || !role || role === 'VISITOR') {
+    if (!hasToken || !role || !ADMIN_ROLES.includes(role)) {
       next({ path: '/login' });
       return;
     }
@@ -107,8 +120,8 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  if (to.path.startsWith('/admin') && role && ADMIN_ROLES.includes(role)) {
-    next();
+  if (to.path.startsWith('/admin') && role && !ADMIN_ROLES.includes(role)) {
+    next(user?.id ? { name: 'Profile' } : { path: '/login' });
     return;
   }
 

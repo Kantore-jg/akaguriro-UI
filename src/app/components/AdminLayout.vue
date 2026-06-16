@@ -21,7 +21,7 @@ import {
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -151,6 +151,7 @@ const navigate = (path) => {
 };
 
 const goToPortal = () => router.push('/');
+const goToProfile = () => router.push('/profile');
 </script>
 
 <template>
@@ -237,6 +238,7 @@ const goToPortal = () => router.push('/');
             <DropdownMenuTrigger as-child>
               <Button variant="ghost" size="sm" class="gap-2">
                 <Avatar class="w-8 h-8">
+                  <AvatarImage v-if="currentUser.avatar" :src="currentUser.avatar" :alt="currentUser.name" />
                   <AvatarFallback class="bg-primary text-white text-xs">
                     {{ userInitials }}
                   </AvatarFallback>
@@ -251,6 +253,10 @@ const goToPortal = () => router.push('/');
             <DropdownMenuContent align="end" class="w-56">
               <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem @click="goToProfile">
+                <User class="w-4 h-4 mr-2" />
+                Mon profil
+              </DropdownMenuItem>
               <DropdownMenuItem @click="goToPortal">
                 <Eye class="w-4 h-4 mr-2" />
                 Portail public

@@ -11,6 +11,8 @@ import {
   register as apiRegister,
   logout as apiLogout,
   fetchProfile,
+  updateProfile as apiUpdateProfile,
+  updatePassword as apiUpdatePassword,
 } from '../api/services/auth.js';
 import {
   fetchProductCategories,
@@ -139,7 +141,7 @@ export function createAppState() {
     loading.value = true;
     try {
       await loadPublicData();
-      if (currentUser.value?.role && currentUser.value.role !== 'VISITOR') {
+      if (currentUser.value?.id) {
         await loadAuthenticatedData();
       } else {
         requests.value = [];
@@ -155,8 +157,8 @@ export function createAppState() {
 
   const setCurrentUser = (user) => {
     currentUser.value = user || GUEST_USER;
-    saveUser(user?.role === 'VISITOR' ? null : user);
-    if (user?.role && user.role !== 'VISITOR') {
+    saveUser(user?.id ? user : null);
+    if (user?.id) {
       refreshAll();
     }
   };
@@ -187,6 +189,28 @@ export function createAppState() {
     requests.value = [];
     receipts.value = [];
     showToast('Session déconnectée', 'info');
+  };
+
+  const updateProfile = async (payload) => {
+    try {
+      const user = await apiUpdateProfile(payload);
+      currentUser.value = user;
+      showToast('Profil mis à jour', 'success');
+      return user;
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      throw error;
+    }
+  };
+
+  const updatePassword = async (payload) => {
+    try {
+      await apiUpdatePassword(payload);
+      showToast('Mot de passe mis à jour', 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      throw error;
+    }
   };
 
   const addPlaceRequest = async (req) => {
@@ -432,6 +456,8 @@ export function createAppState() {
     login,
     register,
     logout,
+    updateProfile,
+    updatePassword,
     refreshAll,
     loadBlocks,
     setCurrentUser,
