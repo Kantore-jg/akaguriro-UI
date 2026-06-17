@@ -159,21 +159,7 @@ function resetFilters() {
       </div>
     </div>
 
-    <!-- Quick helpful instructions bottom -->
-    <section class="bg-slate-900 text-slate-100 p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
-      <div class="absolute right-0 bottom-0 w-44 h-44 bg-teal-500/10 rounded-full blur-2xl"></div>
-      <div class="flex flex-col sm:flex-row items-center gap-4 relative">
-        <div class="w-12 h-12 bg-emerald-500/10 rounded-xl text-emerald-400 flex items-center justify-center shrink-0">
-          <CheckCircle class="w-6 h-6" />
-        </div>
-        <div>
-          <h4 class="text-xs sm:text-sm font-bold text-white">Technologie LED Intelligente et Panneaux Dynamiques</h4>
-          <p class="text-[11px] text-slate-400 leading-relaxed max-w-3xl mt-0.5">
-            Chaque marché sélectionné possède une vue écran LED publique synchronisée. Les prix de référence des denrées de base y sont projetés en temps réel pour lutter contre la spéculation et protéger le pouvoir d'achat burundais.
-          </p>
-        </div>
-      </div>
-    </section>
+    
 
   </div>
 </template>
