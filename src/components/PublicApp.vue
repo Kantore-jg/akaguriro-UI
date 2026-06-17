@@ -2,6 +2,8 @@
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
+import { sameId } from '../utils/ids.js';
 import Navigation from './Navigation.vue';
 import PublicHome from './PublicHome.vue';
 import PublicMarketsList from './PublicMarketsList.vue';
@@ -24,7 +26,10 @@ const {
   markets,
   merchants,
   toast,
+  initialized,
 } = useApp();
+
+const { goToProduct, goToTab, goHome } = usePublicNavigation();
 
 const globalProdQuery = ref('');
 const globalProdCat = ref('all');
@@ -35,9 +40,26 @@ const merchantCategory = ref('all');
 const tabFromRoute = computed(() => route.meta.tab || 'home');
 
 watch(
-  tabFromRoute,
-  (tab) => {
+  () => [route.path, route.params.marketId, route.params.productId, tabFromRoute.value],
+  () => {
+    const tab = tabFromRoute.value;
     if (publicTab.value !== tab) setPublicTab(tab);
+
+    if (route.params.marketId) {
+      if (selectedMarketId.value !== route.params.marketId) {
+        setSelectedMarketId(route.params.marketId);
+      }
+    } else if (route.name === 'Markets') {
+      if (selectedMarketId.value != null) setSelectedMarketId(null);
+    }
+
+    if (route.params.productId) {
+      if (selectedProductId.value !== route.params.productId) {
+        setSelectedProductId(route.params.productId);
+      }
+    } else if (route.name === 'Products') {
+      if (selectedProductId.value != null) setSelectedProductId(null);
+    }
   },
   { immediate: true },
 );
@@ -48,7 +70,7 @@ const filteredProducts = computed(() =>
       p.name.toLowerCase().includes(globalProdQuery.value.toLowerCase()) ||
       p.category.toLowerCase().includes(globalProdQuery.value.toLowerCase());
     const matchesCat = globalProdCat.value === 'all' || p.category === globalProdCat.value;
-    const mObj = markets.value.find((m) => m.id === p.marketId);
+    const mObj = markets.value.find((m) => sameId(m.id, p.marketId));
     const matchesCity =
       globalProdCity.value === 'all' ||
       (mObj ? mObj.city === globalProdCity.value : false);
@@ -67,11 +89,7 @@ const filteredMerchants = computed(() =>
   }),
 );
 
-const navigateHome = () => {
-  router.push('/');
-  setSelectedMarketId(null);
-  setSelectedProductId(null);
-};
+const navigateHome = () => goHome();
 </script>
 
 <template>
@@ -84,7 +102,10 @@ const navigateHome = () => {
       <PublicHome v-else-if="publicTab === 'home'" />
 
       <template v-else-if="publicTab === 'markets'">
-        <PublicMarketDetail v-if="selectedMarketId" />
+        <div v-if="!initialized" class="py-20 text-center text-muted-foreground text-sm">
+          Chargement des marchés...
+        </div>
+        <PublicMarketDetail v-else-if="selectedMarketId" />
         <PublicMarketsList v-else />
       </template>
 
@@ -143,7 +164,7 @@ const navigateHome = () => {
             <div
               v-for="p in filteredProducts"
               :key="p.id"
-              @click="setSelectedProductId(p.id)"
+              @click="goToProduct(p.id)"
               class="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3.5 hover:shadow-md transition-all cursor-pointer group"
             >
               <div class="relative rounded-xl overflow-hidden aspect-square bg-background">
@@ -156,7 +177,7 @@ const navigateHome = () => {
                 <span class="text-[9.5px] font-bold text-primary block uppercase tracking-wide">{{ p.category }}</span>
                 <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">{{ p.name }}</h4>
                 <p class="text-[10.5px] text-slate-400 font-semibold truncate">
-                  {{ markets.find(m => m.id === p.marketId)?.name }} (étal {{ p.placeNumber }})
+                  {{ markets.find(m => sameId(m.id, p.marketId))?.name }} (étal {{ p.placeNumber }})
                 </p>
               </div>
               <div class="border-t border-slate-50 pt-2.5 flex items-center justify-between">
@@ -217,8 +238,8 @@ const navigateHome = () => {
                 <ShieldCheck class="w-4.5 h-4.5 text-primary inline shrink-0" />
               </h3>
               <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
-              <p v-if="markets.find(mk => mk.id === m.activeMarketId)" class="text-slate-500 font-medium">
-                {{ markets.find(mk => mk.id === m.activeMarketId)?.city }} • Étale {{ m.activePlaceId }}
+              <p v-if="markets.find(mk => sameId(mk.id, m.activeMarketId))" class="text-slate-500 font-medium">
+                {{ markets.find(mk => sameId(mk.id, m.activeMarketId))?.city }} • Étale {{ m.activePlaceNumber || m.activePlaceId }}
               </p>
               <div class="flex items-center gap-1.5 text-yellow-400 py-0.5">
                 <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
@@ -227,7 +248,7 @@ const navigateHome = () => {
             </div>
             <div class="absolute bottom-4 right-4 flex gap-1">
               <a
-                :href="`https://wa.me/${m.phone.replace(/\s+/g, '')}`"
+                :href="`https://wa.me/${(m.phone || '').replace(/\s+/g, '')}`"
                 target="_blank"
                 rel="noreferrer"
                 class="p-1.5 bg-emerald-50 text-primary rounded-lg border border-emerald-110 shadow-sm hover:bg-primary hover:text-white transition-colors"
@@ -258,10 +279,10 @@ const navigateHome = () => {
           <h4 class="text-[10px] text-primary font-extrabold uppercase tracking-widest mb-2.5">Accès & Navigation rapide</h4>
           <div class="grid grid-cols-2 gap-2 text-slate-300 font-medium">
             <button @click="navigateHome" class="text-left hover:text-white">Accueil</button>
-            <button @click="router.push('/markets')" class="text-left hover:text-white">Marchés Connectés</button>
-            <button @click="router.push('/products')" class="text-left hover:text-white">Produits phares</button>
-            <button @click="router.push('/merchants')" class="text-left hover:text-white">Annuaire Commerçants</button>
-            <button @click="router.push('/request')" class="text-left hover:text-white text-primary">Demander une place</button>
+            <button @click="goToTab('markets')" class="text-left hover:text-white">Marchés Connectés</button>
+            <button @click="goToTab('products')" class="text-left hover:text-white">Produits phares</button>
+            <button @click="goToTab('merchants')" class="text-left hover:text-white">Annuaire Commerçants</button>
+            <button @click="goToTab('request')" class="text-left hover:text-white text-primary">Demander une place</button>
           </div>
         </div>
         <div class="md:col-span-4 space-y-2">

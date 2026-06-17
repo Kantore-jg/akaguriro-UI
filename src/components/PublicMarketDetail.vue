@@ -6,6 +6,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
+import { sameId } from '../utils/ids.js';
 import {
   MapPin,
   Store,
@@ -25,21 +27,23 @@ const {
   merchants,
   products,
   selectedMarketId,
-  setSelectedMarketId,
-  setPublicTab,
-  setSelectedProductId,
+  initialized,
 } = useApp();
+
+const { goToMarketsList, goToProduct, goToTab } = usePublicNavigation();
 
 const mapCategoryHighlight = ref('all');
 const selectedPlace = ref(null);
 const productSearch = ref('');
 const productCat = ref('all');
 
-const market = computed(() => markets.value.find(m => m.id === selectedMarketId.value));
+const market = computed(() =>
+  markets.value.find((m) => sameId(m.id, selectedMarketId.value)),
+);
 
 const marketPlaces = computed(() => {
   if (!market.value) return [];
-  return places.value.filter(p => p.marketId === market.value.id);
+  return places.value.filter((p) => sameId(p.marketId, market.value.id));
 });
 
 const blocks = computed(() => Array.from(new Set(marketPlaces.value.map(p => p.blockName))));
@@ -47,7 +51,7 @@ const blocks = computed(() => Array.from(new Set(marketPlaces.value.map(p => p.b
 const marketProducts = computed(() => {
   if (!market.value) return [];
   return products.value.filter(p => {
-    const isThisMarket = p.marketId === market.value.id;
+    const isThisMarket = sameId(p.marketId, market.value.id);
     const matchesSearch = p.name.toLowerCase().includes(productSearch.value.toLowerCase()) ||
                           p.category.toLowerCase().includes(productSearch.value.toLowerCase());
     const matchesCat = productCat.value === 'all' || p.category === productCat.value;
@@ -57,7 +61,7 @@ const marketProducts = computed(() => {
 
 const marketMerchants = computed(() => {
   if (!market.value) return [];
-  return merchants.value.filter(m => m.activeMarketId === market.value.id);
+  return merchants.value.filter((m) => sameId(m.activeMarketId, market.value.id));
 });
 
 const topMerchants = computed(() =>
@@ -66,17 +70,23 @@ const topMerchants = computed(() =>
 
 const activeStallMerchant = computed(() => {
   if (!selectedPlace.value || !selectedPlace.value.merchantId) return null;
-  return merchants.value.find(m => m.id === selectedPlace.value.merchantId) || null;
+  return merchants.value.find((m) => sameId(m.id, selectedPlace.value.merchantId)) || null;
 });
 
 const activeStallMerchantProducts = computed(() => {
   if (!selectedPlace.value || !selectedPlace.value.merchantId) return [];
-  return products.value.filter(p => p.merchantId === selectedPlace.value.merchantId);
+  return products.value.filter((p) => sameId(p.merchantId, selectedPlace.value.merchantId));
 });
 
 const availableGategories = computed(() => {
   if (!market.value) return [];
-  return Array.from(new Set(products.value.filter(p => p.marketId === market.value.id).map(p => p.category)));
+  return Array.from(
+    new Set(
+      products.value
+        .filter((p) => sameId(p.marketId, market.value.id))
+        .map((p) => p.category),
+    ),
+  );
 });
 
 function handlePlaceClick(place) {
@@ -94,7 +104,7 @@ function currentStallAvailabilityColor(status) {
 
 function getStallOccupantName(p) {
   if (p.status !== 'occupée') return p.status.toUpperCase();
-  const vendor = merchants.value.find(m => m.id === p.merchantId);
+  const vendor = merchants.value.find((m) => sameId(m.id, p.merchantId));
   return vendor ? vendor.name : 'Occupé';
 }
 
@@ -103,14 +113,18 @@ function getBlockPlaces(block) {
 }
 
 function getVendor(merchantId) {
-  return merchants.value.find(m => m.id === merchantId);
+  return merchants.value.find((m) => sameId(m.id, merchantId));
 }
 </script>
 
 <template>
-  <div v-if="!market" class="py-12 text-center text-slate-500">
+  <div v-if="!initialized" class="py-20 text-center text-slate-500 text-sm">
+    <p>Chargement du marché...</p>
+  </div>
+
+  <div v-else-if="!market" class="py-12 text-center text-slate-500">
     <p>Marché introuvable.</p>
-    <button @click="setSelectedMarketId(null)" class="text-primary font-bold text-xs mt-2">
+    <button @click="goToMarketsList" class="text-primary font-bold text-xs mt-2">
       Retour à la liste
     </button>
   </div>
@@ -120,14 +134,14 @@ function getVendor(merchantId) {
     <!-- 1. RETRO-NAVIGATION BAR -->
     <div class="flex items-center justify-between">
       <button
-        @click="setSelectedMarketId(null)"
+        @click="goToMarketsList"
         class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-primary transition-colors py-1 px-2.5 rounded-lg hover:bg-slate-100"
       >
         <ArrowLeft class="w-4 h-4" />
         Retour aux marchés publics
       </button>
       <span class="text-xs font-semibold text-slate-400 bg-background px-2.5 py-1 rounded-full">
-        Système ID: {{ market.id.toUpperCase() }} • {{ market.city }}
+        Système ID: {{ String(market.id).toUpperCase() }} • {{ market.city }}
       </span>
     </div>
 
@@ -310,7 +324,7 @@ function getVendor(merchantId) {
                   <strong class="text-xs text-primary font-black">1 200 BIF / jour d'occupation</strong>
                 </div>
                 <button
-                  @click="setPublicTab('request')"
+                  @click="goToTab('request')"
                   class="w-full bg-primary hover:bg-emerald-400 text-slate-950 transition-all font-bold py-2 rounded-xl text-xs text-center"
                 >
                   Introduire une demande d'octroi
@@ -359,7 +373,7 @@ function getVendor(merchantId) {
                         <div
                           v-for="p in activeStallMerchantProducts"
                           :key="p.id"
-                          @click="setSelectedProductId(p.id); setPublicTab('products')"
+                          @click="goToProduct(p.id)"
                           class="flex items-center justify-between p-1.5 bg-slate-950 hover:bg-slate-850 rounded border border-slate-850 text-xs cursor-pointer group"
                         >
                           <div class="flex items-center gap-2">
@@ -380,7 +394,7 @@ function getVendor(merchantId) {
                         Appeler
                       </a>
                       <a
-                        :href="`https://wa.me/${activeStallMerchant.phone.replace(/\s+/g, '')}`"
+                        :href="`https://wa.me/${(activeStallMerchant.phone || '').replace(/\s+/g, '')}`"
                         target="_blank"
                         rel="noreferrer"
                         class="bg-primary hover:bg-primary text-white py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5"
@@ -458,7 +472,7 @@ function getVendor(merchantId) {
               {{ m.name }}
             </h4>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
-            <p class="text-[11px] text-slate-500 font-medium">Stalle active : <span class="font-bold text-slate-800">{{ m.activePlaceId }}</span></p>
+            <p class="text-[11px] text-slate-500 font-medium">Stalle active : <span class="font-bold text-slate-800">{{ m.activePlaceNumber || m.activePlaceId }}</span></p>
 
             <div class="flex items-center gap-1 text-yellow-400 pt-0.5">
               <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
@@ -509,7 +523,7 @@ function getVendor(merchantId) {
         <div
           v-for="p in marketProducts"
           :key="p.id"
-          @click="setSelectedProductId(p.id); setPublicTab('products')"
+          @click="goToProduct(p.id)"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
         >
           <div class="relative rounded-xl overflow-hidden bg-background aspect-square">

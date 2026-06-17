@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Plus, Search, MapPin, LayoutGrid } from 'lucide-vue-next';
+import { Plus, Search, MapPin, LayoutGrid, Printer } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import StatCard from '../../StatCard.vue';
 import PlacesTable from '../../places/PlacesTable.vue';
 import BlocksTable from '../../places/BlocksTable.vue';
@@ -51,7 +52,16 @@ const {
   findMerchant,
 } = useAdminScope();
 
+const { openPlacesPrint } = usePrintReport();
+
 const canManage = computed(() => isSuperAdmin.value || isMarketAdmin.value);
+
+const printMarketId = computed(() => {
+  if (marketFilter.value !== 'all') return marketFilter.value;
+  return assignedMarketId.value || undefined;
+});
+
+const handlePrint = () => openPlacesPrint(printMarketId.value);
 
 const activeTab = ref('places');
 const searchQuery = ref('');
@@ -194,7 +204,12 @@ const onCreateBlockFromPlace = (marketId) => {
           Structurez les marchés en blocs et gérez les étals
         </p>
       </div>
-      <div v-if="canManage" class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-2">
+        <Button variant="outline" class="rounded-full" @click="handlePrint">
+          <Printer class="w-4 h-4 mr-2" />
+          Imprimer le plan
+        </Button>
+        <template v-if="canManage">
         <Button variant="outline" @click="openBlockForm()">
           <LayoutGrid class="w-4 h-4 mr-2" />
           Nouveau bloc
@@ -203,6 +218,7 @@ const onCreateBlockFromPlace = (marketId) => {
           <Plus class="w-4 h-4 mr-2" />
           Nouvel emplacement
         </Button>
+        </template>
       </div>
     </div>
 

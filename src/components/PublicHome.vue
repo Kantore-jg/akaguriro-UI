@@ -7,6 +7,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 
 const router = useRouter();
 import {
@@ -26,10 +27,9 @@ const {
   markets,
   products,
   merchants,
-  setPublicTab,
-  setSelectedMarketId,
-  setSelectedProductId,
 } = useApp();
+
+const { goToTab, goToMarket, goToProduct } = usePublicNavigation();
 
 const searchQuery = ref('');
 const searchCategory = ref('all');
@@ -52,7 +52,7 @@ const categories = computed(() => [
 
 function handleHeroSearchSubmit(e) {
   e.preventDefault();
-  setPublicTab('products');
+  goToTab('products');
 }
 </script>
 
@@ -138,7 +138,7 @@ function handleHeroSearchSubmit(e) {
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Explorer par Catégories</h2>
         </div>
         <button
-          @click="setPublicTab('products')"
+          @click="goToTab('products')"
           class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Tous les produits
@@ -150,7 +150,7 @@ function handleHeroSearchSubmit(e) {
         <div
           v-for="(cat, idx) in categories"
           :key="idx"
-          @click="setPublicTab('products')"
+          @click="goToTab('products')"
           class="bg-white hover:bg-primary/5/40 p-4 rounded-2xl border border-slate-100 hover:border-primary/20 transition-all cursor-pointer shadow-sm flex flex-col items-center text-center group"
         >
           <span class="text-3xl mb-2.5 group-hover:scale-110 transition-transform duration-200">{{ cat.icon }}</span>
@@ -168,7 +168,7 @@ function handleHeroSearchSubmit(e) {
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Nos Marchés Publics Connectés</h2>
         </div>
         <button
-          @click="setPublicTab('markets')"
+          @click="goToTab('markets')"
           class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Afficher la liste complète
@@ -222,7 +222,7 @@ function handleHeroSearchSubmit(e) {
               </div>
 
               <button
-                @click="setSelectedMarketId(m.id); setPublicTab('markets')"
+                @click="goToMarket(m.id)"
                 class="w-full bg-background hover:bg-primary/5 hover:text-primary text-slate-700 font-bold transition-all py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-100"
               >
                 Visiter le Marché
@@ -303,7 +303,7 @@ function handleHeroSearchSubmit(e) {
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produits Tendances</h2>
         </div>
         <button
-          @click="setPublicTab('products')"
+          @click="goToTab('products')"
           class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Explorer tout le catalogue
@@ -315,7 +315,7 @@ function handleHeroSearchSubmit(e) {
         <div
           v-for="p in products.slice(0, 4)"
           :key="p.id"
-          @click="setSelectedProductId(p.id); setPublicTab('products')"
+          @click="goToProduct(p.id)"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
         >
           <div class="relative rounded-xl overflow-hidden bg-background aspect-square">
@@ -372,7 +372,7 @@ function handleHeroSearchSubmit(e) {
         
         <div class="shrink-0 flex flex-col sm:flex-row gap-3 relative w-full sm:w-auto">
           <button
-            @click="setPublicTab('request')"
+            @click="goToTab('request')"
             class="bg-primary hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
           >
             Demander une place

@@ -19,6 +19,7 @@ import {
   Building2,
   ChevronLeft,
   Circle,
+  Printer,
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
@@ -110,6 +111,15 @@ const navigation = computed(() => {
     icon: Package,
     path: '/admin/products',
   });
+
+  if (isSuperAdmin.value || isMarketAdmin.value || isMerchant.value) {
+    items.push({
+      id: 'prints',
+      name: 'Impressions',
+      icon: Printer,
+      path: '/admin/prints',
+    });
+  }
 
   if (!isMerchant.value) {
     items.push({

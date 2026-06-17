@@ -17,14 +17,16 @@ const emit = defineEmits(['action']);
       <h1 class="bs-page-title">{{ title }}</h1>
       <p v-if="subtitle" class="bs-page-subtitle">{{ subtitle }}</p>
     </div>
-    <Button
-      v-if="actionLabel"
-      class="rounded-full shadow-sm"
-      @click="emit('action')"
-    >
-      <component v-if="actionIcon" :is="actionIcon" class="w-4 h-4" />
-      {{ actionLabel }}
-    </Button>
-    <slot name="actions" />
+    <div v-if="actionLabel || $slots.actions" class="flex flex-wrap items-center gap-2 shrink-0">
+      <slot name="actions" />
+      <Button
+        v-if="actionLabel"
+        class="rounded-full shadow-sm"
+        @click="emit('action')"
+      >
+        <component v-if="actionIcon" :is="actionIcon" class="w-4 h-4" />
+        {{ actionLabel }}
+      </Button>
+    </div>
   </div>
 </template>

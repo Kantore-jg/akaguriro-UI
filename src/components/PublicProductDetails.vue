@@ -6,6 +6,8 @@
 <script setup>
 import { computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
+import { sameId } from '../utils/ids.js';
 import {
   ArrowLeft,
   MapPin,
@@ -20,44 +22,49 @@ const {
   markets,
   merchants,
   selectedProductId,
-  setSelectedProductId,
-  setSelectedMarketId,
-  setPublicTab,
-  showToast
+  showToast,
 } = useApp();
 
-const product = computed(() => products.value.find(p => p.id === selectedProductId.value));
+const { goToProductsList, goToMarket, goToProduct, goHome } = usePublicNavigation();
+
+const product = computed(() =>
+  products.value.find((p) => sameId(p.id, selectedProductId.value)),
+);
 
 const market = computed(() => {
   if (!product.value) return undefined;
-  return markets.value.find(m => m.id === product.value.marketId);
+  return markets.value.find((m) => sameId(m.id, product.value.marketId));
 });
 
 const merchant = computed(() => {
   if (!product.value) return undefined;
-  return merchants.value.find(m => m.id === product.value.merchantId);
+  return merchants.value.find((m) => sameId(m.id, product.value.merchantId));
 });
 
 const similarProducts = computed(() => {
   if (!product.value) return [];
-  return products.value.filter(
-    p => p.category === product.value.category && p.id !== product.value.id
-  ).slice(0, 4);
+  return products.value
+    .filter(
+      (p) =>
+        p.category === product.value.category && !sameId(p.id, product.value.id),
+    )
+    .slice(0, 4);
 });
 
 function handleViewPlaceOnMap() {
   if (!market.value || !product.value?.placeNumber) return;
-
-  setSelectedMarketId(market.value.id);
-  setPublicTab('markets');
-  showToast(`Redirection vers le ${market.value.name} - Étalage ${product.value.placeNumber}`, 'success');
+  goToMarket(market.value.id);
+  showToast(
+    `Redirection vers le ${market.value.name} - Étalage ${product.value.placeNumber}`,
+    'success',
+  );
 }
 </script>
 
 <template>
   <div v-if="!product" class="py-20 text-center text-slate-500">
     <p>Produit non trouvé ou retiré par son vendeur.</p>
-    <button @click="setPublicTab('home')" class="mt-4 text-primary font-bold text-xs underline">
+    <button @click="goHome" class="mt-4 text-primary font-bold text-xs underline">
       Retour à l'accueil
     </button>
   </div>
@@ -67,7 +74,7 @@ function handleViewPlaceOnMap() {
     <!-- 1. RETRO NAVIGATION BACK BUTTON -->
     <div>
       <button
-        @click="setSelectedProductId(null)"
+        @click="goToProductsList"
         class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-primary transition-colors py-1 px-2.5 rounded-lg hover:bg-slate-100"
       >
         <ArrowLeft class="w-4 h-4" />
@@ -195,7 +202,7 @@ function handleViewPlaceOnMap() {
 
           <a
             v-if="merchant"
-            :href="`https://wa.me/${merchant.phone.replace(/\s+/g, '')}?text=Bonjour%20${encodeURIComponent(merchant.name)},%20je%20suis%20intéressé%20par%20votre%20produit%20${encodeURIComponent(product.name)}%20(Etalage%20${product.placeNumber})%20depuis%20Akaguriro.`"
+            :href="`https://wa.me/${(merchant.phone || '').replace(/\s+/g, '')}?text=Bonjour%20${encodeURIComponent(merchant.name)},%20je%20suis%20intéressé%20par%20votre%20produit%20${encodeURIComponent(product.name)}%20(Etalage%20${product.placeNumber})%20depuis%20Akaguriro.`"
             target="_blank"
             rel="noreferrer"
             class="flex-1 bg-primary hover:bg-primary text-white font-bold py-3.5 px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow shadow-emerald-700/30 text-center transition-all"
@@ -222,7 +229,7 @@ function handleViewPlaceOnMap() {
         <div
           v-for="p in similarProducts"
           :key="p.id"
-          @click="setSelectedProductId(p.id)"
+          @click="goToProduct(p.id)"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3 space-y-3 group"
         >
           <div class="relative rounded-lg overflow-hidden bg-background aspect-square">

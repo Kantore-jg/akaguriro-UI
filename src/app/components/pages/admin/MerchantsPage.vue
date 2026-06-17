@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Search, Users, ShieldCheck, Star } from 'lucide-vue-next';
+import { Search, Users, ShieldCheck, Star, Printer } from 'lucide-vue-next';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import { usePrintReport } from '../../../../composables/usePrintReport.js';
+import Button from '../../ui/Button.vue';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
@@ -22,7 +24,10 @@ const {
   scopedMarkets,
   scopedProducts,
   findMarket,
+  assignedMarketId,
 } = useAdminScope();
+
+const { openMerchantsPrint } = usePrintReport();
 
 const searchQuery = ref('');
 const marketFilter = ref('all');
@@ -73,6 +78,13 @@ const openView = (merchant) => {
   viewOpen.value = true;
 };
 
+const printMarketId = computed(() => {
+  if (marketFilter.value !== 'all') return marketFilter.value;
+  return assignedMarketId.value || undefined;
+});
+
+const handlePrint = () => openMerchantsPrint(printMarketId.value);
+
 const viewingProductsCount = computed(() => {
   if (!viewingMerchant.value) return 0;
   return scopedProducts.value.filter(
@@ -86,7 +98,14 @@ const viewingProductsCount = computed(() => {
     <PageHeader
       title="Gestion Des Commerçants"
       subtitle="Répertoire des exploitants habilités sur les marchés connectés."
-    />
+    >
+      <template #actions>
+        <Button variant="outline" class="rounded-full" @click="handlePrint">
+          <Printer class="w-4 h-4" />
+          Imprimer la liste
+        </Button>
+      </template>
+    </PageHeader>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard

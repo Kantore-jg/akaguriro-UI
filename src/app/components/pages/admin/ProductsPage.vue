@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Plus, Search, LayoutGrid } from 'lucide-vue-next';
+import { Plus, Search, LayoutGrid, Printer } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import { usePrintReport } from '../../../../composables/usePrintReport.js';
+import Button from '../../ui/Button.vue';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import ProductCard from '../../products/ProductCard.vue';
@@ -36,7 +38,10 @@ const {
   assignedMerchant,
 } = useAdminScope();
 
+const { openProductsPrint } = usePrintReport();
+
 const searchQuery = ref('');
+const merchantFilter = ref('all');
 const categoryFilter = ref('all');
 const formOpen = ref(false);
 const deleteOpen = ref(false);
@@ -68,9 +73,22 @@ const filteredProducts = computed(() =>
       p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q);
     const matchesCat = categoryFilter.value === 'all' || p.category === categoryFilter.value;
-    return matchesQuery && matchesCat;
+    const matchesMerchant =
+      merchantFilter.value === 'all' || p.merchantId == merchantFilter.value;
+    return matchesQuery && matchesCat && matchesMerchant;
   }),
 );
+
+const handlePrint = () =>
+  openProductsPrint({
+    marketId: assignedMarketId.value || undefined,
+    merchantId:
+      merchantFilter.value !== 'all'
+        ? merchantFilter.value
+        : isMerchant.value
+          ? assignedMerchant.value?.id
+          : undefined,
+  });
 
 const pageTitle = computed(() =>
   isMerchant.value ? 'Gestion De Mes Produits' : 'Gestion Des Produits',
@@ -137,7 +155,14 @@ const filterByCategory = (name) => {
       action-label="Ajouter un produit"
       :action-icon="Plus"
       @action="openCreate"
-    />
+    >
+      <template #actions>
+        <Button variant="outline" class="rounded-full" @click="handlePrint">
+          <Printer class="w-4 h-4" />
+          {{ isMerchant ? 'Imprimer mon catalogue' : 'Imprimer le catalogue' }}
+        </Button>
+      </template>
+    </PageHeader>
 
     <section v-if="categoryCards.length" class="space-y-3">
       <h2 class="text-sm font-semibold text-foreground">Catégories</h2>
@@ -179,6 +204,20 @@ const filterByCategory = (name) => {
             <SelectItem value="all">Toutes catégories</SelectItem>
             <SelectItem v-for="cat in categories" :key="cat" :value="cat">
               {{ cat }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div v-if="!isMerchant" class="space-y-1 w-full sm:w-48">
+        <label class="text-xs font-medium text-muted-foreground">Commerçant</label>
+        <Select v-model="merchantFilter">
+          <SelectTrigger class="bg-card">
+            <SelectValue placeholder="Tous commerçants" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous commerçants</SelectItem>
+            <SelectItem v-for="m in scopedMerchants" :key="m.id" :value="m.id">
+              {{ m.name }}
             </SelectItem>
           </SelectContent>
         </Select>

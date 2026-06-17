@@ -7,6 +7,7 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import {
   Building2,
   ShoppingBag,
@@ -25,11 +26,10 @@ const {
   login,
   logout,
   publicTab,
-  setPublicTab,
-  setSelectedMarketId,
-  setSelectedProductId,
   showToast,
 } = useApp();
+
+const { goHome, goToTab } = usePublicNavigation();
 
 const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
 
@@ -66,7 +66,7 @@ async function handleRoleChange(role) {
   if (role === 'VISITOR') {
     await logout();
     router.push('/');
-    setPublicTab('home');
+    goToTab('home');
     return;
   }
 
@@ -82,18 +82,15 @@ async function handleRoleChange(role) {
 }
 
 function handleLogoClick() {
-  router.push('/');
-  setPublicTab('home');
-  setSelectedMarketId(null);
-  setSelectedProductId(null);
+  goHome();
 }
 
 function handlePublicNav(tab) {
-  const paths = { home: '/', markets: '/markets', products: '/products', merchants: '/merchants', auth: '/login', request: '/request' };
-  router.push(paths[tab] || '/');
-  setPublicTab(tab);
-  setSelectedMarketId(null);
-  setSelectedProductId(null);
+  if (tab === 'auth') {
+    router.push('/login');
+  } else {
+    goToTab(tab);
+  }
   mobileMenuOpen.value = false;
 }
 

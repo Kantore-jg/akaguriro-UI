@@ -68,6 +68,36 @@ const routes = [
         component: () => import('../app/components/pages/admin/ReceiptsPage.vue'),
         meta: { title: 'Reçus' },
       },
+      {
+        path: 'prints',
+        name: 'AdminPrints',
+        component: () => import('../app/components/print/PrintReportsPage.vue'),
+        meta: { title: 'Impressions', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'] },
+      },
+    ],
+  },
+  {
+    path: '/admin/print',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'merchants',
+        name: 'PrintMerchants',
+        component: () => import('../app/components/print/PrintMerchantsPage.vue'),
+        meta: { title: 'Impression commerçants', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+      },
+      {
+        path: 'places',
+        name: 'PrintPlaces',
+        component: () => import('../app/components/print/PrintPlacesPage.vue'),
+        meta: { title: 'Impression emplacements', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+      },
+      {
+        path: 'products',
+        name: 'PrintProducts',
+        component: () => import('../app/components/print/PrintProductsPage.vue'),
+        meta: { title: 'Impression produits' },
+      },
     ],
   },
   {
@@ -77,7 +107,9 @@ const routes = [
     children: [
       { path: '', name: 'Home', meta: { tab: 'home' } },
       { path: 'markets', name: 'Markets', meta: { tab: 'markets' } },
+      { path: 'markets/:marketId', name: 'MarketDetail', meta: { tab: 'markets' } },
       { path: 'products', name: 'Products', meta: { tab: 'products' } },
+      { path: 'products/:productId', name: 'ProductDetail', meta: { tab: 'products' } },
       { path: 'merchants', name: 'Merchants', meta: { tab: 'merchants' } },
       { path: 'request', name: 'Request', meta: { tab: 'request' } },
       {

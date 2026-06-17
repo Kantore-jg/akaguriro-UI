@@ -6,9 +6,11 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
+import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import { MapPin, Search, ChevronRight, CheckCircle } from 'lucide-vue-next';
 
-const { markets, setSelectedMarketId } = useApp();
+const { markets } = useApp();
+const { goToMarket } = usePublicNavigation();
 
 const searchQuery = ref('');
 const selectedCity = ref('all');
@@ -123,13 +125,13 @@ function resetFilters() {
             <div class="space-y-1.5 border-t border-slate-50 pt-3">
               <div class="flex justify-between items-center text-[11px] font-bold">
                 <span class="text-slate-400">TAUX D'OCCUPATION :</span>
-                <span class="text-slate-800">{{ m.occupiedPlaces }} / {{ m.totalPlaces }} places ({{ Math.round((m.occupiedPlaces / m.totalPlaces) * 100) }}%)</span>
+                <span class="text-slate-800">{{ m.occupiedPlaces }} / {{ m.totalPlaces }} places ({{ m.totalPlaces ? Math.round((m.occupiedPlaces / m.totalPlaces) * 100) : 0 }}%)</span>
               </div>
               <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   class="h-full rounded-full transition-all duration-500"
-                  :class="Math.round((m.occupiedPlaces / m.totalPlaces) * 100) > 80 ? 'bg-amber-500' : 'bg-primary'"
-                  :style="{ width: `${Math.round((m.occupiedPlaces / m.totalPlaces) * 100)}%` }"
+                  :class="(m.totalPlaces && Math.round((m.occupiedPlaces / m.totalPlaces) * 100) > 80) ? 'bg-amber-500' : 'bg-primary'"
+                  :style="{ width: `${m.totalPlaces ? Math.round((m.occupiedPlaces / m.totalPlaces) * 100) : 0}%` }"
                 ></div>
               </div>
             </div>
@@ -147,7 +149,7 @@ function resetFilters() {
 
             <!-- Button -->
             <button
-              @click="setSelectedMarketId(m.id)"
+              @click="goToMarket(m.id)"
               class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center justify-center gap-1 shadow-sm"
             >
               Consulter le plan interactif
