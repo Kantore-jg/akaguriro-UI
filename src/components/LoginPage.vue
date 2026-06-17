@@ -103,16 +103,6 @@ async function handleSubmit(e) {
     <div class="relative z-10 w-full max-w-md">
       <div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
 
-        <div class="bg-slate-900 px-8 py-6 text-center">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/30">
-            <ShieldCheck class="w-7 h-7" />
-          </div>
-          <h1 class="text-xl font-black text-white tracking-tight">AKAGURIRO</h1>
-          <p class="text-slate-400 text-xs font-semibold mt-1">
-            {{ isLogin ? 'Connexion à votre espace' : 'Création de compte citoyen' }}
-          </p>
-        </div>
-
         <div class="p-8 space-y-6">
           <form @submit="handleSubmit" class="space-y-4">
             <div v-if="!isLogin" class="space-y-1">
@@ -201,21 +191,6 @@ async function handleSubmit(e) {
             </button>
           </p>
 
-          <div v-if="isLogin" class="pt-4 border-t border-slate-100 space-y-2">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide text-center">Comptes démo (password)</p>
-            <div class="flex flex-wrap gap-2 justify-center">
-              <button
-                v-for="demo in DEMO_ACCOUNTS"
-                :key="demo.email"
-                type="button"
-                :disabled="submitting"
-                class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-colors disabled:opacity-50"
-                @click="handleQuickLogin(demo.email)"
-              >
-                {{ demo.label }}
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

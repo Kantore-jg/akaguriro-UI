@@ -368,19 +368,8 @@ function handleHeroSearchSubmit(e) {
 
     <!-- 6. PROMOTIONAL SUB-HERO FOR MERCHANTS -->
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="bg-gradient-to-r from-teal-900 to-emerald-900 rounded-3xl p-8 sm:p-12 relative overflow-hidden text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-        <div class="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
-
-        <div class="space-y-4 max-w-xl relative">
-          <h3 class="text-xs font-bold uppercase tracking-widest text-emerald-400">Pour les Commerçants</h3>
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-display">
-            Vous vendez sur les marchés du Burundi ?
-          </h2>
-          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-            Demandez un emplacement libre en ligne, enregistrez votre catalogue d'articles, obtenez des étiquettes LED intelligentes et offrez une immense visibilité nationale à vos produits gratuitement !
-          </p>
-        </div>
-
+      <!-- <div class="bg-gradient-to-r from-teal-900 to-emerald-900 rounded-3xl p-8 sm:p-12 relative overflow-hidden text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8"> -->
+        
         <div class="shrink-0 flex flex-col sm:flex-row gap-3 relative w-full sm:w-auto">
           <button
             @click="setPublicTab('request')"
@@ -390,12 +379,12 @@ function handleHeroSearchSubmit(e) {
           </button>
           <button
             @click="router.push('/login')"
-            class="bg-transparent hover:bg-slate-800/50 border border-slate-600 transition-all text-white font-bold px-5 py-3 rounded-xl text-xs sm:text-sm text-center"
+            class="bg-emerald-500 hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
           >
             Créer mon compte
           </button>
         </div>
-      </div>
+      <!-- </div> -->
     </section>
 
   </div>
