@@ -12,12 +12,13 @@ import {
   Coins,
   Menu,
   X,
-  Bell,
   LogOut,
   User,
   ChevronDown,
   Eye,
   Building2,
+  ChevronLeft,
+  Circle,
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
@@ -56,11 +57,25 @@ const roleLabel = computed(() =>
   (currentUser.value?.role || '').replace(/_/g, ' '),
 );
 
+const formattedDate = computed(() => {
+  return new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+});
+
+const breadcrumb = computed(() => {
+  const title = route.meta?.title || 'Tableau de bord';
+  return { section: 'Administration', page: title };
+});
+
 const navigation = computed(() => {
   const items = [
     {
       id: 'dashboard',
-      name: 'Tableau de bord',
+      name: 'Tableau de Bord',
       icon: LayoutDashboard,
       path: '/admin',
       exact: true,
@@ -69,41 +84,16 @@ const navigation = computed(() => {
 
   if (isSuperAdmin.value) {
     items.push(
-      {
-        id: 'markets',
-        name: `Marchés (${markets.value.length})`,
-        icon: Store,
-        path: '/admin/markets',
-      },
-      {
-        id: 'places',
-        name: 'Emplacements',
-        icon: MapPin,
-        path: '/admin/places',
-      },
-      {
-        id: 'merchants',
-        name: 'Commerçants',
-        icon: Users,
-        path: '/admin/merchants',
-      },
+      { id: 'markets', name: 'Marchés', icon: Store, path: '/admin/markets' },
+      { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
+      { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
     );
   }
 
   if (isMarketAdmin.value) {
     items.push(
-      {
-        id: 'places',
-        name: 'Emplacements',
-        icon: MapPin,
-        path: '/admin/places',
-      },
-      {
-        id: 'merchants',
-        name: 'Commerçants',
-        icon: Users,
-        path: '/admin/merchants',
-      },
+      { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
+      { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
       {
         id: 'requests',
         name: 'Demandes',
@@ -158,100 +148,94 @@ const goToProfile = () => router.push('/profile');
   <div class="min-h-screen flex bg-background">
     <aside
       :class="[
-        'transition-all duration-300 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col fixed lg:sticky top-0 h-screen z-30 overflow-hidden',
-        sidebarOpen ? 'w-64' : 'w-0',
+        'transition-all duration-300 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col fixed lg:sticky top-0 h-screen z-30 overflow-hidden shadow-sm',
+        sidebarOpen ? 'w-60' : 'w-0 lg:w-[68px]',
       ]"
     >
-      <div class="p-6 border-b border-sidebar-border">
+      <div class="p-5 border-b border-sidebar-border">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-            <Building2 class="w-6 h-6 text-white" />
+          <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <Building2 class="w-5 h-5 text-white" />
           </div>
-          <div class="flex-1 min-w-0">
-            <h1 class="text-sm font-semibold text-sidebar-foreground truncate">Akaguriro</h1>
-            <p class="text-xs text-sidebar-foreground/65">Gestion des marchés</p>
+          <div v-if="sidebarOpen" class="flex-1 min-w-0">
+            <h1 class="text-sm font-bold text-foreground tracking-tight truncate">AKAGURIRO</h1>
+            <p class="text-[10px] text-primary font-semibold uppercase tracking-wider">Espace Contrôle</p>
           </div>
         </div>
       </div>
 
-
-      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
         <button
           v-for="item in navigation"
           :key="item.id"
           @click="navigate(item.path)"
           :class="[
-            'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left',
-            isActive(item)
-              ? 'bg-primary text-white'
-              : 'text-sidebar-foreground hover:bg-sidebar-accent',
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left text-sm',
+            isActive(item) ? 'bs-nav-active' : 'bs-nav-item',
           ]"
         >
-          <component :is="item.icon" class="w-5 h-5 shrink-0" />
-          <span class="text-sm flex-1">{{ item.name }}</span>
+          <component :is="item.icon" class="w-[18px] h-[18px] shrink-0" />
+          <span v-if="sidebarOpen" class="flex-1 truncate">{{ item.name }}</span>
           <Badge
-            v-if="item.badge"
-            class="bg-destructive text-white text-[10px] px-1.5 py-0"
+            v-if="sidebarOpen && item.badge"
+            class="bg-primary/15 text-primary text-[10px] px-1.5 py-0 border-0"
           >
             {{ item.badge }}
           </Badge>
         </button>
       </nav>
 
-      <div class="p-4 border-t border-sidebar-border">
+      <div class="p-3 border-t border-sidebar-border space-y-1">
+        <button
+          @click="sidebarOpen = !sidebarOpen"
+          class="w-full hidden lg:flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent transition-colors text-sm"
+        >
+          <ChevronLeft :class="['w-4 h-4 transition-transform', !sidebarOpen && 'rotate-180']" />
+          <span v-if="sidebarOpen">Réduire</span>
+        </button>
         <button
           @click="goToPortal"
-          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-sidebar-accent text-sidebar-foreground hover:bg-sidebar-accent/80 transition-colors text-sm"
+          class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-primary transition-colors text-sm"
         >
           <Eye class="w-4 h-4" />
-          Portail public
+          <span v-if="sidebarOpen">Portail public</span>
         </button>
       </div>
     </aside>
 
-    <div class="flex-1 flex flex-col min-h-screen">
-      <header class="h-16 bg-white border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20">
-        <div class="flex items-center gap-4">
-          <Button variant="ghost" size="sm" @click="sidebarOpen = !sidebarOpen">
+    <div class="flex-1 flex flex-col min-h-screen min-w-0">
+      <header class="h-14 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20 shadow-sm">
+        <div class="flex items-center gap-3 min-w-0">
+          <Button variant="ghost" size="sm" class="lg:hidden shrink-0" @click="sidebarOpen = !sidebarOpen">
             <Menu v-if="!sidebarOpen" class="w-5 h-5" />
-            <X v-else class="w-5 h-5 lg:hidden" />
-            <Menu v-if="sidebarOpen" class="w-5 h-5 hidden lg:block" />
+            <X v-else class="w-5 h-5" />
           </Button>
-          <div>
-            <h2 class="text-lg font-semibold text-foreground">Espace Administratif</h2>
-            <p class="text-xs text-muted-foreground">Plateforme Akaguriro — République du Burundi</p>
-          </div>
+          <p class="text-sm truncate">
+            <span class="text-muted-foreground">{{ breadcrumb.section }} / </span>
+            <span class="text-primary font-medium">{{ breadcrumb.page }}</span>
+          </p>
         </div>
 
-        <div class="flex items-center gap-2">
-          <Button variant="ghost" size="sm" class="relative">
-            <Bell class="w-5 h-5" />
-            <Badge
-              v-if="pendingRequestsCount + pendingReceiptsCount > 0"
-              class="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs bg-destructive"
-            >
-              {{ pendingRequestsCount + pendingReceiptsCount }}
-            </Badge>
-          </Button>
+        <div class="flex items-center gap-3 lg:gap-5 shrink-0">
+         
+          <span class="hidden md:inline text-xs text-muted-foreground capitalize">{{ formattedDate }}</span>
 
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button variant="ghost" size="sm" class="gap-2">
+              <button class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold hover:bg-primary/90 transition-colors">
                 <Avatar class="w-8 h-8">
                   <AvatarImage v-if="currentUser.avatar" :src="currentUser.avatar" :alt="currentUser.name" />
                   <AvatarFallback class="bg-primary text-white text-xs">
                     {{ userInitials }}
                   </AvatarFallback>
                 </Avatar>
-                <div class="hidden lg:block text-left">
-                  <p class="text-xs font-medium">{{ currentUser.name }}</p>
-                  <p class="text-xs text-muted-foreground">{{ roleLabel }}</p>
-                </div>
-                <ChevronDown class="w-4 h-4 hidden lg:block" />
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-56">
-              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                <p class="font-medium">{{ currentUser.name }}</p>
+                <p class="text-xs text-muted-foreground font-normal">{{ roleLabel }}</p>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem @click="goToProfile">
                 <User class="w-4 h-4 mr-2" />
@@ -271,40 +255,15 @@ const goToProfile = () => router.push('/profile');
         </div>
       </header>
 
-      <main class="flex-1 p-4 lg:p-6 overflow-auto admin-bg">
+      <main class="flex-1 p-4 lg:p-6 overflow-auto">
         <router-view />
       </main>
     </div>
 
     <div
       v-if="sidebarOpen"
-      class="fixed inset-0 bg-black/50 z-20 lg:hidden"
+      class="fixed inset-0 bg-black/30 z-20 lg:hidden"
       @click="sidebarOpen = false"
     />
   </div>
 </template>
-
-<style scoped>
-.admin-bg {
-  position: relative;
-  min-height: calc(100vh - 4rem);
-}
-
-.admin-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('/burundi-bg.png');
-  background-size: cover;
-  background-position: center;
-  filter: blur(1px);
-  opacity: 0.35;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.admin-bg > :deep(*) {
-  position: relative;
-  z-index: 1;
-}
-</style>

@@ -85,8 +85,8 @@ function handlePlaceClick(place) {
 
 function currentStallAvailabilityColor(status) {
   switch (status) {
-    case 'occupée': return 'bg-emerald-600 border-emerald-700 text-white';
-    case 'libre': return 'bg-white border-dashed border-slate-300 text-slate-400 hover:bg-emerald-50 hover:border-emerald-300';
+    case 'occupée': return 'bg-primary border-emerald-700 text-white';
+    case 'libre': return 'bg-white border-dashed border-slate-300 text-slate-400 hover:bg-primary/5 hover:border-primary/30';
     case 'maintenance': return 'bg-amber-100 border-amber-300 text-amber-700';
     default: return 'bg-slate-100 border-slate-200';
   }
@@ -110,7 +110,7 @@ function getVendor(merchantId) {
 <template>
   <div v-if="!market" class="py-12 text-center text-slate-500">
     <p>Marché introuvable.</p>
-    <button @click="setSelectedMarketId(null)" class="text-emerald-600 font-bold text-xs mt-2">
+    <button @click="setSelectedMarketId(null)" class="text-primary font-bold text-xs mt-2">
       Retour à la liste
     </button>
   </div>
@@ -121,12 +121,12 @@ function getVendor(merchantId) {
     <div class="flex items-center justify-between">
       <button
         @click="setSelectedMarketId(null)"
-        class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-600 transition-colors py-1 px-2.5 rounded-lg hover:bg-slate-100"
+        class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-primary transition-colors py-1 px-2.5 rounded-lg hover:bg-slate-100"
       >
         <ArrowLeft class="w-4 h-4" />
         Retour aux marchés publics
       </button>
-      <span class="text-xs font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full">
+      <span class="text-xs font-semibold text-slate-400 bg-background px-2.5 py-1 rounded-full">
         Système ID: {{ market.id.toUpperCase() }} • {{ market.city }}
       </span>
     </div>
@@ -145,7 +145,7 @@ function getVendor(merchantId) {
       <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
 
         <div class="lg:col-span-8 space-y-4">
-          <span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+          <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
             En direct de {{ market.city }}
           </span>
           <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
@@ -155,7 +155,7 @@ function getVendor(merchantId) {
             {{ market.description }}
           </p>
           <p class="text-slate-400 text-xs font-semibold flex items-center gap-1">
-            <MapPin class="w-4 h-4 text-emerald-400 shrink-0" />
+            <MapPin class="w-4 h-4 text-primary shrink-0" />
             {{ market.location }}
           </p>
         </div>
@@ -163,7 +163,7 @@ function getVendor(merchantId) {
         <div class="lg:col-span-4 grid grid-cols-3 gap-2 bg-slate-900/90 border border-slate-800 p-3 rounded-2xl backdrop-blur-sm">
           <div class="text-center p-2">
             <span class="block text-[10px] text-slate-400 font-bold uppercase">Places</span>
-            <span class="text-lg font-black text-emerald-400">{{ market.totalPlaces }}</span>
+            <span class="text-lg font-black text-primary">{{ market.totalPlaces }}</span>
           </div>
           <div class="text-center p-2 border-x border-slate-800">
             <span class="block text-[10px] text-slate-400 font-bold uppercase">Occupées</span>
@@ -184,7 +184,7 @@ function getVendor(merchantId) {
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <Compass class="w-5 h-5 text-emerald-500 shrink-0" />
+            <Compass class="w-5 h-5 text-primary shrink-0" />
             <h2 class="text-lg font-extrabold text-slate-900 tracking-tight font-display">Plan Géomatique Indoor Interactif</h2>
           </div>
           <p class="text-xs text-slate-500 font-medium">
@@ -196,7 +196,7 @@ function getVendor(merchantId) {
           <span class="text-xs font-bold text-slate-400">Surligner la catégorie :</span>
           <select
             v-model="mapCategoryHighlight"
-            class="bg-slate-50 border border-slate-200 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer text-slate-700"
+            class="bg-background border border-slate-200 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer text-slate-700"
           >
             <option value="all">Toutes les catégories</option>
             <option value="Poissonnerie">🐟 Poissonnerie</option>
@@ -208,9 +208,9 @@ function getVendor(merchantId) {
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-6 py-2 px-4 bg-slate-50 rounded-xl text-xs font-semibold text-slate-600">
+      <div class="flex flex-wrap items-center gap-6 py-2 px-4 bg-background rounded-xl text-xs font-semibold text-slate-600">
         <div class="flex items-center gap-2">
-          <span class="inline-block w-3 h-3 rounded-md bg-emerald-600"></span>
+          <span class="inline-block w-3 h-3 rounded-md bg-primary"></span>
           <span>Occupée / Active</span>
         </div>
         <div class="flex items-center gap-2">
@@ -229,15 +229,15 @@ function getVendor(merchantId) {
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-        <div class="lg:col-span-8 space-y-8 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100 relative">
+        <div class="lg:col-span-8 space-y-8 bg-background p-4 sm:p-6 rounded-2xl border border-slate-100 relative">
           <div class="absolute top-2 right-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-200/50 px-2 py-0.5 rounded select-none">
             Entrée Principale (Nord)
           </div>
 
           <div v-for="block in blocks" :key="block" class="space-y-3.5 bg-white p-4 rounded-xl border border-slate-200/40 shadow-sm">
-            <div class="flex justify-between items-center bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+            <div class="flex justify-between items-center bg-background px-2.5 py-1.5 rounded-lg border border-slate-100">
               <h4 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
-                <Store class="w-4 h-4 text-emerald-500" />
+                <Store class="w-4 h-4 text-primary" />
                 {{ block }}
               </h4>
               <span class="text-[10px] font-bold text-slate-400">
@@ -288,7 +288,7 @@ function getVendor(merchantId) {
               <div class="flex justify-between items-start border-b border-slate-800 pb-3">
                 <div>
                   <h4 class="text-base font-extrabold text-white">Étalage local {{ selectedPlace.id }}</h4>
-                  <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">{{ selectedPlace.blockName }} • {{ selectedPlace.rowName }}</p>
+                  <p class="text-[10px] text-primary font-bold uppercase tracking-wider">{{ selectedPlace.blockName }} • {{ selectedPlace.rowName }}</p>
                 </div>
                 <button
                   @click="selectedPlace = null"
@@ -299,7 +299,7 @@ function getVendor(merchantId) {
               </div>
 
               <div v-if="selectedPlace.status === 'libre'" class="space-y-4 py-3">
-                <div class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 font-bold text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <div class="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-bold text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20">
                   🟢 Emplacement Libre
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-semibold">
@@ -307,11 +307,11 @@ function getVendor(merchantId) {
                 </p>
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
                   <span class="block text-[10px] text-slate-400 font-bold">REDEVANCE COMMUNALE EST :</span>
-                  <strong class="text-xs text-emerald-400 font-black">1 200 BIF / jour d'occupation</strong>
+                  <strong class="text-xs text-primary font-black">1 200 BIF / jour d'occupation</strong>
                 </div>
                 <button
                   @click="setPublicTab('request')"
-                  class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all font-bold py-2 rounded-xl text-xs text-center"
+                  class="w-full bg-primary hover:bg-emerald-400 text-slate-950 transition-all font-bold py-2 rounded-xl text-xs text-center"
                 >
                   Introduire une demande d'octroi
                 </button>
@@ -338,7 +338,7 @@ function getVendor(merchantId) {
                       <div class="flex-1 min-w-0">
                         <h5 class="text-xs font-black text-white truncate flex items-center gap-1 justify-between">
                           {{ activeStallMerchant.name }}
-                          <ShieldCheck class="w-3.5 h-3.5 text-emerald-400 inline shrink-0" />
+                          <ShieldCheck class="w-3.5 h-3.5 text-primary inline shrink-0" />
                         </h5>
                         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">{{ activeStallMerchant.category }}</p>
                         <div class="flex items-center gap-1 mt-0.5 text-yellow-400">
@@ -366,7 +366,7 @@ function getVendor(merchantId) {
                             <img :src="p.image" :alt="p.name" class="w-7 h-7 rounded object-cover" />
                             <span class="font-semibold text-slate-300 truncate max-w-[120px] group-hover:text-emerald-300">{{ p.name }}</span>
                           </div>
-                          <span class="font-extrabold text-emerald-400 text-[11px]">{{ p.price.toLocaleString('fr-FR') }} BIF</span>
+                          <span class="font-extrabold text-primary text-[11px]">{{ p.price.toLocaleString('fr-FR') }} BIF</span>
                         </div>
                       </div>
                     </div>
@@ -376,14 +376,14 @@ function getVendor(merchantId) {
                         :href="`tel:${activeStallMerchant.phone}`"
                         class="bg-slate-800 text-slate-200 hover:text-white py-1.5 rounded-xl border border-slate-700 font-bold flex items-center justify-center gap-1.5"
                       >
-                        <Phone class="w-3.5 h-3.5 text-emerald-400" />
+                        <Phone class="w-3.5 h-3.5 text-primary" />
                         Appeler
                       </a>
                       <a
                         :href="`https://wa.me/${activeStallMerchant.phone.replace(/\s+/g, '')}`"
                         target="_blank"
                         rel="noreferrer"
-                        class="bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5"
+                        class="bg-primary hover:bg-primary text-white py-1.5 rounded-xl font-bold flex items-center justify-center gap-1.5"
                       >
                         <MessageSquare class="w-3.5 h-3.5" />
                         WhatsApp
@@ -411,8 +411,8 @@ function getVendor(merchantId) {
 
           <div class="border-t border-slate-800 pt-3 text-[9.5px] text-slate-400 font-bold flex justify-between items-center bg-slate-900 select-none">
             <span>GPS: {{ market.city.toUpperCase() }}_PLAN_LIVE</span>
-            <span class="text-emerald-400 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-primary flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               STABLE OMNI
             </span>
           </div>
@@ -425,7 +425,7 @@ function getVendor(merchantId) {
     <!-- 4. TOP COMMERÇANTS PODIUM -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">L'Élite d'affaires</h3>
+        <h3 class="text-sm font-bold text-primary uppercase tracking-wider">L'Élite d'affaires</h3>
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
           Vendeurs les Mieux Notés
         </h2>
@@ -454,7 +454,7 @@ function getVendor(merchantId) {
           />
 
           <div class="space-y-1 min-w-0 flex-1">
-            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 truncate group-hover:text-emerald-600 transition-colors">
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 truncate group-hover:text-primary transition-colors">
               {{ m.name }}
             </h4>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
@@ -475,7 +475,7 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-3">
         <div>
-          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Articles Locaux</h3>
+          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Articles Locaux</h3>
           <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
             Catalogue Alimentaire & Produits du Marché
           </h2>
@@ -512,7 +512,7 @@ function getVendor(merchantId) {
           @click="setSelectedProductId(p.id); setPublicTab('products')"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
         >
-          <div class="relative rounded-xl overflow-hidden bg-slate-50 aspect-square">
+          <div class="relative rounded-xl overflow-hidden bg-background aspect-square">
             <img
               :src="p.image"
               :alt="p.name"
@@ -527,10 +527,10 @@ function getVendor(merchantId) {
           </div>
 
           <div class="space-y-1">
-            <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wide">
+            <span class="text-[9.5px] font-bold text-primary uppercase tracking-wide">
               {{ p.category }}
             </span>
-            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-emerald-600 transition-colors">
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
               {{ p.name }}
             </h4>
             <p class="text-[10.5px] text-slate-400 font-semibold truncate">
@@ -545,7 +545,7 @@ function getVendor(merchantId) {
               </span>
               <span class="text-[9px] text-slate-400 ml-1">/ {{ p.unit }}</span>
             </div>
-            <span class="text-[10px] font-black text-emerald-600 group-hover:text-emerald-700">
+            <span class="text-[10px] font-black text-primary group-hover:text-primary">
               Voir
             </span>
           </div>

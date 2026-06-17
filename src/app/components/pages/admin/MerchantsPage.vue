@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue';
 import { Search, Users, ShieldCheck, Star } from 'lucide-vue-next';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import PageHeader from '../../layout/PageHeader.vue';
+import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import MerchantsTable from '../../merchants/MerchantsTable.vue';
 import MerchantViewDialog from '../../merchants/MerchantViewDialog.vue';
@@ -81,12 +83,10 @@ const viewingProductsCount = computed(() => {
 
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-semibold text-foreground">Commerçants</h1>
-      <p class="text-sm text-muted-foreground mt-1">
-        Répertoire des exploitants habilités sur les marchés connectés
-      </p>
-    </div>
+    <PageHeader
+      title="Gestion Des Commerçants"
+      subtitle="Répertoire des exploitants habilités sur les marchés connectés."
+    />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard
@@ -109,42 +109,38 @@ const viewingProductsCount = computed(() => {
       />
     </div>
 
-    <Card>
-      <CardContent class="p-4">
-        <div class="flex flex-col lg:flex-row gap-3">
-          <div class="relative flex-1">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              v-model="searchQuery"
-              placeholder="Rechercher par nom, téléphone..."
-              class="pl-9"
-            />
-          </div>
-          <Select v-model="marketFilter">
-            <SelectTrigger class="w-full lg:w-48">
-              <SelectValue placeholder="Tous les marchés" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les marchés</SelectItem>
-              <SelectItem v-for="m in scopedMarkets" :key="m.id" :value="m.id">
-                {{ m.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select v-model="categoryFilter">
-            <SelectTrigger class="w-full lg:w-48">
-              <SelectValue placeholder="Toutes filières" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes filières</SelectItem>
-              <SelectItem v-for="cat in categories" :key="cat" :value="cat">
-                {{ cat }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+    <FilterBar
+      :show-clear="searchQuery || marketFilter !== 'all' || categoryFilter !== 'all'"
+      @clear="searchQuery = ''; marketFilter = 'all'; categoryFilter = 'all'"
+    >
+      <div class="flex-1 space-y-1 w-full">
+        <label class="text-xs font-medium text-muted-foreground">Recherche</label>
+        <div class="relative">
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input v-model="searchQuery" placeholder="Nom, téléphone..." class="pl-9 bg-card" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div class="space-y-1 w-full lg:w-44">
+        <label class="text-xs font-medium text-muted-foreground">Marché</label>
+        <Select v-model="marketFilter">
+          <SelectTrigger class="bg-card"><SelectValue placeholder="Tous" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les marchés</SelectItem>
+            <SelectItem v-for="m in scopedMarkets" :key="m.id" :value="m.id">{{ m.name }}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div class="space-y-1 w-full lg:w-44">
+        <label class="text-xs font-medium text-muted-foreground">Filière</label>
+        <Select v-model="categoryFilter">
+          <SelectTrigger class="bg-card"><SelectValue placeholder="Toutes" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes filières</SelectItem>
+            <SelectItem v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FilterBar>
 
     <MerchantsTable
       :merchants="filteredMerchants"

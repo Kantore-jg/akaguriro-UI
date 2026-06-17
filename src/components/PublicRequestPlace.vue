@@ -60,7 +60,7 @@ function findMarket(marketId) {
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
     <!-- Header -->
     <div class="space-y-1">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-600">Formulaire Citoyen</h3>
+      <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Formulaire Citoyen</h3>
       <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
         Demande Publique d'Octroi d'Emplacement
       </h1>
@@ -74,7 +74,7 @@ function findMarket(marketId) {
       <!-- Left: Demande Form Component -->
       <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
         <h2 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-          <Store class="w-5 h-5 text-emerald-500" />
+          <Store class="w-5 h-5 text-primary" />
           Introduire un dossier
         </h2>
 
@@ -83,7 +83,7 @@ function findMarket(marketId) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1">
               <label class="text-slate-500 block">Nom du Candidat</label>
-              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2.5">
                 <User class="w-4 h-4 text-slate-400 shrink-0" />
                 <input
                   type="text"
@@ -97,7 +97,7 @@ function findMarket(marketId) {
 
             <div class="space-y-1">
               <label class="text-slate-500 block">Numéro de Téléphone</label>
-              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2.5">
                 <Phone class="w-4 h-4 text-slate-400 shrink-0" />
                 <input
                   type="tel"
@@ -113,7 +113,7 @@ function findMarket(marketId) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1">
               <label class="text-slate-500 block">Filière / Catégorie d'activité</label>
-              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 mr-1">
+              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2 mr-1">
                 <Briefcase class="w-4 h-4 text-slate-400 shrink-0" />
                 <select
                   v-model="category"
@@ -132,7 +132,7 @@ function findMarket(marketId) {
 
             <div class="space-y-1">
               <label class="text-slate-500 block">Marché Souhaité</label>
-              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 mr-1">
+              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2 mr-1">
                 <Store class="w-4 h-4 text-slate-400 shrink-0" />
                 <select
                   v-model="targetMarketId"
@@ -146,7 +146,7 @@ function findMarket(marketId) {
 
           <div class="space-y-1">
             <label class="text-slate-500 block">Description Concise de l'Activité Réelle</label>
-            <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+            <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2.5">
               <FileText class="w-4 h-4 text-slate-400 shrink-0 self-start mt-1" />
               <input
                 type="text"
@@ -164,14 +164,14 @@ function findMarket(marketId) {
               rows="4"
               placeholder="Rédigez ici vos motivations..."
               v-model="description"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 outline-none font-medium text-slate-850 text-xs focus:bg-white focus:border-emerald-400 transition-colors"
+              class="w-full bg-background border border-slate-200 rounded-xl py-2.5 px-4 outline-none font-medium text-slate-850 text-xs focus:bg-white focus:border-primary transition-colors"
               required
             />
           </div>
 
           <button
             type="submit"
-            class="w-full bg-emerald-600 hover:bg-emerald-500 transition-all text-white font-extrabold py-3.5 rounded-xl text-center text-xs tracking-wide shadow shadow-emerald-700/30 pt-3.5"
+            class="w-full bg-primary hover:bg-primary transition-all text-white font-extrabold py-3.5 rounded-xl text-center text-xs tracking-wide shadow shadow-emerald-700/30 pt-3.5"
           >
             Soumettre ma demande d'enregistrement
           </button>
@@ -184,7 +184,7 @@ function findMarket(marketId) {
         <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl border border-slate-800 space-y-5 shadow-sm">
 
           <div class="space-y-1">
-            <h3 class="text-xs font-black uppercase text-emerald-400 tracking-wider">Tableau des Candidatures Actives</h3>
+            <h3 class="text-xs font-black uppercase text-primary tracking-wider">Tableau des Candidatures Actives</h3>
             <p class="text-[11.5px] text-slate-400">
               Suivez en direct l'état d'affectation de vos demandes soumises :
             </p>
@@ -212,7 +212,7 @@ function findMarket(marketId) {
                 </span>
                 <span
                   v-else-if="item.status === 'approved'"
-                  class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
+                  class="inline-flex items-center gap-1 bg-emerald-50 text-primary border border-primary/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
                 >
                   <CheckCircle2 class="w-3 h-3" /> Demande Approuvée (Stall Alloué)
                 </span>
@@ -230,7 +230,7 @@ function findMarket(marketId) {
                 <p><strong class="text-white">Marché :</strong> {{ findMarket(item.requestedMarketId)?.name || 'Inconnu' }}</p>
                 <div
                   v-if="item.status === 'approved'"
-                  class="mt-2 text-[10px] text-emerald-400 font-extrabold bg-emerald-950/40 p-2 rounded border border-emerald-900/35"
+                  class="mt-2 text-[10px] text-primary font-extrabold bg-emerald-950/40 p-2 rounded border border-emerald-900/35"
                 >
                   🎉 Félicitations ! Un emplacement libre a été attribué et vous avez été enregistré comme marchand officiel. Consultez le plan du marché !
                 </div>
@@ -244,9 +244,9 @@ function findMarket(marketId) {
 
         </div>
 
-        <div class="bg-slate-100/70 border border-slate-200/40 p-4 rounded-2xl text-xs text-slate-500 font-medium">
+        <!-- <div class="bg-slate-100/70 border border-slate-200/40 p-4 rounded-2xl text-xs text-slate-500 font-medium">
           💡 <strong>Note de simulation :</strong> Pour tester le processus de validation de bout-en-bout, soumettez une demande ici, puis basculez sur le profil <strong>🔑 Super Admin</strong> ou <strong>🏢 Admin Marché</strong> via la barre de simu au sommet, allez sur le Dashboard à la colonne <strong>"Demandes"</strong> pour approuver le dossier. Le système mettra en œuvre l'étalage en un instant !
-        </div>
+        </div> -->
       </div>
 
     </div>

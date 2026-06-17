@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 import { FileText, Search, CheckCircle, XCircle } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import PageHeader from '../../layout/PageHeader.vue';
+import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import Badge from '../../ui/Badge.vue';
 import Button from '../../ui/Button.vue';
@@ -50,12 +52,10 @@ const statusBadge = (status) => {
 
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-semibold text-foreground">Demandes d'emplacement</h1>
-      <p class="text-sm text-muted-foreground mt-1">
-        Validation des dossiers d'octroi d'étals par la mairie
-      </p>
-    </div>
+    <PageHeader
+      title="Gestion Des Demandes"
+      subtitle="Validation des dossiers d'octroi d'étals par la mairie."
+    />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard title="Total dossiers" :value="scopedRequests.length" :icon="FileText" color="primary" />
@@ -68,16 +68,18 @@ const statusBadge = (status) => {
       />
     </div>
 
-    <Card>
-      <CardContent class="p-4 flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
+    <FilterBar :show-clear="searchQuery || statusFilter !== 'all'" @clear="searchQuery = ''; statusFilter = 'all'">
+      <div class="flex-1 space-y-1 w-full">
+        <label class="text-xs font-medium text-muted-foreground">Recherche</label>
+        <div class="relative">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input v-model="searchQuery" placeholder="Rechercher un candidat..." class="pl-9" />
+          <Input v-model="searchQuery" placeholder="Candidat, activité..." class="pl-9 bg-card" />
         </div>
+      </div>
+      <div class="space-y-1 w-full sm:w-44">
+        <label class="text-xs font-medium text-muted-foreground">Statut</label>
         <Select v-model="statusFilter">
-          <SelectTrigger class="w-full sm:w-44">
-            <SelectValue placeholder="Tous statuts" />
-          </SelectTrigger>
+          <SelectTrigger class="bg-card"><SelectValue placeholder="Tous statuts" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous statuts</SelectItem>
             <SelectItem value="pending">En attente</SelectItem>
@@ -85,8 +87,8 @@ const statusBadge = (status) => {
             <SelectItem value="rejected">Rejeté</SelectItem>
           </SelectContent>
         </Select>
-      </CardContent>
-    </Card>
+      </div>
+    </FilterBar>
 
     <div v-if="!filteredRequests.length" class="text-center py-16 rounded-lg border border-border bg-card text-muted-foreground text-sm">
       Aucun dossier trouvé.

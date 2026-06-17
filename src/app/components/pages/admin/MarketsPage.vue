@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue';
 import { Plus, Search, Store } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
+import PageHeader from '../../layout/PageHeader.vue';
+import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import MarketsTable from '../../markets/MarketsTable.vue';
 import MarketFormDialog from '../../markets/MarketFormDialog.vue';
@@ -122,18 +124,13 @@ const viewingStats = computed(() => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold text-foreground">Marchés Publics</h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          Registre national des marchés connectés au réseau Akaguriro
-        </p>
-      </div>
-      <Button @click="openCreate">
-        <Plus class="w-4 h-4 mr-2" />
-        Nouveau marché
-      </Button>
-    </div>
+    <PageHeader
+      title="Gestion Des Marchés"
+      subtitle="Configuration et contrôle des infrastructures connectées."
+      action-label="Ajouter un marché"
+      :action-icon="Plus"
+      @action="openCreate"
+    />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard
@@ -158,31 +155,27 @@ const viewingStats = computed(() => {
       />
     </div>
 
-    <Card>
-      <CardContent class="p-4">
-        <div class="flex flex-col sm:flex-row gap-3">
-          <div class="relative flex-1">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              v-model="searchQuery"
-              placeholder="Rechercher par nom, ville ou adresse..."
-              class="pl-9"
-            />
-          </div>
-          <Select v-model="cityFilter">
-            <SelectTrigger class="w-full sm:w-48">
-              <SelectValue placeholder="Toutes les villes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les villes</SelectItem>
-              <SelectItem v-for="city in cities" :key="city" :value="city">
-                {{ city }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+    <FilterBar :show-clear="searchQuery || cityFilter !== 'all'" @clear="searchQuery = ''; cityFilter = 'all'">
+      <div class="flex-1 space-y-1 w-full">
+        <label class="text-xs font-medium text-muted-foreground">Recherche</label>
+        <div class="relative">
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input v-model="searchQuery" placeholder="Nom, ville ou adresse..." class="pl-9 bg-card" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div class="space-y-1 w-full sm:w-48">
+        <label class="text-xs font-medium text-muted-foreground">Ville</label>
+        <Select v-model="cityFilter">
+          <SelectTrigger class="bg-card">
+            <SelectValue placeholder="Toutes les villes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes les villes</SelectItem>
+            <SelectItem v-for="city in cities" :key="city" :value="city">{{ city }}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FilterBar>
 
     <MarketsTable
       :markets="filteredMarkets"

@@ -100,7 +100,8 @@ export function mapMerchant(m) {
     image: m.image || null,
     category: m.category || 'Commerce Général',
     rating: m.rating ?? 4.8,
-    activePlaceId: m.active_place_number || m.active_place_id,
+    activePlaceId: m.active_place_id || null,
+    activePlaceNumber: m.active_place_number || '',
     activeMarketId: m.active_market_id,
     joinedDate: m.joined_date,
     verified: m.verified ?? false,
@@ -213,7 +214,7 @@ export function placeToApi(data) {
 }
 
 export function productToApi(data) {
-  return {
+  const payload = {
     market_id: data.marketId,
     place_id: data.placeId || null,
     category_id: data.categoryId || null,
@@ -223,7 +224,14 @@ export function productToApi(data) {
     unit: data.unit || 'unit',
     stock: data.stock ?? 0,
     available: data.available ?? true,
+    is_trending: data.isTrending ?? false,
   };
+
+  if (data.merchantId) {
+    payload.user_id = data.merchantId;
+  }
+
+  return payload;
 }
 
 export function placeRequestToApi(data) {

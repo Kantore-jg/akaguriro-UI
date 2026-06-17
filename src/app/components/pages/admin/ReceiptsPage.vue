@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 import { Coins, Plus, Search, ExternalLink } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import PageHeader from '../../layout/PageHeader.vue';
+import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import ReceiptFormDialog from '../../receipts/ReceiptFormDialog.vue';
 import Badge from '../../ui/Badge.vue';
@@ -84,18 +86,13 @@ const merchantMarketName = computed(() => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold text-foreground">{{ pageTitle }}</h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          Suivi des redevances mensuelles des commerçants
-        </p>
-      </div>
-      <Button v-if="isMerchant" @click="formOpen = true">
-        <Plus class="w-4 h-4 mr-2" />
-        Transmettre un reçu
-      </Button>
-    </div>
+    <PageHeader
+      :title="isMerchant ? 'Gestion De Mes Reçus' : 'Gestion Des Reçus'"
+      subtitle="Suivi des redevances mensuelles des commerçants."
+      :action-label="isMerchant ? 'Transmettre un reçu' : ''"
+      :action-icon="Plus"
+      @action="formOpen = true"
+    />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard title="Reçus" :value="scopedReceipts.length" :icon="Coins" color="primary" />
@@ -108,16 +105,18 @@ const merchantMarketName = computed(() => {
       />
     </div>
 
-    <Card>
-      <CardContent class="p-4 flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
+    <FilterBar :show-clear="searchQuery || statusFilter !== 'all'" @clear="searchQuery = ''; statusFilter = 'all'">
+      <div class="flex-1 space-y-1 w-full">
+        <label class="text-xs font-medium text-muted-foreground">Recherche</label>
+        <div class="relative">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input v-model="searchQuery" placeholder="Rechercher..." class="pl-9" />
+          <Input v-model="searchQuery" placeholder="Commerçant, mois..." class="pl-9 bg-card" />
         </div>
+      </div>
+      <div class="space-y-1 w-full sm:w-44">
+        <label class="text-xs font-medium text-muted-foreground">Statut</label>
         <Select v-model="statusFilter">
-          <SelectTrigger class="w-full sm:w-44">
-            <SelectValue placeholder="Tous statuts" />
-          </SelectTrigger>
+          <SelectTrigger class="bg-card"><SelectValue placeholder="Tous statuts" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous statuts</SelectItem>
             <SelectItem value="pending">En attente</SelectItem>
@@ -125,8 +124,8 @@ const merchantMarketName = computed(() => {
             <SelectItem value="rejected">Rejeté</SelectItem>
           </SelectContent>
         </Select>
-      </CardContent>
-    </Card>
+      </div>
+    </FilterBar>
 
     <div class="rounded-lg border border-border bg-card">
       <Table>

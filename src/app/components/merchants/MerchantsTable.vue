@@ -55,7 +55,7 @@ const emit = defineEmits(['view']);
           <TableCell class="text-sm">{{ merchant.phone }}</TableCell>
           <TableCell class="text-sm">
             {{ getMarketLabel(merchant.activeMarketId) }}
-            <span class="text-muted-foreground"> · {{ merchant.activePlaceId }}</span>
+            <span class="text-muted-foreground"> · {{ merchant.activePlaceNumber || merchant.activePlaceId }}</span>
           </TableCell>
           <TableCell>{{ merchant.category }}</TableCell>
           <TableCell>

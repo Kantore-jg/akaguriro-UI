@@ -39,7 +39,7 @@ const emit = defineEmits(['update:open']);
           </p>
           <p class="text-sm flex items-center gap-1">
             <MapPin class="w-3.5 h-3.5 text-muted-foreground" />
-            {{ marketName }} — Étale {{ merchant.activePlaceId }}
+            {{ marketName }} — Étale {{ merchant.activePlaceNumber || merchant.activePlaceId }}
           </p>
           <div class="flex items-center gap-1 text-yellow-500">
             <Star class="w-4 h-4 fill-yellow-400" />

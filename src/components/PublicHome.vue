@@ -70,7 +70,7 @@ function handleHeroSearchSubmit(e) {
             
 
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] font-display">
-              Retrouvez facilement les <span class="bg-gradient-to-r from-emerald-400 to-teal-300 text-transparent bg-clip-text">produits</span> et <span class="bg-gradient-to-r from-teal-300 to-emerald-400 text-transparent bg-clip-text">commerçants</span> du Burundi
+              Retrouvez facilement les <span class="bg-gradient-to-r from-primary-400 to-primary-300 text-transparent bg-clip-text">produits</span> et <span class="bg-gradient-to-r from-teal-300 to-emerald-400 text-transparent bg-clip-text">commerçants</span> du Burundi
             </h2>
 
             <p class="text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
@@ -89,7 +89,7 @@ function handleHeroSearchSubmit(e) {
               </div>
 
               <div class="sm:w-44 flex items-center gap-2 px-3 py-2 bg-slate-900/60 rounded-xl text-xs text-slate-300">
-                <MapPin class="w-4 h-4 text-emerald-400 shrink-0" />
+                <MapPin class="w-4 h-4 text-primary shrink-0" />
                 <select
                   v-model="searchMarket"
                   class="bg-transparent border-0 outline-none w-full cursor-pointer text-slate-300 font-medium"
@@ -101,21 +101,21 @@ function handleHeroSearchSubmit(e) {
 
               <button
                 type="submit"
-                class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold px-6 py-3 rounded-xl text-slate-950 text-sm transition-all shadow-lg hover:scale-[1.01]"
+                class="bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 font-bold px-6 py-3 rounded-xl text-slate-950 text-sm transition-all shadow-lg hover:scale-[1.01]"
               >
                 Trouver
               </button>
             </form>
 
             <div class="flex flex-wrap items-center gap-6 text-xs text-slate-400 pt-2 font-medium">
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Éclairage LED Intelligent</span>
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Plans Indoor Interactifs</span>
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-emerald-500" /> Catalogues Commerçants Vérifiés</span>
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Éclairage LED Intelligent</span>
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Plans Indoor Interactifs</span>
+              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Catalogues Commerçants Vérifiés</span>
             </div>
           </div>
 
           <div class="lg:col-span-5 relative">
-            <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 blur-xl"></div>
+            <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-500 opacity-20 blur-xl"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-700 aspect-[4/3] shadow-2xl">
               <img
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=650"
@@ -134,12 +134,12 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
-          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Filières Actives</h3>
+          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Filières Actives</h3>
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Explorer par Catégories</h2>
         </div>
         <button
           @click="setPublicTab('products')"
-          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+          class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Tous les produits
           <ChevronRight class="w-4 h-4" />
@@ -151,7 +151,7 @@ function handleHeroSearchSubmit(e) {
           v-for="(cat, idx) in categories"
           :key="idx"
           @click="setPublicTab('products')"
-          class="bg-white hover:bg-emerald-50/40 p-4 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer shadow-sm flex flex-col items-center text-center group"
+          class="bg-white hover:bg-primary/5/40 p-4 rounded-2xl border border-slate-100 hover:border-primary/20 transition-all cursor-pointer shadow-sm flex flex-col items-center text-center group"
         >
           <span class="text-3xl mb-2.5 group-hover:scale-110 transition-transform duration-200">{{ cat.icon }}</span>
           <h5 class="text-xs sm:text-sm font-bold text-slate-800">{{ cat.name }}</h5>
@@ -164,12 +164,12 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Infrastructures du Pays</h3>
+          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3>
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Nos Marchés Publics Connectés</h2>
         </div>
         <button
           @click="setPublicTab('markets')"
-          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+          class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Afficher la liste complète
           <ChevronRight class="w-4 h-4" />
@@ -189,14 +189,14 @@ function handleHeroSearchSubmit(e) {
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div class="absolute top-3 left-3 bg-slate-900/80 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
-              <MapPin class="w-3 h-3 text-emerald-400" />
+              <MapPin class="w-3 h-3 text-primary" />
               {{ m.city }}
             </div>
           </div>
 
           <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <h4 class="text-base font-extrabold text-slate-900 tracking-tight leading-snug group-hover:text-emerald-600 transition-colors">
+              <h4 class="text-base font-extrabold text-slate-900 tracking-tight leading-snug group-hover:text-primary transition-colors">
                 {{ m.name }}
               </h4>
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -214,7 +214,7 @@ function handleHeroSearchSubmit(e) {
                   <span class="text-slate-400 block text-[10px]">PLACES LIBRES :</span>
                   <span
                     class="text-xs font-bold"
-                    :class="(m.totalPlaces - m.occupiedPlaces) > 0 ? 'text-emerald-600' : 'text-amber-600'"
+                    :class="(m.totalPlaces - m.occupiedPlaces) > 0 ? 'text-primary' : 'text-amber-600'"
                   >
                     {{ m.totalPlaces - m.occupiedPlaces }} dispos
                   </span>
@@ -223,7 +223,7 @@ function handleHeroSearchSubmit(e) {
 
               <button
                 @click="setSelectedMarketId(m.id); setPublicTab('markets')"
-                class="w-full bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-bold transition-all py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-100"
+                class="w-full bg-background hover:bg-primary/5 hover:text-primary text-slate-700 font-bold transition-all py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-100"
               >
                 Visiter le Marché
                 <ChevronRight class="w-3.5 h-3.5" />
@@ -238,7 +238,7 @@ function handleHeroSearchSubmit(e) {
     <section class="bg-slate-100/70 border-y border-slate-200/50 py-12 px-4">
       <div class="mx-auto max-w-7xl">
         <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
-          <h3 class="text-sm font-bold text-emerald-600 uppercase tracking-wider">Indicateurs Digitaux</h3>
+          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Indicateurs Digitaux</h3>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">La Smart City en Chiffres</h2>
           <p class="text-slate-500 text-xs sm:text-sm">
             Suivi statistique réactif de nos places d'étalage et flux de produits nationaux.
@@ -254,18 +254,18 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Marchés Digitalisés</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalMarketsCount }}</span>
-              <span class="text-[10px] text-emerald-500 block font-semibold">100% de fiabilité</span>
+              <span class="text-[10px] text-primary block font-semibold">100% de fiabilité</span>
             </div>
           </div>
 
           <div class="bg-white p-6 rounded-2xl border border-slate-200/40 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
               <Users class="w-6 h-6" />
             </div>
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Commerçants Enregistrés</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalMerchantsCount }}</span>
-              <span class="text-[10px] text-emerald-500 block font-semibold">+4 recrutés ce mois</span>
+              <span class="text-[10px] text-primary block font-semibold">+4 recrutés ce mois</span>
             </div>
           </div>
 
@@ -276,7 +276,7 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Produits en Ligne</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalProductsCount }}</span>
-              <span class="text-[10px] text-emerald-500 block font-semibold">Mis à jour régulièrement</span>
+              <span class="text-[10px] text-primary block font-semibold">Mis à jour régulièrement</span>
             </div>
           </div>
 
@@ -286,7 +286,7 @@ function handleHeroSearchSubmit(e) {
             </div>
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Emplacements Libres</span>
-              <span class="text-2xl font-extrabold text-slate-900 text-emerald-600">{{ totalAvailablePlaces }}</span>
+              <span class="text-2xl font-extrabold text-slate-900 text-primary">{{ totalAvailablePlaces }}</span>
               <span class="text-[10px] text-amber-500 block font-semibold">Disponibles à la demande</span>
             </div>
           </div>
@@ -299,12 +299,12 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h3 class="text-sm font-bold text-teal-600 uppercase tracking-wider">Catalogue National</h3>
+          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Catalogue National</h3>
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produits Tendances</h2>
         </div>
         <button
           @click="setPublicTab('products')"
-          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 self-start"
+          class="text-xs font-bold text-primary hover:text-primary flex items-center gap-1.5 self-start"
         >
           Explorer tout le catalogue
           <ChevronRight class="w-4 h-4" />
@@ -318,7 +318,7 @@ function handleHeroSearchSubmit(e) {
           @click="setSelectedProductId(p.id); setPublicTab('products')"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
         >
-          <div class="relative rounded-xl overflow-hidden bg-slate-50 aspect-square">
+          <div class="relative rounded-xl overflow-hidden bg-background aspect-square">
             <img
               :src="p.image"
               :alt="p.name"
@@ -340,10 +340,10 @@ function handleHeroSearchSubmit(e) {
           </div>
 
           <div class="space-y-1">
-            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">
+            <span class="text-[10px] font-bold text-primary uppercase tracking-wide">
               {{ p.category }}
             </span>
-            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-emerald-600 transition-colors">
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
               {{ p.name }}
             </h4>
             <p class="text-[11px] text-slate-400 font-medium">
@@ -353,12 +353,12 @@ function handleHeroSearchSubmit(e) {
 
           <div class="border-t border-slate-50 pt-2.5 flex items-center justify-between">
             <div>
-              <span class="text-xs sm:text-sm font-extrabold text-emerald-600">
+              <span class="text-xs sm:text-sm font-extrabold text-primary">
                 {{ p.price.toLocaleString('fr-FR') }} BIF
               </span>
               <span class="text-[9.5px] text-slate-400 ml-1">/ {{ p.unit }}</span>
             </div>
-            <span class="text-[10px] font-bold bg-slate-50 text-slate-600 px-2 py-1 rounded-lg hover:bg-emerald-55 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <span class="text-[10px] font-bold bg-background text-slate-600 px-2 py-1 rounded-lg hover:bg-primary group-hover:bg-primary group-hover:text-white transition-colors">
               Détails
             </span>
           </div>
@@ -373,13 +373,13 @@ function handleHeroSearchSubmit(e) {
         <div class="shrink-0 flex flex-col sm:flex-row gap-3 relative w-full sm:w-auto">
           <button
             @click="setPublicTab('request')"
-            class="bg-emerald-500 hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
+            class="bg-primary hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
           >
             Demander une place
           </button>
           <button
             @click="router.push('/login')"
-            class="bg-emerald-500 hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
+            class="bg-primary hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
           >
             Créer mon compte
           </button>

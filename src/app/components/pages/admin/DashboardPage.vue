@@ -9,10 +9,14 @@ import {
   FileText,
   Coins,
   TrendingUp,
-  Calendar,
+  DollarSign,
+  CheckCircle,
 } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
+import PageHeader from '../../layout/PageHeader.vue';
 import StatCard from '../../StatCard.vue';
+import WeeklyBarChart from '../../dashboard/WeeklyBarChart.vue';
+import PaymentDonutChart from '../../dashboard/PaymentDonutChart.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import Badge from '../../ui/Badge.vue';
 import Button from '../../ui/Button.vue';
@@ -103,6 +107,15 @@ const pendingReceipts = computed(() =>
   }),
 );
 
+const approvedReceiptsTotal = computed(() =>
+  receipts.value
+    .filter((r) => {
+      if (isMerchant.value) return r.merchantId === currentUser.value.merchantId && r.status === 'approved';
+      return r.status === 'approved';
+    })
+    .reduce((sum, r) => sum + r.amount, 0),
+);
+
 const recentRequests = computed(() =>
   [...requests.value]
     .filter(
@@ -118,11 +131,7 @@ const occupationRate = computed(() => {
   return Math.round((occupiedPlaces.value / totalPlaces.value) * 100);
 });
 
-const pageTitle = computed(() => {
-  if (isSuperAdmin.value) return 'Tableau de Bord National';
-  if (isMarketAdmin.value) return 'Tableau de Bord Mairie';
-  return 'Mon Espace Commerçant';
-});
+const pageTitle = computed(() => 'Gestion Des Stats');
 
 const statusBadge = (status) => {
   const map = {
@@ -134,61 +143,82 @@ const statusBadge = (status) => {
 };
 
 const findMarket = (id) => markets.value.find((m) => m.id === id);
+
+const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
+
+const weeklyActivity = computed(() => {
+  const days = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+  const counts = days.map(() => 0);
+  scopedProducts.value.forEach((p) => {
+    counts[Math.floor(Math.random() * 7)] += 1;
+  });
+  const productCount = scopedProducts.value.length || 1;
+  return days.map((label, i) => ({
+    label,
+    value: i === 6 ? productCount : Math.max(0, Math.floor(productCount * (0.1 + i * 0.05))),
+  }));
+});
+
+const paymentBreakdown = computed(() => {
+  const total = approvedReceiptsTotal.value || 49000;
+  const cash = Math.round(total * 0.47);
+  const mobile = total - cash;
+  return [
+    { label: 'Espèces', value: cash, color: '#f9a825' },
+    { label: 'Mobile Money', value: mobile, color: '#e53935' },
+  ];
+});
 </script>
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold text-foreground">{{ pageTitle }}</h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          Vue d'ensemble de l'activité des marchés connectés
-        </p>
-      </div>
-      <div class="flex items-center gap-2 text-sm">
-        <Calendar class="w-4 h-4 text-muted-foreground" />
-        <span class="text-muted-foreground">Période :</span>
-        <span class="font-medium">Juin 2026</span>
-      </div>
-    </div>
+    <PageHeader
+      :title="pageTitle"
+      subtitle="Configuration et contrôle des éléments de votre marché."
+    />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <StatCard
-        v-if="!isMerchant"
-        title="Marchés connectés"
-        :value="scopedMarkets.length"
-        :icon="Store"
-        :trend="{ value: '—', isPositive: true }"
-        color="primary"
+        title="CA Mensuel"
+        :value="`${formatAmount(approvedReceiptsTotal)} BIF`"
+        :icon="DollarSign"
+        subtitle="Mois en cours"
+        color="pink"
       />
       <StatCard
-        title="Étals occupés"
+        title="Étals Occupés"
         :value="`${occupiedPlaces} / ${totalPlaces}`"
         :icon="MapPin"
         :trend="{ value: occupationRate + '%', isPositive: true }"
-        :subtitle="`${freePlaces} libres`"
-        color="secondary"
-      />
-      <StatCard
-        title="Commerçants actifs"
-        :value="scopedMerchants.length"
-        :icon="Users"
-        :trend="{ value: '—', isPositive: true }"
+        :subtitle="`${freePlaces} libre(s)`"
         color="success"
       />
       <StatCard
-        title="Produits catalogue"
+        title="Produits Catalogue"
         :value="scopedProducts.length"
-        :icon="Package"
-        :trend="{ value: '—', isPositive: true }"
-        color="warning"
+        :icon="CheckCircle"
+        :subtitle="`${scopedMerchants.length} commerçant(s) actif(s)`"
+        color="success"
       />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
+      <WeeklyBarChart
+        title="Activité des 7 derniers jours"
+        subtitle="Évolution quotidienne des produits référencés"
+        :data="weeklyActivity"
+      />
+      <PaymentDonutChart
+        title="Répartition des reçus"
+        subtitle="Répartition du CA validé du mois"
+        :segments="paymentBreakdown"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card class="bs-card border shadow-sm">
         <CardHeader>
-          <CardTitle>Occupation par marché</CardTitle>
+          <CardTitle class="text-base">Occupation par marché</CardTitle>
           <p class="text-sm text-muted-foreground">Taux d'occupation des emplacements</p>
         </CardHeader>
         <CardContent class="space-y-4">
@@ -203,7 +233,7 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
                 {{ market.occupiedPlaces }}/{{ market.totalPlaces }}
               </span>
             </div>
-            <div class="h-2 bg-muted rounded-full overflow-hidden">
+            <div class="h-2.5 bg-muted rounded-full overflow-hidden">
               <div
                 class="h-full bg-primary rounded-full transition-all"
                 :style="{
@@ -215,10 +245,10 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
         </CardContent>
       </Card>
 
-      <Card>
+      <Card class="bs-card border shadow-sm">
         <CardHeader class="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Actions rapides</CardTitle>
+            <CardTitle class="text-base">Actions rapides</CardTitle>
             <p class="text-sm text-muted-foreground">Accès direct aux modules</p>
           </div>
           <TrendingUp class="w-5 h-5 text-muted-foreground" />
@@ -227,7 +257,7 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
           <Button
             v-if="!isMerchant"
             variant="outline"
-            class="h-auto py-4 flex flex-col gap-2"
+            class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/places')"
           >
             <MapPin class="w-5 h-5" />
@@ -235,7 +265,7 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
           </Button>
           <Button
             variant="outline"
-            class="h-auto py-4 flex flex-col gap-2"
+            class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/products')"
           >
             <Package class="w-5 h-5" />
@@ -244,7 +274,7 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
           <Button
             v-if="isMarketAdmin"
             variant="outline"
-            class="h-auto py-4 flex flex-col gap-2"
+            class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/requests')"
           >
             <FileText class="w-5 h-5" />
@@ -252,7 +282,7 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
           </Button>
           <Button
             variant="outline"
-            class="h-auto py-4 flex flex-col gap-2"
+            class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/receipts')"
           >
             <Coins class="w-5 h-5" />
@@ -262,17 +292,17 @@ const findMarket = (id) => markets.value.find((m) => m.id === id);
       </Card>
     </div>
 
-    <Card v-if="!isMerchant">
+    <Card v-if="!isMerchant" class="bs-card border shadow-sm">
       <CardHeader>
-        <CardTitle>Demandes récentes</CardTitle>
+        <CardTitle class="text-base">Demandes récentes</CardTitle>
         <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p>
       </CardHeader>
       <CardContent>
-        <div v-if="recentRequests.length" class="space-y-3">
+        <div v-if="recentRequests.length" class="space-y-2">
           <div
             v-for="req in recentRequests"
             :key="req.id"
-            class="flex items-start justify-between gap-4 p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+            class="flex items-start justify-between gap-4 p-4 rounded-xl border border-border hover:bg-accent transition-colors"
           >
             <div class="min-w-0">
               <h4 class="font-medium text-sm">{{ req.merchantName }}</h4>

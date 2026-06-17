@@ -14,7 +14,6 @@ import {
   LogOut,
   Menu,
   X,
-  ShieldAlert,
   LayoutDashboard,
   Tv,
 } from 'lucide-vue-next';
@@ -46,7 +45,6 @@ const userInitials = computed(() => {
 });
 
 const mobileMenuOpen = ref(false);
-const globalSearchRaw = ref('');
 const roleSwitcherOpen = ref(false);
 
 const DEMO_EMAILS = {
@@ -54,6 +52,13 @@ const DEMO_EMAILS = {
   ADMIN_MARCHE: 'admin.bujumbura@akaguriro.bi',
   COMMERCANT: 'commercant@akaguriro.bi',
 };
+
+const navItems = [
+  { id: 'home', label: 'Accueil', path: '/' },
+  { id: 'markets', label: 'Marchés', path: '/markets' },
+  { id: 'products', label: 'Produits', path: '/products' },
+  { id: 'merchants', label: 'Commerçants', path: '/merchants' },
+];
 
 async function handleRoleChange(role) {
   roleSwitcherOpen.value = false;
@@ -83,17 +88,9 @@ function handleLogoClick() {
   setSelectedProductId(null);
 }
 
-const publicPaths = {
-  home: '/',
-  markets: '/markets',
-  products: '/products',
-  merchants: '/merchants',
-  auth: '/login',
-  request: '/request',
-};
-
 function handlePublicNav(tab) {
-  router.push(publicPaths[tab] || '/');
+  const paths = { home: '/', markets: '/markets', products: '/products', merchants: '/merchants', auth: '/login', request: '/request' };
+  router.push(paths[tab] || '/');
   setPublicTab(tab);
   setSelectedMarketId(null);
   setSelectedProductId(null);
@@ -115,301 +112,162 @@ function goToProfile() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 w-full bg-slate-900 text-white shadow-md border-b border-slate-800">
-    <!-- Role Switcher Floating Panel -->
+  <header class="sticky top-0 z-50 w-full bg-card text-foreground shadow-sm border-b border-border">
     <div
       v-if="roleSwitcherOpen"
-      class="absolute top-10 right-2 md:right-8 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-4 z-50 w-72 text-slate-100"
+      class="absolute top-14 right-4 bg-card border border-border rounded-xl shadow-xl p-4 z-50 w-72"
     >
-      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-700">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Simulation de Rôles</h4>
-        <button @click="roleSwitcherOpen = false" class="text-slate-400 hover:text-white">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-border">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Simulation de Rôles</h4>
+        <button @click="roleSwitcherOpen = false" class="text-muted-foreground hover:text-foreground">
           <X class="w-4 h-4" />
         </button>
       </div>
-      <p class="text-[11px] text-slate-300 mb-3 leading-relaxed">
-        Sélectionnez un profil pour tester les différentes vues et autorisations de la plateforme :
-      </p>
       <div class="space-y-1.5 text-xs">
         <button
-          @click="handleRoleChange('VISITOR')"
-          class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'VISITOR' && isPublicRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
+          v-for="(role, label) in [
+            ['VISITOR', '👤 Visiteur Public'],
+            ['COMMERCANT', '🏪 Commerçant'],
+            ['ADMIN_MARCHE', '🏢 Admin Marché'],
+            ['SUPER_ADMIN', '🔑 Super Admin'],
+          ]"
+          :key="role[0]"
+          @click="handleRoleChange(role[0])"
+          class="w-full py-2 px-3 rounded-lg text-left transition-colors"
+          :class="currentUser.role === role[0] ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'"
         >
-          <span>👤 Visiteur Public (Anonyme)</span>
-          <span v-if="currentUser.role === 'VISITOR'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
+          {{ role[1] }}
         </button>
-        <button
-          @click="handleRoleChange('COMMERCANT')"
-          class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'COMMERCANT' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
-        >
-          <span>🏪 Commerçant (Anésie N.)</span>
-          <span v-if="currentUser.role === 'COMMERCANT'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
-        </button>
-        <button
-          @click="handleRoleChange('ADMIN_MARCHE')"
-          class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'ADMIN_MARCHE' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
-        >
-          <span>🏢 Admin Marché (Pierre N.)</span>
-          <span v-if="currentUser.role === 'ADMIN_MARCHE'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
-        </button>
-        <button
-          @click="handleRoleChange('SUPER_ADMIN')"
-          class="w-full py-1.5 px-3 rounded text-left flex items-center justify-between transition-colors"
-          :class="currentUser.role === 'SUPER_ADMIN' && isAdminRoute ? 'bg-emerald-600 text-white' : 'bg-slate-700/50 hover:bg-slate-700'"
-        >
-          <span>🔑 Super Administrateur (Gilbert)</span>
-          <span v-if="currentUser.role === 'SUPER_ADMIN'" class="text-[10px] bg-slate-900 px-1.5 py-0.2 rounded font-semibold text-emerald-300">Actif</span>
-        </button>
-      </div>
-
-      <div class="border-t border-slate-700 py-1.5 mt-3 flex items-center justify-between">
-        <span class="text-[11px] text-slate-300 font-medium">Bascule rapide d'écran :</span>
-        <div class="flex gap-1">
-          <button
-            @click="router.push('/'); roleSwitcherOpen = false"
-            class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="isPublicRoute ? 'text-emerald-400 font-bold' : ''"
-            title="Secteur Public"
-          >
-            <ShoppingBag class="w-4 h-4 inline" />
-          </button>
-          <button
-            @click="goToAdmin(); roleSwitcherOpen = false"
-            class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="isAdminRoute ? 'text-emerald-400 font-bold' : ''"
-            title="Espace Admin"
-          >
-            <LayoutDashboard class="w-4 h-4 inline" />
-          </button>
-          <button
-            @click="goToLed(); roleSwitcherOpen = false"
-            class="p-1 rounded hover:bg-slate-700 text-slate-300 hover:text-white"
-            :class="isLedRoute ? 'text-emerald-400 font-bold' : ''"
-            title="Écran LED Public"
-          >
-            <Tv class="w-4 h-4 inline" />
-          </button>
-        </div>
       </div>
     </div>
 
-    <!-- Main Bar -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-
-      <!-- Brand logo -->
-      <div @click="handleLogoClick" class="flex items-center gap-2.5 cursor-pointer group shrink-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
-          <Building2 class="w-5 h-5 text-slate-950" />
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14">
+        <div @click="handleLogoClick" class="flex items-center gap-2.5 cursor-pointer group shrink-0">
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <Building2 class="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h1 class="text-base font-bold tracking-tight text-primary">AKAGURIRO</h1>
+            <p class="text-[9px] uppercase tracking-wider text-muted-foreground font-medium leading-none">Smart Markets Burundi</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-[19px] font-extrabold tracking-tight font-display bg-gradient-to-r from-emerald-400 to-teal-300 text-transparent bg-clip-text">
-            Akaguriro
-          </h1>
-          <p class="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold leading-none -mt-0.5">Smart Markets Burundi</p>
-        </div>
-      </div>
 
-      <!-- Desktop Quick Nav Links -->
-      <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-200">
-        <button
-          @click="handlePublicNav('home')"
-          class="transition-colors py-1 hover:text-emerald-400"
-          :class="isPublicRoute && publicTab === 'home' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
-        >
-          Accueil
-        </button>
-        <button
-          @click="handlePublicNav('markets')"
-          class="transition-colors py-1 hover:text-emerald-400"
-          :class="isPublicRoute && publicTab === 'markets' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
-        >
-          Marchés
-        </button>
-        <button
-          @click="handlePublicNav('products')"
-          class="transition-colors py-1 hover:text-emerald-400"
-          :class="isPublicRoute && publicTab === 'products' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
-        >
-          Produits
-        </button>
-        <button
-          @click="handlePublicNav('merchants')"
-          class="transition-colors py-1 hover:text-emerald-400"
-          :class="isPublicRoute && publicTab === 'merchants' ? 'text-emerald-400 border-b-2 border-emerald-400' : ''"
-        >
-          Commerçants
-        </button>
-
-        <template v-if="!isLoggedIn">
+        <nav class="hidden lg:flex items-center gap-1">
           <button
-            @click="handlePublicNav('auth')"
-            class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-1.5 rounded-lg text-xs transition-all shadow shadow-emerald-700/30"
+            v-for="item in navItems"
+            :key="item.id"
+            @click="handlePublicNav(item.id)"
+            class="px-4 py-2 text-sm font-medium transition-colors relative"
+            :class="isPublicRoute && publicTab === item.id
+              ? 'text-primary'
+              : 'text-muted-foreground hover:text-foreground'"
           >
-            Nous rejoindre (Connexion)
+            {{ item.label }}
+            <span
+              v-if="isPublicRoute && publicTab === item.id"
+              class="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full"
+            />
           </button>
-        </template>
-        <template v-else>
-          <div class="flex items-center gap-2 pl-4 border-l border-slate-800">
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <button
+            @click="isLedRoute ? router.push('/') : goToLed()"
+            class="hidden md:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
+            :class="isLedRoute ? 'bg-primary text-primary-foreground border-primary' : 'text-muted-foreground'"
+          >
+            <Tv class="w-3.5 h-3.5" />
+            LED
+          </button>
+
+          <template v-if="!isLoggedIn">
             <button
-              @click="goToProfile"
-              class="transition-all px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-              :class="isProfileRoute ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
+              @click="handlePublicNav('auth')"
+              class="bs-btn-primary text-xs hidden sm:inline-flex"
             >
-              <User class="w-3.5 h-3.5 text-emerald-500" />
-              Mon profil
+              Connexion
             </button>
+          </template>
+          <template v-else>
+            <span v-if="isLoggedIn" class="hidden md:inline text-xs text-muted-foreground">
+              Connecté : <span class="font-medium text-foreground">{{ currentUser.name }}</span>
+            </span>
             <button
               v-if="canAccessAdmin"
               @click="goToAdmin"
-              class="transition-all px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-              :class="isAdminRoute ? 'bg-slate-800 text-emerald-400' : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'"
+              class="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
+              :class="isAdminRoute ? 'text-primary border-primary/30 bg-primary/5' : 'text-muted-foreground'"
             >
-              <LayoutDashboard class="w-3.5 h-3.5 text-emerald-500" />
-              Mon Espace Admin
+              <LayoutDashboard class="w-3.5 h-3.5" />
+              Admin
+            </button>
+            <button
+              @click="goToProfile"
+              class="w-8 h-8 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center hover:bg-primary/90 transition-colors"
+              :title="currentUser.name"
+            >
+              {{ userInitials }}
             </button>
             <button
               @click="handleRoleChange('VISITOR')"
-              class="p-1.5 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
+              class="bs-btn-primary text-xs hidden sm:inline-flex"
               title="Se déconnecter"
             >
-              <LogOut class="w-4 h-4" />
+              <LogOut class="w-3.5 h-3.5" />
+              Déconnexion
             </button>
-          </div>
-        </template>
-      </nav>
+          </template>
 
-      <!-- Global actions: Screen Toggle & Mobile Menu -->
-      <div class="flex items-center gap-2">
-        <button
-          @click="isLedRoute ? router.push('/') : goToLed()"
-          class="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all"
-          :class="isLedRoute ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:bg-slate-800'"
-          title="Affichage Écran LED Public"
-        >
-          <Tv class="w-3.5 h-3.5" />
-          Écran LED
-        </button>
-
-        <button
-          v-if="isLoggedIn"
-          @click="goToProfile"
-          class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700/60 text-xs hover:bg-slate-700/80 transition-colors"
-        >
-          <img
-            v-if="currentUser.avatar"
-            :src="currentUser.avatar"
-            :alt="currentUser.name"
-            class="w-5 h-5 rounded-full object-cover"
-          />
-          <span
-            v-else
-            class="w-5 h-5 rounded-full bg-emerald-600 text-[9px] font-bold flex items-center justify-center text-white"
+          <button
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="lg:hidden p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent transition-colors"
           >
-            {{ userInitials }}
-          </span>
-          <span class="max-w-[70px] truncate hidden sm:inline text-slate-300">{{ currentUser.name.split(' ')[0] }}</span>
-          <span class="px-1 text-[9px] font-bold bg-slate-900 rounded text-emerald-400 uppercase tracking-tight">{{ currentUser.role.replace('_', ' ') }}</span>
-        </button>
-        <div
-          v-else
-          class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full border border-slate-700/60 text-xs"
-        >
-          <User class="w-3.5 h-3.5 text-emerald-400" />
-          <span class="hidden sm:inline text-slate-400">Visiteur</span>
+            <X v-if="mobileMenuOpen" class="w-5 h-5" />
+            <Menu v-else class="w-5 h-5" />
+          </button>
         </div>
-
-        <button
-          @click="mobileMenuOpen = !mobileMenuOpen"
-          class="lg:hidden p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-        >
-          <X v-if="mobileMenuOpen" class="w-6 h-6" />
-          <Menu v-else class="w-6 h-6" />
-        </button>
       </div>
-
     </div>
 
-    <!-- Mobile Drawer Navigation Menu -->
     <div
       v-if="mobileMenuOpen"
-      class="lg:hidden block bg-slate-900 border-t border-slate-800 px-4 py-4 space-y-3 absolute top-[90px] left-0 w-full shadow-2xl z-40 animate-fadeIn text-slate-200"
+      class="lg:hidden border-t border-border bg-card px-4 py-4 space-y-2 animate-fadeIn"
     >
-      <div class="space-y-1">
+      <button
+        v-for="item in navItems"
+        :key="item.id"
+        @click="handlePublicNav(item.id)"
+        class="w-full py-2.5 px-3 rounded-lg text-left text-sm font-medium"
+        :class="isPublicRoute && publicTab === item.id ? 'bg-primary/10 text-primary' : 'hover:bg-accent'"
+      >
+        {{ item.label }}
+      </button>
+      <div class="border-t border-border pt-3 space-y-2">
         <button
-          @click="handlePublicNav('home')"
-          class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="isPublicRoute && publicTab === 'home' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
+          v-if="!isLoggedIn"
+          @click="handlePublicNav('auth')"
+          class="w-full bs-btn-primary text-center"
         >
-          Accueil du portail
+          Connexion / Inscription
         </button>
-        <button
-          @click="handlePublicNav('markets')"
-          class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="isPublicRoute && publicTab === 'markets' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
-        >
-          Marchés du Burundi
-        </button>
-        <button
-          @click="handlePublicNav('products')"
-          class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="isPublicRoute && publicTab === 'products' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
-        >
-          Produits en vente
-        </button>
-        <button
-          @click="handlePublicNav('merchants')"
-          class="w-full py-2.5 px-3 rounded-lg text-left font-medium block"
-          :class="isPublicRoute && publicTab === 'merchants' ? 'bg-slate-800 text-emerald-400' : 'hover:bg-slate-800'"
-        >
-          Commerçants actifs
-        </button>
-        <button
-          @click="goToLed(); mobileMenuOpen = false"
-          class="w-full py-2.5 px-3 rounded-lg text-left font-medium flex items-center gap-2 border border-slate-800 text-blue-400"
-          :class="isLedRoute ? 'bg-slate-800' : 'hover:bg-slate-800'"
-        >
-          <Tv class="w-4 h-4" />
-          Écran publicitaire LED de marché
-        </button>
-      </div>
-
-      <div class="border-t border-slate-800 pt-3">
-        <template v-if="!isLoggedIn">
-          <button
-            @click="handlePublicNav('auth')"
-            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-center text-xs block transition-all"
-          >
-            S'enregistrer / Connexion
-          </button>
-        </template>
         <template v-else>
-          <div class="space-y-2">
-            <button
-              @click="goToProfile"
-              class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
-            >
-              <User class="w-4 h-4" />
-              Mon profil
-            </button>
-            <button
-              v-if="canAccessAdmin"
-              @click="goToAdmin(); mobileMenuOpen = false"
-              class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
-            >
-              <LayoutDashboard class="w-4 h-4" />
-              Aller au Dashboard Administratif
-            </button>
-            <button
-              @click="handleRoleChange('VISITOR'); mobileMenuOpen = false"
-              class="w-full bg-red-950/20 text-red-400 hover:bg-red-950/40 font-semibold py-2 rounded-lg text-center text-xs flex items-center justify-center gap-2 transition-all"
-            >
-              <LogOut class="w-3.5 h-3.5" />
-              Se déconnecter
-            </button>
-          </div>
+          <button @click="goToProfile" class="w-full py-2 rounded-lg text-sm font-medium hover:bg-accent flex items-center justify-center gap-2">
+            <User class="w-4 h-4" /> Mon profil
+          </button>
+          <button
+            v-if="canAccessAdmin"
+            @click="goToAdmin(); mobileMenuOpen = false"
+            class="w-full py-2 rounded-lg text-sm font-medium hover:bg-accent flex items-center justify-center gap-2"
+          >
+            <LayoutDashboard class="w-4 h-4" /> Espace Admin
+          </button>
+          <button
+            @click="handleRoleChange('VISITOR'); mobileMenuOpen = false"
+            class="w-full bs-btn-primary text-center"
+          >
+            Déconnexion
+          </button>
         </template>
       </div>
     </div>
