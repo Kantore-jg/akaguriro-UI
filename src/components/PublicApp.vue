@@ -285,14 +285,14 @@ const navigateHome = () => goHome();
             <button @click="goToTab('request')" class="text-left hover:text-white text-primary">Demander une place</button>
           </div>
         </div>
-        <div class="md:col-span-4 space-y-2">
+        <!-- <div class="md:col-span-4 space-y-2">
           <h4 class="text-[10px] text-primary font-extrabold uppercase tracking-widest mb-2.5">Partenaires Institutionnels</h4>
           <p class="text-slate-400 text-[11px] font-medium leading-relaxed">
             • Ministère des Infrastructures, du Commerce et de la Digitalisation <br />
             • Mairie de Bujumbura & Commissariats aux Marchés <br />
             • Régie Nationale des Postes et Télécommunications
           </p>
-        </div>
+        </div> -->
       </div>
       <div class="mx-auto max-w-7xl border-t border-slate-850 pt-6 mt-8 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-[9.5px] font-bold uppercase tracking-wide gap-3">
         <span>Plateforme Officielle - Akaguriro Burundi © 2026. Tous droits réservés.</span>

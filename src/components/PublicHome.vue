@@ -134,7 +134,7 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
-          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Filières Actives</h3>
+          <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Filières Actives</h3> -->
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Explorer par Catégories</h2>
         </div>
         <button
@@ -164,7 +164,7 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3>
+          <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3> -->
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Nos Marchés Publics Connectés</h2>
         </div>
         <button
@@ -188,10 +188,10 @@ function handleHeroSearchSubmit(e) {
               :alt="m.name"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
-            <div class="absolute top-3 left-3 bg-slate-900/80 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+            <!-- <div class="absolute top-3 left-3 bg-slate-900/80 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
               <MapPin class="w-3 h-3 text-primary" />
               {{ m.city }}
-            </div>
+            </div> -->
           </div>
 
           <div class="p-5 flex-1 flex flex-col justify-between space-y-4">

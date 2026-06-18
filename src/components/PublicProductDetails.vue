@@ -133,7 +133,7 @@ function handleViewPlaceOnMap() {
               class="inline-flex items-center gap-1 font-bold text-xs mt-1 px-2.5 py-0.5 rounded-full"
               :class="product.available ? 'bg-primary/10 text-emerald-800' : 'bg-red-100 text-red-800'"
             >
-              {{ product.available ? '🟢 En Stock' : '🔴 Rupture de stock' }}
+              {{ product.available ? ' En Stock' : ' Rupture de stock' }}
             </span>
           </div>
         </div>

@@ -119,13 +119,13 @@ function findMarket(marketId) {
                   v-model="category"
                   class="bg-transparent border-0 outline-none w-full text-xs cursor-pointer text-slate-700"
                 >
-                  <option value="Poissonnerie">🐟 Poissonnerie</option>
-                  <option value="Café & Thé">☕ Café & Thé de Montagne</option>
-                  <option value="Fruits & Légumes">🥑 Fruits & Légumes</option>
-                  <option value="Vivres">🌾 Vivres Alimentaires</option>
-                  <option value="Textiles">👕 Textiles & Couture</option>
-                  <option value="Artisanat">👜 Vanerie & Artisanat</option>
-                  <option value="Électronique">🔌 Tech / Services</option>
+                  <option value="Poissonnerie"> Poissonnerie</option>
+                  <option value="Café & Thé">Café & Thé de Montagne</option>
+                  <option value="Fruits & Légumes"> Fruits & Légumes</option>
+                  <option value="Vivres"> Vivres Alimentaires</option>
+                  <option value="Textiles"> Textiles & Couture</option>
+                  <option value="Artisanat"> Vanerie & Artisanat</option>
+                  <option value="Électronique"> Tech / Services</option>
                 </select>
               </div>
             </div>
@@ -145,7 +145,7 @@ function findMarket(marketId) {
           </div>
 
           <div class="space-y-1">
-            <label class="text-slate-500 block">Description Concise de l'Activité Réelle</label>
+            <label class="text-slate-500 block">Description</label>
             <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2.5">
               <FileText class="w-4 h-4 text-slate-400 shrink-0 self-start mt-1" />
               <input
@@ -159,7 +159,7 @@ function findMarket(marketId) {
           </div>
 
           <div class="space-y-1">
-            <label class="text-slate-500 block">Justification (Pourquoi avez-vous besoin de cette place ?)</label>
+            <label class="text-slate-500 block">Pourquoi avez-vous besoin de cette place ?</label>
             <textarea
               rows="4"
               placeholder="Rédigez ici vos motivations..."
@@ -173,8 +173,7 @@ function findMarket(marketId) {
             type="submit"
             class="w-full bg-primary hover:bg-primary transition-all text-white font-extrabold py-3.5 rounded-xl text-center text-xs tracking-wide shadow shadow-emerald-700/30 pt-3.5"
           >
-            Soumettre ma demande d'enregistrement
-          </button>
+            Soumettre</button>
 
         </form>
       </div>

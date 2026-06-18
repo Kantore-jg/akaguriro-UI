@@ -140,9 +140,9 @@ function getVendor(merchantId) {
         <ArrowLeft class="w-4 h-4" />
         Retour aux marchés publics
       </button>
-      <span class="text-xs font-semibold text-slate-400 bg-background px-2.5 py-1 rounded-full">
+      <!-- <span class="text-xs font-semibold text-slate-400 bg-background px-2.5 py-1 rounded-full">
         Système ID: {{ String(market.id).toUpperCase() }} • {{ market.city }}
-      </span>
+      </span> -->
     </div>
 
     <!-- 2. COVER HEADER -->
@@ -159,9 +159,9 @@ function getVendor(merchantId) {
       <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
 
         <div class="lg:col-span-8 space-y-4">
-          <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+          <!-- <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
             En direct de {{ market.city }}
-          </span>
+          </span> -->
           <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
             {{ market.name }}
           </h1>
@@ -213,11 +213,11 @@ function getVendor(merchantId) {
             class="bg-background border border-slate-200 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer text-slate-700"
           >
             <option value="all">Toutes les catégories</option>
-            <option value="Poissonnerie">🐟 Poissonnerie</option>
-            <option value="Céréales & Café">☕ Café / Céréales</option>
-            <option value="Fruits & Légumes">🥑 Fruits & Légumes</option>
-            <option value="Vivres">🌾 Vivres</option>
-            <option value="Textiles">👕 Textiles</option>
+            <option value="Poissonnerie"> Poissonnerie</option>
+            <option value="Céréales & Café"> Café / Céréales</option>
+            <option value="Fruits & Légumes"> Fruits & Légumes</option>
+            <option value="Vivres"> Vivres</option>
+            <option value="Textiles"> Textiles</option>
           </select>
         </div>
       </div>
@@ -314,7 +314,7 @@ function getVendor(merchantId) {
 
               <div v-if="selectedPlace.status === 'libre'" class="space-y-4 py-3">
                 <div class="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-bold text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  🟢 Emplacement Libre
+                   Emplacement Libre
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-semibold">
                   Cette place est actuellement vacante de commerçant. Elle peut accueillir des activités de type <strong class="text-white">Commerce Général, Primeurs, Poissonnerie ou textiles</strong>.
@@ -333,7 +333,7 @@ function getVendor(merchantId) {
 
               <div v-else-if="selectedPlace.status === 'maintenance'" class="space-y-4 py-3">
                 <div class="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 font-bold text-[10px] px-2 py-0.5 rounded-full border border-amber-500/20">
-                  🟡 En travaux / Réservée
+                   En travaux / Réservée
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed font-semibold">
                   Cet emplacement fait l'objet d'opérations d'entretien périodiques ou d'ajustement structurels par l'équipe d'administration publique.
@@ -423,13 +423,13 @@ function getVendor(merchantId) {
             </div>
           </template>
 
-          <div class="border-t border-slate-800 pt-3 text-[9.5px] text-slate-400 font-bold flex justify-between items-center bg-slate-900 select-none">
+          <!-- <div class="border-t border-slate-800 pt-3 text-[9.5px] text-slate-400 font-bold flex justify-between items-center bg-slate-900 select-none">
             <span>GPS: {{ market.city.toUpperCase() }}_PLAN_LIVE</span>
             <span class="text-primary flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               STABLE OMNI
             </span>
-          </div>
+          </div> -->
         </div>
 
       </div>
