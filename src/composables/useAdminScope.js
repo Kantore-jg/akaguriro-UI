@@ -11,6 +11,7 @@ export function useAdminScope() {
     products,
     requests,
     receipts,
+    users,
   } = useApp();
 
   const isSuperAdmin = computed(() => currentUser.value.role === 'SUPER_ADMIN');
@@ -76,6 +77,17 @@ export function useAdminScope() {
     ),
   );
 
+  const scopedUsers = computed(() => {
+    if (assignedMarketId.value) {
+      return users.value.filter(
+        (u) =>
+          u.id === currentUser.value.id ||
+          u.marketId == assignedMarketId.value,
+      );
+    }
+    return users.value;
+  });
+
   const scopedReceipts = computed(() => {
     if (isMerchant.value && assignedMerchantId.value) {
       return receipts.value.filter((r) => r.merchantId === assignedMerchantId.value);
@@ -101,6 +113,7 @@ export function useAdminScope() {
     products,
     requests,
     receipts,
+    users,
     isSuperAdmin,
     isMarketAdmin,
     isMerchant,
@@ -113,6 +126,7 @@ export function useAdminScope() {
     scopedMerchants,
     scopedProducts,
     scopedRequests,
+    scopedUsers,
     scopedReceipts,
     findMarket,
     findMerchant,

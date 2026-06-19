@@ -146,7 +146,7 @@ function goToProfile() {
           </div>
           <div>
             <h1 class="text-base font-bold tracking-tight text-primary">AKAGURIRO</h1>
-            <p class="text-[9px] uppercase tracking-wider text-muted-foreground font-medium leading-none">Smart Markets Burundi</p>
+            <!-- <p class="text-[9px] uppercase tracking-wider text-muted-foreground font-medium leading-none">Smart Markets Burundi</p> -->
           </div>
         </div>
 
@@ -169,14 +169,14 @@ function goToProfile() {
         </nav>
 
         <div class="flex items-center gap-2">
-          <button
+          <!-- <button
             @click="isLedRoute ? router.push('/') : goToLed()"
             class="hidden md:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
             :class="isLedRoute ? 'bg-primary text-primary-foreground border-primary' : 'text-muted-foreground'"
           >
             <Tv class="w-3.5 h-3.5" />
             LED
-          </button>
+          </button> -->
 
           <template v-if="!isLoggedIn">
             <button

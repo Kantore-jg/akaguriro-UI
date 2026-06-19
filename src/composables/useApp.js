@@ -22,6 +22,10 @@ import {
   fetchProducts,
   fetchPlaceRequests,
   fetchReceipts,
+  fetchUsers,
+  createUser,
+  updateUserApi,
+  deleteUserApi,
   createMarket,
   updateMarket as apiUpdateMarket,
   deleteMarketApi,
@@ -64,8 +68,10 @@ export function createAppState() {
   const productCategories = ref([]);
   const requests = ref([]);
   const receipts = ref([]);
+  const users = ref([]);
   const currentUser = ref(getStoredUser() || GUEST_USER);
   const loading = ref(false);
+  const usersLoading = ref(false);
   const initialized = ref(false);
 
   const viewState = ref('PUBLIC');
@@ -135,6 +141,21 @@ export function createAppState() {
     ]);
     requests.value = req;
     receipts.value = rec;
+  };
+
+  const loadUsers = async () => {
+    if (!['SUPER_ADMIN', 'ADMIN_MARCHE'].includes(currentUser.value?.role)) {
+      users.value = [];
+      return;
+    }
+    usersLoading.value = true;
+    try {
+      users.value = await fetchUsers();
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Erreur de chargement des utilisateurs'), 'error');
+    } finally {
+      usersLoading.value = false;
+    }
   };
 
   const refreshAll = async () => {
@@ -404,6 +425,53 @@ export function createAppState() {
     }
   };
 
+  const addUser = async (user) => {
+    try {
+      const created = await createUser(user);
+      users.value = [created, ...users.value];
+      showToast(`Utilisateur "${user.name}" créé avec succès`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const updateUser = async (user) => {
+    try {
+      const updated = await updateUserApi(user.id, user);
+      users.value = users.value.map((u) => (u.id === user.id ? updated : u));
+      showToast(`Utilisateur "${user.name}" mis à jour`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const deleteUser = async (id) => {
+    try {
+      await deleteUserApi(id);
+      users.value = users.value.filter((u) => u.id !== id);
+      showToast('Utilisateur supprimé', 'success');
+      return true;
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Impossible de supprimer cet utilisateur'), 'error');
+      return false;
+    }
+  };
+
+  const toggleUserActive = async (id, isActive) => {
+    const user = users.value.find((u) => u.id === id);
+    if (!user) return;
+    try {
+      const updated = await updateUserApi(id, { ...user, isActive });
+      users.value = users.value.map((u) => (u.id === id ? updated : u));
+      showToast(
+        `Compte ${isActive ? 'activé' : 'désactivé'}`,
+        isActive ? 'success' : 'info',
+      );
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
   const updatePlaceStatus = async (placeNumber, marketId, status, merchantId) => {
     const place = places.value.find((p) => p.id === placeNumber && p.marketId === marketId);
     if (!place?.placeId) {
@@ -444,8 +512,10 @@ export function createAppState() {
     productCategories,
     requests,
     receipts,
+    users,
     currentUser,
     loading,
+    usersLoading,
     initialized,
     viewState,
     selectedMarketId,
@@ -459,6 +529,7 @@ export function createAppState() {
     updateProfile,
     updatePassword,
     refreshAll,
+    loadUsers,
     loadBlocks,
     setCurrentUser,
     setViewState,
@@ -482,6 +553,10 @@ export function createAppState() {
     updateProduct,
     deleteProduct,
     updatePlaceStatus,
+    addUser,
+    updateUser,
+    deleteUser,
+    toggleUserActive,
     showToast,
     clearToast,
   };

@@ -14,6 +14,7 @@ import {
   X,
   LogOut,
   User,
+  UserCog,
   ChevronDown,
   Eye,
   Building2,
@@ -85,6 +86,7 @@ const navigation = computed(() => {
 
   if (isSuperAdmin.value) {
     items.push(
+      { id: 'users', name: 'Utilisateurs', icon: UserCog, path: '/admin/users' },
       { id: 'markets', name: 'Marchés', icon: Store, path: '/admin/markets' },
       { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
       { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
@@ -93,6 +95,7 @@ const navigation = computed(() => {
 
   if (isMarketAdmin.value) {
     items.push(
+      { id: 'users', name: 'Utilisateurs', icon: UserCog, path: '/admin/users' },
       { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
       { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
       {

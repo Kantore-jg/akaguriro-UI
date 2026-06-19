@@ -166,6 +166,13 @@ export function mapReceipt(r) {
   };
 }
 
+const ROLE_LABELS = {
+  SUPER_ADMIN: 'Super Administrateur',
+  ADMIN_MARCHE: 'Admin Marché',
+  COMMERCANT: 'Commerçant',
+  USER: 'Utilisateur',
+};
+
 export function mapUser(u) {
   const role = u.roles?.[0] || 'USER';
   return {
@@ -175,10 +182,31 @@ export function mapUser(u) {
     phone: u.phone || '',
     avatar: resolveStorageUrl(u.avatar),
     role,
-    marketId: u.managed_market_id || null,
+    roleLabel: ROLE_LABELS[role] || role,
+    isActive: u.is_active ?? true,
+    marketId: u.managed_market_id || u.active_market_id || null,
+    marketName: u.managed_market?.name || u.active_market?.name || '',
     merchantId: role === 'COMMERCANT' ? u.id : null,
     permissions: u.permissions || [],
+    createdAt: u.created_at?.split('T')[0] || '',
   };
+}
+
+export function userToApi(data) {
+  const payload = {
+    name: data.name,
+    email: data.email,
+    phone: data.phone || null,
+    role: data.role,
+    is_active: data.isActive ?? true,
+    managed_market_id: data.role === 'ADMIN_MARCHE' ? (data.marketId || null) : null,
+  };
+
+  if (data.password) {
+    payload.password = data.password;
+  }
+
+  return payload;
 }
 
 export function marketToApi(data) {

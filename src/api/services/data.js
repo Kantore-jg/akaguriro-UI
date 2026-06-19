@@ -8,7 +8,9 @@ import {
   mapProduct,
   mapPlaceRequest,
   mapReceipt,
+  mapUser,
   marketToApi,
+  userToApi,
   blockToApi,
   placeToApi,
   productToApi,
@@ -89,6 +91,25 @@ export async function fetchPlaces(params = {}) {
 export async function fetchMerchants(params = {}) {
   const { data } = await apiClient.get('/merchants', { params: { per_page: PER_PAGE, ...params } });
   return extractList({ data }).map(mapMerchant);
+}
+
+export async function fetchUsers(params = {}) {
+  const { data } = await apiClient.get('/users', { params: { per_page: PER_PAGE, ...params } });
+  return extractList({ data }).map(mapUser);
+}
+
+export async function createUser(user) {
+  const { data } = await apiClient.post('/users', userToApi(user));
+  return mapUser(extractData({ data }));
+}
+
+export async function updateUserApi(id, user) {
+  const { data } = await apiClient.put(`/users/${id}`, userToApi(user));
+  return mapUser(extractData({ data }));
+}
+
+export async function deleteUserApi(id) {
+  await apiClient.delete(`/users/${id}`);
 }
 
 export async function fetchProducts(params = {}) {

@@ -33,6 +33,12 @@ const routes = [
         meta: { title: 'Tableau de bord' },
       },
       {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('../app/components/pages/admin/UsersPage.vue'),
+        meta: { title: 'Utilisateurs', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+      },
+      {
         path: 'markets',
         name: 'AdminMarkets',
         component: () => import('../app/components/pages/admin/MarketsPage.vue'),
