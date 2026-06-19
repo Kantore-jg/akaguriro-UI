@@ -42,14 +42,6 @@ const totalAvailablePlaces = computed(() =>
   markets.value.reduce((sum, m) => sum + (m.totalPlaces - m.occupiedPlaces), 0)
 );
 
-const categories = computed(() => [
-  { name: 'Poissons', icon: '🐟', count: products.value.filter(p => p.category === 'Poissons').length },
-  { name: 'Café & Thé', icon: '☕', count: products.value.filter(p => p.category === 'Café & Thé').length },
-  { name: 'Fruits & Légumes', icon: '🥑', count: products.value.filter(p => p.category === 'Fruits & Légumes').length },
-  { name: 'Vivres', icon: '🌾', count: products.value.filter(p => p.category === 'Vivres').length },
-  { name: 'Textiles', icon: '👕', count: products.value.filter(p => p.category === 'Textiles').length },
-]);
-
 function handleHeroSearchSubmit(e) {
   e.preventDefault();
   goToTab('products');
@@ -59,82 +51,12 @@ function handleHeroSearchSubmit(e) {
 <template>
   <div class="space-y-16 pb-20">
 
-    <!-- 1. HERO SECTION -->
-    <!-- <section class="relative overflow-hidden bg-slate-900 text-white py-12 lg:py-24 px-4 sm:px-6 lg:px-8">
-      <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,#000_70%,transparent_100%)] opacity-35" />
 
-      <div class="relative mx-auto max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
-          <div class="lg:col-span-7 space-y-6">
-            
-
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] font-display">
-              Retrouvez facilement les <span class="bg-gradient-to-r from-primary-400 to-primary-300 text-transparent bg-clip-text">produits</span> et <span class="bg-gradient-to-r from-teal-300 to-emerald-400 text-transparent bg-clip-text">commerçants</span> du Burundi
-            </h2>
-
-            <p class="text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
-              Akaguriro digitalise les marchés de Bujumbura, Gitega, Ngozi et Rumonge. Explorez l'emplacement exact des étals, comparez les prix nationaux en temps réel et contactez directement les marchands locaux.
-            </p>
-
-            <form @submit="handleHeroSearchSubmit" class="bg-slate-800/90 border border-slate-700/60 p-2 rounded-2xl shadow-2xl max-w-2xl flex flex-col sm:flex-row gap-2 transition-all">
-              <div class="flex-1 flex items-center gap-2 px-3 py-2 bg-slate-900/60 rounded-xl">
-                <Search class="w-5 h-5 text-slate-400 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Chercher un produit (ex. Mukeke, Avocat...)"
-                  v-model="searchQuery"
-                  class="w-full bg-transparent border-0 text-white text-sm outline-none placeholder:text-slate-500"
-                />
-              </div>
-
-              <div class="sm:w-44 flex items-center gap-2 px-3 py-2 bg-slate-900/60 rounded-xl text-xs text-slate-300">
-                <MapPin class="w-4 h-4 text-primary shrink-0" />
-                <select
-                  v-model="searchMarket"
-                  class="bg-transparent border-0 outline-none w-full cursor-pointer text-slate-300 font-medium"
-                >
-                  <option value="all" class="bg-slate-800 text-white">Tous Marchés</option>
-                  <option v-for="m in markets" :key="m.id" :value="m.id" class="bg-slate-800 text-white">{{ m.city }}</option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                class="bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 font-bold px-6 py-3 rounded-xl text-slate-950 text-sm transition-all shadow-lg hover:scale-[1.01]"
-              >
-                Trouver
-              </button>
-            </form>
-
-            <div class="flex flex-wrap items-center gap-6 text-xs text-slate-400 pt-2 font-medium">
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Éclairage LED Intelligent</span>
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Plans Indoor Interactifs</span>
-              <span class="flex items-center gap-1.5"><CheckCircle class="w-4 h-4 text-primary" /> Catalogues Commerçants Vérifiés</span>
-            </div>
-          </div>
-
-          <div class="lg:col-span-5 relative">
-            <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-500 opacity-20 blur-xl"></div>
-            <div class="relative rounded-2xl overflow-hidden border border-slate-700 aspect-[4/3] shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=650"
-                alt="Marché Africain Moderne"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section> -->
-
-    <!-- 2. CATEGORIES INSPIRATION BAR -->
+    <!-- 2. CATEGORIES INSPIRATION BAR
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
-          <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Filières Actives</h3> -->
+           <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Filières Actives</h3> 
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Explorer par Catégories</h2>
         </div>
         <button
@@ -158,7 +80,7 @@ function handleHeroSearchSubmit(e) {
           <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ cat.count }} articles en vente</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- 3. POPULAR MARKETS SECTION -->
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -238,11 +160,11 @@ function handleHeroSearchSubmit(e) {
     <section class="bg-slate-100/70 border-y border-slate-200/50 py-12 px-4">
       <div class="mx-auto max-w-7xl">
         <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
-          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Indicateurs Digitaux</h3>
+          <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Indicateurs Digitaux</h3> -->
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">La Smart City en Chiffres</h2>
-          <p class="text-slate-500 text-xs sm:text-sm">
+          <!-- <p class="text-slate-500 text-xs sm:text-sm">
             Suivi statistique réactif de nos places d'étalage et flux de produits nationaux.
-          </p>
+          </p> -->
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -254,7 +176,6 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Marchés Digitalisés</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalMarketsCount }}</span>
-              <span class="text-[10px] text-primary block font-semibold">100% de fiabilité</span>
             </div>
           </div>
 
@@ -265,7 +186,6 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Commerçants Enregistrés</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalMerchantsCount }}</span>
-              <span class="text-[10px] text-primary block font-semibold">+4 recrutés ce mois</span>
             </div>
           </div>
 
@@ -276,7 +196,6 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Produits en Ligne</span>
               <span class="text-2xl font-extrabold text-slate-900">{{ totalProductsCount }}</span>
-              <span class="text-[10px] text-primary block font-semibold">Mis à jour régulièrement</span>
             </div>
           </div>
 
@@ -287,7 +206,6 @@ function handleHeroSearchSubmit(e) {
             <div>
               <span class="text-[11px] text-slate-400 block font-semibold uppercase">Emplacements Libres</span>
               <span class="text-2xl font-extrabold text-slate-900 text-primary">{{ totalAvailablePlaces }}</span>
-              <span class="text-[10px] text-amber-500 block font-semibold">Disponibles à la demande</span>
             </div>
           </div>
 
@@ -299,7 +217,7 @@ function handleHeroSearchSubmit(e) {
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Catalogue National</h3>
+          <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Catalogue National</h3> -->
           <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produits Tendances</h2>
         </div>
         <button

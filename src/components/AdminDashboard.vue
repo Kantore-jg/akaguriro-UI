@@ -634,7 +634,7 @@ function getMerchantById(id) {
                 </td>
                 <td class="py-4 px-4">
                   <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold text-[9px]">
-                    🟢 CONNECTÉ (LED ACTIVE)
+                     CONNECTÉ (LED ACTIVE)
                   </span>
                 </td>
               </tr>

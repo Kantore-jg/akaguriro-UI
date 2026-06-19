@@ -197,10 +197,10 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div class="space-y-1">
-          <div class="flex items-center gap-2">
+          <!-- <div class="flex items-center gap-2">
             <Compass class="w-5 h-5 text-primary shrink-0" />
             <h2 class="text-lg font-extrabold text-slate-900 tracking-tight font-display">Plan Géomatique Indoor Interactif</h2>
-          </div>
+          </div> -->
           <p class="text-xs text-slate-500 font-medium">
             Représentation en temps réel des étals physiques du marché. Cliquez sur un carré d'étal pour visiter le commerçant et voir ses produits.
           </p>
@@ -439,7 +439,6 @@ function getVendor(merchantId) {
     <!-- 4. TOP COMMERÇANTS PODIUM -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h3 class="text-sm font-bold text-primary uppercase tracking-wider">L'Élite d'affaires</h3>
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
           Vendeurs les Mieux Notés
         </h2>
@@ -489,7 +488,6 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-3">
         <div>
-          <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Articles Locaux</h3>
           <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
             Catalogue Alimentaire & Produits du Marché
           </h2>

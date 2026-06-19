@@ -69,14 +69,14 @@ onMounted(() => {
     <div class="print-document">
       <header class="print-document__header">
         <div class="print-document__brand">AKAGURIRO</div>
-        <div class="print-document__subtitle">République du Burundi — Rapport officiel</div>
+        <!-- <div class="print-document__subtitle">République du Burundi — Rapport officiel</div> -->
         <h1 class="print-document__title">
           Plan des emplacements
           <template v-if="market"> — {{ market.name }}</template>
         </h1>
         <div class="print-document__meta">
           <span v-if="market"><strong>Marché :</strong> {{ market.name }} ({{ market.city }})</span>
-          <span><strong>Édité par :</strong> {{ currentUser.name }}</span>
+          <!-- <span><strong>Édité par :</strong> {{ currentUser.name }}</span> -->
           <span><strong>Date :</strong> {{ printedAt }}</span>
         </div>
       </header>

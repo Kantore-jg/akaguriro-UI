@@ -113,7 +113,7 @@ const navigateHome = () => goHome();
         <PublicProductDetails v-if="selectedProductId" />
         <div v-else class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
           <div class="space-y-1.5">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Alimentation, Textiles & Épices</h3>
+            <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Alimentation, Textiles & Épices</h3> -->
             <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
               Catalogue Digital des Produits du Burundi
             </h1>
@@ -139,7 +139,7 @@ const navigateHome = () => goHome();
               >
                 <option value="all">Secteur / Tout</option>
                 <option value="Poissons"> Poissons</option>
-                <option value="Café & Thé">☕ Café & Thé</option>
+                <option value="Café & Thé"> Café & Thé</option>
                 <option value="Fruits & Légumes"> Fruits & Légumes</option>
                 <option value="Vivres"> Vivres</option>
                 <option value="Textiles"> Textiles</option>
@@ -194,13 +194,11 @@ const navigateHome = () => goHome();
 
       <div v-else-if="publicTab === 'merchants'" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
         <div class="space-y-1.5">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Habilités par Mairies</h3>
+          <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Habilités par Mairies</h3> -->
           <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
-            Annuaire Public des Commerçants
+           Public des Commerçants
           </h1>
-          <p class="text-slate-500 text-sm max-w-xl font-medium">
-            Vérifiez les agréments d'occupation d'étals, inspectez leur score et contactez-les de manière sécurisée.
-          </p>
+         
         </div>
 
         <div class="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -219,7 +217,7 @@ const navigateHome = () => goHome();
           >
             <option value="all">Spécialité / Tout</option>
             <option value="Poissonnerie"> Poissonnerie</option>
-            <option value="Spécialités Nationales">☕ Spécialités Nationales</option>
+            <option value="Spécialités Nationales">Spécialités Nationales</option>
             <option value="Fruits & Légumes"> Fruits & Légumes</option>
             <option value="Textiles & Modes">Textiles & Modes</option>
           </select>
@@ -272,7 +270,7 @@ const navigateHome = () => goHome();
             <h3 class="text-base font-extrabold text-white">Akaguriro</h3>
           </div>
           <p class="text-slate-400 leading-relaxed text-[11px] font-medium max-w-sm">
-            Plateforme nationale de digitalisation et d'aide à la gestion des marchés communaux de la République du Burundi.
+            Plateforme de digitalisation et d'aide à la gestion des marchés communaux de la République du Burundi.
           </p>
         </div>
         <div class="md:col-span-4 space-y-1">

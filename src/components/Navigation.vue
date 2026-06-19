@@ -187,9 +187,9 @@ function goToProfile() {
             </button>
           </template>
           <template v-else>
-            <span v-if="isLoggedIn" class="hidden md:inline text-xs text-muted-foreground">
+            <!-- <span v-if="isLoggedIn" class="hidden md:inline text-xs text-muted-foreground">
               Connecté : <span class="font-medium text-foreground">{{ currentUser.name }}</span>
-            </span>
+            </span> -->
             <button
               v-if="canAccessAdmin"
               @click="goToAdmin"
