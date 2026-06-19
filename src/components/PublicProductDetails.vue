@@ -104,17 +104,14 @@ function handleViewPlaceOnMap() {
       <div class="lg:col-span-6 space-y-6">
 
         <div class="space-y-2">
-          <span class="inline-block bg-emerald-50 text-primary font-bold text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-emerald-100">
-            {{ product.category }}
-          </span>
-          <h1 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
+          <h1 ">
             {{ product.name }}
           </h1>
 
           <!-- Store & City location block -->
           <p v-if="market" class="text-xs sm:text-sm font-semibold text-slate-500 flex items-center gap-1.5 pt-0.5">
             <MapPin class="w-4 h-4 text-primary shrink-0" />
-            {{ market.name }} ({{ market.city }})
+            {{ market.name }} 
           </p>
         </div>
 
@@ -219,7 +216,7 @@ function handleViewPlaceOnMap() {
     <!-- 4. SIMILAR SUGGESTED PRODUCTS -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight font-display">
+        <h2 ">
           Dans la même filière alimentaire ({{ product.category }})
         </h2>
       </div>

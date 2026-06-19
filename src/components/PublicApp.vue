@@ -114,11 +114,11 @@ const navigateHome = () => goHome();
         <div v-else class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
           <div class="space-y-1.5">
             <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Alimentation, Textiles & Épices</h3> -->
-            <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
+            <h1 ">
               Catalogue Digital des Produits du Burundi
             </h1>
             <p class="text-slate-500 text-sm max-w-xl font-medium">
-              Comparez les tarifs indicatifs arrêtés par les mairies provinciales et localisez précisément l'étalage d'approvisionnement.
+              Comparez les tarifs indicatifs arrêtés par les mairies provinciales 
             </p>
           </div>
 
@@ -165,13 +165,13 @@ const navigateHome = () => goHome();
               v-for="p in filteredProducts"
               :key="p.id"
               @click="goToProduct(p.id)"
-              class="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3.5 hover:shadow-md transition-all cursor-pointer group"
+              class="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3.5  transition-all "
             >
               <div class="relative rounded-xl overflow-hidden aspect-square bg-background">
                 <img :src="p.image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <span v-if="p.isTrending" class="absolute top-2.5 left-2.5 bg-yellow-400 text-slate-900 font-extrabold text-[8.5px] px-2 py-0.5 rounded uppercase">
+                <!-- <span v-if="p.isTrending" class="absolute top-2.5 left-2.5 bg-yellow-400 text-slate-900 font-extrabold text-[8.5px] px-2 py-0.5 rounded uppercase">
                   Tendance
-                </span>
+                </span> -->
               </div>
               <div class="space-y-1">
                 <span class="text-[9.5px] font-bold text-primary block uppercase tracking-wide">{{ p.category }}</span>
@@ -195,7 +195,7 @@ const navigateHome = () => goHome();
       <div v-else-if="publicTab === 'merchants'" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
         <div class="space-y-1.5">
           <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Habilités par Mairies</h3> -->
-          <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
+          <h1 ">
            Public des Commerçants
           </h1>
          

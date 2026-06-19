@@ -87,7 +87,7 @@ function handleHeroSearchSubmit(e) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3> -->
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Nos Marchés Publics Connectés</h2>
+          <h2 class="">Nos Marchés Publics Connectés</h2>
         </div>
         <button
           @click="goToTab('markets')"
@@ -118,7 +118,7 @@ function handleHeroSearchSubmit(e) {
 
           <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <h4 class="text-base font-extrabold text-slate-900 tracking-tight leading-snug group-hover:text-primary transition-colors">
+              <h4 ">
                 {{ m.name }}
               </h4>
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -161,7 +161,7 @@ function handleHeroSearchSubmit(e) {
       <div class="mx-auto max-w-7xl">
         <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Indicateurs Digitaux</h3> -->
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">La Smart City en Chiffres</h2>
+          <h2>La Smart City en Chiffres</h2>
           <!-- <p class="text-slate-500 text-xs sm:text-sm">
             Suivi statistique réactif de nos places d'étalage et flux de produits nationaux.
           </p> -->
@@ -218,7 +218,7 @@ function handleHeroSearchSubmit(e) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Catalogue National</h3> -->
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produits Tendances</h2>
+          <h2 >Produits Tendances</h2>
         </div>
         <button
           @click="goToTab('products')"
@@ -234,7 +234,7 @@ function handleHeroSearchSubmit(e) {
           v-for="p in products.slice(0, 4)"
           :key="p.id"
           @click="goToProduct(p.id)"
-          class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-3.5 space-y-3 group"
+          class=""
         >
           <div class="relative rounded-xl overflow-hidden bg-background aspect-square">
             <img

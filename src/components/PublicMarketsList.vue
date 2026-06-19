@@ -37,12 +37,10 @@ function resetFilters() {
     <!-- Header -->
     <div class="space-y-2">
       <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Plateforme Nationale</h3> -->
-      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+      <h1 ">
         Marchés Publics Numérisés du Burundi
       </h1>
-      <p class="text-slate-500 text-sm max-w-2xl">
-        Sélectionnez un marché et accédez à l'index exhaustif de ses commerçants, ses produits phares, son taux d'occupation de places et le plan géomatique en direct.
-      </p>
+    
     </div>
 
     <!-- Filters & Search Panel -->
