@@ -91,13 +91,5 @@ const reports = computed(() => {
       </button>
     </div>
 
-    <div class="bs-card p-4 text-sm text-muted-foreground">
-      <p>
-        Les rapports s'ouvrent dans une page HTML dédiée. Utilisez le bouton
-        <strong class="text-foreground">Imprimer</strong> ou
-        <kbd class="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+P</kbd>
-        pour lancer l'impression papier ou l'export PDF.
-      </p>
-    </div>
   </div>
 </template>

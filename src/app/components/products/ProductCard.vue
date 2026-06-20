@@ -27,9 +27,9 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
       >
         Aucune image
       </div>
-      <span class="bs-category-pill absolute top-3 left-3 bg-white/90 backdrop-blur-sm">
+      <!-- <span class="bs-category-pill absolute top-3 left-3 bg-white/90 backdrop-blur-sm">
         {{ product.category }}
-      </span>
+      </span> -->
     </div>
 
     <div class="p-4 flex-1 flex flex-col gap-3">
