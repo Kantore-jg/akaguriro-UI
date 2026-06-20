@@ -1,5 +1,5 @@
 <script setup>
-import { Star, ShieldCheck, Phone, MapPin } from 'lucide-vue-next';
+import { ShieldCheck, Phone, MapPin } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import {
@@ -41,10 +41,6 @@ const emit = defineEmits(['update:open']);
             <MapPin class="w-3.5 h-3.5 text-muted-foreground" />
             {{ marketName }} — Étale {{ merchant.activePlaceNumber || merchant.activePlaceId }}
           </p>
-          <div class="flex items-center gap-1 text-yellow-500">
-            <Star class="w-4 h-4 fill-yellow-400" />
-            <span class="text-sm font-medium">{{ merchant.rating }} / 5</span>
-          </div>
         </div>
       </div>
 

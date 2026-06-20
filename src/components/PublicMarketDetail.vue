@@ -16,7 +16,6 @@ import {
   X,
   MessageSquare,
   Phone,
-  Star,
   Compass,
   ArrowLeft,
 } from 'lucide-vue-next';
@@ -65,7 +64,9 @@ const marketMerchants = computed(() => {
 });
 
 const topMerchants = computed(() =>
-  [...marketMerchants.value].sort((a, b) => b.rating - a.rating).slice(0, 3)
+  [...marketMerchants.value]
+    .sort((a, b) => (b.productsCount ?? 0) - (a.productsCount ?? 0))
+    .slice(0, 3),
 );
 
 const activeStallMerchant = computed(() => {
@@ -355,10 +356,6 @@ function getVendor(merchantId) {
                           <ShieldCheck class="w-3.5 h-3.5 text-primary inline shrink-0" />
                         </h5>
                         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">{{ activeStallMerchant.category }}</p>
-                        <div class="flex items-center gap-1 mt-0.5 text-yellow-400">
-                          <Star class="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <!-- <span class="text-[10.5px] font-semibold text-slate-300">{{ activeStallMerchant.rating }} (Score UX)</span> -->
-                        </div>
                       </div>
                     </div>
 
@@ -436,11 +433,11 @@ function getVendor(merchantId) {
 
     </section>
 
-    <!-- 4. TOP COMMERÇANTS PODIUM -->
+    <!-- 4. COMMERÇANTS ACTIFS -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
-          Vendeurs les Mieux Notés
+          Commerçants actifs
         </h2>
       </div>
 
@@ -472,11 +469,7 @@ function getVendor(merchantId) {
             </h4>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
             <p class="text-[11px] text-slate-500 font-medium">Stalle active : <span class="font-bold text-slate-800">{{ m.activePlaceNumber || m.activePlaceId }}</span></p>
-
-            <div class="flex items-center gap-1 text-yellow-400 pt-0.5">
-              <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-              <!-- <span class="text-[11.5px] font-extrabold text-slate-700">{{ m.rating }} score</span> -->
-            </div>
+            <p class="text-[11px] text-slate-500 font-medium">{{ m.productsCount ?? 0 }} produit(s) référencé(s)</p>
           </div>
           </div>
         </template>

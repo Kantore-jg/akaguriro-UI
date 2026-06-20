@@ -99,7 +99,6 @@ export function mapMerchant(m) {
     phone: m.phone || '',
     image: m.image || null,
     category: m.category || 'Commerce Général',
-    rating: m.rating ?? 4.8,
     activePlaceId: m.active_place_id || null,
     activePlaceNumber: m.active_place_number || '',
     activeMarketId: m.active_market_id,

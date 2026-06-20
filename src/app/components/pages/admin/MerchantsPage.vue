@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Search, Users, ShieldCheck, Star, Printer } from 'lucide-vue-next';
+import { Search, Users, ShieldCheck, Package, Printer } from 'lucide-vue-next';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import Button from '../../ui/Button.vue';
@@ -60,13 +60,7 @@ const verifiedCount = computed(() =>
   scopedMerchants.value.filter((m) => m.verified).length,
 );
 
-const avgRating = computed(() => {
-  if (!scopedMerchants.value.length) return '—';
-  const avg =
-    scopedMerchants.value.reduce((s, m) => s + m.rating, 0) /
-    scopedMerchants.value.length;
-  return avg.toFixed(1);
-});
+const totalProducts = computed(() => scopedProducts.value.length);
 
 const getMarketLabel = (marketId) => {
   const m = findMarket(marketId);
@@ -121,9 +115,9 @@ const viewingProductsCount = computed(() => {
         color="success"
       />
       <StatCard
-        title="Score moyen"
-        :value="avgRating"
-        :icon="Star"
+        title="Produits référencés"
+        :value="totalProducts"
+        :icon="Package"
         color="warning"
       />
     </div>

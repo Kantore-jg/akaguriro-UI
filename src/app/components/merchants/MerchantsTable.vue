@@ -1,5 +1,5 @@
 <script setup>
-import { Eye, MoreHorizontal, ShieldCheck, Star } from 'lucide-vue-next';
+import { Eye, MoreHorizontal, ShieldCheck } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import {
@@ -34,14 +34,13 @@ const emit = defineEmits(['view']);
           <TableHead>Téléphone</TableHead>
           <TableHead>Marché & étal</TableHead>
           <TableHead>Filière</TableHead>
-          <!-- <TableHead>Score</TableHead> -->
           <TableHead>Statut</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-if="!merchants.length">
-          <TableCell colspan="7" class="text-center py-8 text-muted-foreground">
+          <TableCell colspan="6" class="text-center py-8 text-muted-foreground">
             Aucun commerçant trouvé.
           </TableCell>
         </TableRow>
@@ -58,12 +57,6 @@ const emit = defineEmits(['view']);
             <span class="text-muted-foreground"> · {{ merchant.activePlaceNumber || merchant.activePlaceId }}</span>
           </TableCell>
           <TableCell>{{ merchant.category }}</TableCell>
-          <!-- <TableCell>
-            <div class="flex items-center gap-1 text-sm">
-              <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-              {{ merchant.rating }}
-            </div>
-          </TableCell> -->
           <TableCell>
             <Badge :variant="merchant.verified ? 'default' : 'secondary'">
               <ShieldCheck class="w-3 h-3 mr-1" />

@@ -9,7 +9,6 @@ import { useLedDisplay } from '../composables/useLedDisplay.js';
 import {
   Tv,
   TrendingUp,
-  Star,
   Volume2,
   Eye,
   Sparkles,
@@ -169,7 +168,7 @@ const formatRefreshTime = (date) =>
         <div class="border-b border-slate-800 pb-2">
           <h2 class="text-base sm:text-lg font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
             <Sparkles class="w-5 h-5 text-yellow-400" />
-            Opérateurs Exemplaires
+            Commerçants actifs
           </h2>
         </div>
 
@@ -193,16 +192,12 @@ const formatRefreshTime = (date) =>
                 {{ item.category }} • Étale {{ item.activePlaceId }}
               </p>
               <p class="text-[10px] text-slate-500 font-medium">{{ item.productsCount }} produit(s) actif(s)</p>
-              <div class="flex items-center gap-1 text-yellow-400 pt-1">
-                <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                <!-- <span class="text-[11px] font-extrabold text-slate-200">{{ item.rating }} Score Habilité</span> -->
-              </div>
             </div>
           </div>
         </div>
 
         <div v-else class="bg-slate-900 border border-slate-800 p-8 rounded-2xl text-center text-slate-500 text-sm font-bold">
-          Aucun commerçant classé pour ce marché
+          Aucun commerçant actif pour ce marché
         </div>
       </section>
     </main>

@@ -46,7 +46,6 @@ export function useLedDisplay() {
       category: m.category || 'Commerce Général',
       activePlaceId: m.active_place_number || '—',
       activeMarketId: m.active_market_id,
-      rating: m.rating ?? 4.8,
       productsCount: m.products_count ?? 0,
     })),
   );

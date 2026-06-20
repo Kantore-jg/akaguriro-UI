@@ -11,7 +11,7 @@ import PublicMarketDetail from './PublicMarketDetail.vue';
 import PublicProductDetails from './PublicProductDetails.vue';
 import PublicRequestPlace from './PublicRequestPlace.vue';
 import ProfilePage from './ProfilePage.vue';
-import { Search, Star, MessageSquare, ShieldCheck } from 'lucide-vue-next';
+import { Search, MessageSquare, ShieldCheck } from 'lucide-vue-next';
 
 const route = useRoute();
 const router = useRouter();
@@ -239,10 +239,6 @@ const navigateHome = () => goHome();
               <p v-if="markets.find(mk => sameId(mk.id, m.activeMarketId))" class="text-slate-500 font-medium">
                 {{ markets.find(mk => sameId(mk.id, m.activeMarketId))?.city }} • Étale {{ m.activePlaceNumber || m.activePlaceId }}
               </p>
-              <div class="flex items-center gap-1.5 text-yellow-400 py-0.5">
-                <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                <!-- <span class="text-[11.5px] font-black text-slate-700">{{ m.rating }} (Score Mairie)</span> -->
-              </div>
             </div>
             <div class="absolute bottom-4 right-4 flex gap-1">
               <a

@@ -14,7 +14,6 @@ import {
   Store,
   MessageSquare,
   ShieldCheck,
-  Star
 } from 'lucide-vue-next';
 
 const {
@@ -163,7 +162,7 @@ function handleViewPlaceOnMap() {
           </div>
         </div>
 
-        <!-- 3. MERCHANT SHORTCARD WITH RATINGS -->
+        <!-- 3. MERCHANT SHORTCARD -->
         <div v-if="merchant" class="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-3 shadow-inner">
           <span class="block text-[10px] text-primary font-bold uppercase tracking-wider">Commerçant Habilité</span>
           <div class="flex gap-3.5 items-center">
@@ -178,11 +177,6 @@ function handleViewPlaceOnMap() {
                 <ShieldCheck class="w-4 h-4 text-primary inline shrink-0" />
               </h4>
               <p class="text-[10px] text-slate-400 uppercase font-semibold leading-none mt-0.5">{{ merchant.category }}</p>
-
-              <div class="flex items-center gap-1.5 mt-1 text-yellow-400">
-                <Star class="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                <!-- <span class="text-[10.5px] font-semibold text-slate-200">{{ merchant.rating }} Score de satisfaction client</span> -->
-              </div>
             </div>
           </div>
         </div>
