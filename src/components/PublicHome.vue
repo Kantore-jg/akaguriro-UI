@@ -161,7 +161,7 @@ function handleHeroSearchSubmit(e) {
       <div class="mx-auto max-w-7xl">
         <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Indicateurs Digitaux</h3> -->
-          <h2>La Smart City en Chiffres</h2>
+          <h2>Akaguriro en Chiffres</h2>
           <!-- <p class="text-slate-500 text-xs sm:text-sm">
             Suivi statistique réactif de nos places d'étalage et flux de produits nationaux.
           </p> -->

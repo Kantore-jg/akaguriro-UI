@@ -206,13 +206,13 @@ const goToProfile = () => router.push('/profile');
           <ChevronLeft :class="['w-4 h-4 transition-transform', !sidebarOpen && 'rotate-180']" />
           <span v-if="sidebarOpen">Réduire</span>
         </button>
-        <button
+        <!-- <button
           @click="goToPortal"
           class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-primary transition-colors text-sm"
         >
           <Eye class="w-4 h-4" />
           <span v-if="sidebarOpen">Portail public</span>
-        </button>
+        </button> -->
       </div>
     </aside>
 
