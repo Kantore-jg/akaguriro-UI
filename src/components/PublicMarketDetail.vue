@@ -357,7 +357,7 @@ function getVendor(merchantId) {
                         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">{{ activeStallMerchant.category }}</p>
                         <div class="flex items-center gap-1 mt-0.5 text-yellow-400">
                           <Star class="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span class="text-[10.5px] font-semibold text-slate-300">{{ activeStallMerchant.rating }} (Score UX)</span>
+                          <!-- <span class="text-[10.5px] font-semibold text-slate-300">{{ activeStallMerchant.rating }} (Score UX)</span> -->
                         </div>
                       </div>
                     </div>
@@ -475,7 +475,7 @@ function getVendor(merchantId) {
 
             <div class="flex items-center gap-1 text-yellow-400 pt-0.5">
               <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-              <span class="text-[11.5px] font-extrabold text-slate-700">{{ m.rating }} score</span>
+              <!-- <span class="text-[11.5px] font-extrabold text-slate-700">{{ m.rating }} score</span> -->
             </div>
           </div>
           </div>

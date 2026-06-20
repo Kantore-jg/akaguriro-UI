@@ -34,7 +34,7 @@ const emit = defineEmits(['view']);
           <TableHead>Téléphone</TableHead>
           <TableHead>Marché & étal</TableHead>
           <TableHead>Filière</TableHead>
-          <TableHead>Score</TableHead>
+          <!-- <TableHead>Score</TableHead> -->
           <TableHead>Statut</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
@@ -58,12 +58,12 @@ const emit = defineEmits(['view']);
             <span class="text-muted-foreground"> · {{ merchant.activePlaceNumber || merchant.activePlaceId }}</span>
           </TableCell>
           <TableCell>{{ merchant.category }}</TableCell>
-          <TableCell>
+          <!-- <TableCell>
             <div class="flex items-center gap-1 text-sm">
               <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
               {{ merchant.rating }}
             </div>
-          </TableCell>
+          </TableCell> -->
           <TableCell>
             <Badge :variant="merchant.verified ? 'default' : 'secondary'">
               <ShieldCheck class="w-3 h-3 mr-1" />

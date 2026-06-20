@@ -195,7 +195,7 @@ const formatRefreshTime = (date) =>
               <p class="text-[10px] text-slate-500 font-medium">{{ item.productsCount }} produit(s) actif(s)</p>
               <div class="flex items-center gap-1 text-yellow-400 pt-1">
                 <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                <span class="text-[11px] font-extrabold text-slate-200">{{ item.rating }} Score Habilité</span>
+                <!-- <span class="text-[11px] font-extrabold text-slate-200">{{ item.rating }} Score Habilité</span> -->
               </div>
             </div>
           </div>

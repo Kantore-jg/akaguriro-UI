@@ -181,7 +181,7 @@ function handleViewPlaceOnMap() {
 
               <div class="flex items-center gap-1.5 mt-1 text-yellow-400">
                 <Star class="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                <span class="text-[10.5px] font-semibold text-slate-200">{{ merchant.rating }} Score de satisfaction client</span>
+                <!-- <span class="text-[10.5px] font-semibold text-slate-200">{{ merchant.rating }} Score de satisfaction client</span> -->
               </div>
             </div>
           </div>

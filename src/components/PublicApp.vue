@@ -241,7 +241,7 @@ const navigateHome = () => goHome();
               </p>
               <div class="flex items-center gap-1.5 text-yellow-400 py-0.5">
                 <Star class="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                <span class="text-[11.5px] font-black text-slate-700">{{ m.rating }} (Score Mairie)</span>
+                <!-- <span class="text-[11.5px] font-black text-slate-700">{{ m.rating }} (Score Mairie)</span> -->
               </div>
             </div>
             <div class="absolute bottom-4 right-4 flex gap-1">
