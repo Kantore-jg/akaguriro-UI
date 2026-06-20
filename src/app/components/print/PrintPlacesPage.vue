@@ -139,7 +139,7 @@ onMounted(() => {
       </table>
 
       <footer class="print-document__footer">
-        <span>Document généré par Akaguriro — Smart Markets Burundi</span>
+        <span>Document Akaguriro</span>
         <span>{{ printedAt }}</span>
       </footer>
     </div>

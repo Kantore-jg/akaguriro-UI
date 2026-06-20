@@ -89,12 +89,12 @@ onMounted(() => {
       <header class="print-document__header">
         <div class="print-document__brand">AKAGURIRO</div>
         <div class="print-document__subtitle">République du Burundi — Catalogue produits</div>
-        <h1 class="print-document__title">{{ pageTitle }}</h1>
+        <!-- <h1 class="print-document__title">{{ pageTitle }}</h1> -->
         <div class="print-document__meta">
           <span v-if="market"><strong>Marché :</strong> {{ market.name }} ({{ market.city }})</span>
           <span v-if="merchant"><strong>Commerçant :</strong> {{ merchant.name }}</span>
           <span v-if="merchant"><strong>Étal :</strong> {{ merchant.activePlaceNumber || '—' }}</span>
-          <span><strong>Édité par :</strong> {{ currentUser.name }}</span>
+          <!-- <span><strong>Édité par :</strong> {{ currentUser.name }}</span> -->
           <span><strong>Date :</strong> {{ printedAt }}</span>
         </div>
       </header>
@@ -158,7 +158,7 @@ onMounted(() => {
       </table>
 
       <footer class="print-document__footer">
-        <span>Document généré par Akaguriro — Smart Markets Burundi</span>
+        <span>Document Akaguriro</span>
         <span>{{ printedAt }}</span>
       </footer>
     </div>

@@ -64,9 +64,9 @@ function findMarket(marketId) {
       <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
         Demande Publique d'Octroi d'Emplacement
       </h1>
-      <p class="text-slate-500 text-sm max-w-2xl font-medium">
+      <!-- <p class="text-slate-500 text-sm max-w-2xl font-medium">
         Postulez en ligne pour obtenir un étalage légal et sécurisé dans l'un des marchés publics connectés du Burundi.
-      </p>
+      </p> -->
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -231,8 +231,7 @@ function findMarket(marketId) {
                   v-if="item.status === 'approved'"
                   class="mt-2 text-[10px] text-primary font-extrabold bg-emerald-950/40 p-2 rounded border border-emerald-900/35"
                 >
-                  🎉 Félicitations ! Un emplacement libre a été attribué et vous avez été enregistré comme marchand officiel. Consultez le plan du marché !
-                </div>
+                  🎉 Félicitations ! vous avez été enregistré comme marchand officiel.               </div>
               </div>
 
               <div class="flex justify-end text-[9.5px] font-bold text-slate-500">

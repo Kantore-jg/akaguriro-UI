@@ -56,7 +56,7 @@ onMounted(() => {
         </h1>
         <div class="print-document__meta">
           <span v-if="market"><strong>Marché :</strong> {{ market.name }} ({{ market.city }})</span>
-          <span><strong>Édité par :</strong> {{ currentUser.name }}</span>
+          <!-- <span><strong>Édité par :</strong> {{ currentUser.name }}</span> -->
           <span><strong>Date :</strong> {{ printedAt }}</span>
         </div>
       </header>
@@ -113,7 +113,7 @@ onMounted(() => {
       </table>
 
       <footer class="print-document__footer">
-        <span>Document généré par Akaguriro — Smart Markets Burundi</span>
+        <span>Document Akaguriro </span>
         <span>{{ printedAt }}</span>
       </footer>
     </div>

@@ -93,12 +93,87 @@ export function useAdminScope() {
       return receipts.value.filter((r) => r.merchantId === assignedMerchantId.value);
     }
     if (assignedMarketId.value) {
-      const merchantIds = merchants.value
-        .filter((m) => m.activeMarketId === assignedMarketId.value)
-        .map((m) => m.id);
-      return receipts.value.filter((r) => merchantIds.includes(r.merchantId));
+      return receipts.value.filter((r) => r.marketId == assignedMarketId.value);
     }
     return receipts.value;
+  });
+
+  const scopedPendingRequests = computed(() =>
+    scopedRequests.value.filter((r) => r.status === 'pending'),
+  );
+
+  const scopedPendingReceipts = computed(() =>
+    scopedReceipts.value.filter((r) => r.status === 'pending'),
+  );
+
+  const scopedApprovedReceipts = computed(() =>
+    scopedReceipts.value.filter((r) => r.status === 'approved'),
+  );
+
+  const scopedApprovedReceiptsTotal = computed(() =>
+    scopedApprovedReceipts.value.reduce((sum, r) => sum + r.amount, 0),
+  );
+
+  const scopedTotalPlaces = computed(() => scopedPlaces.value.length);
+
+  const scopedOccupiedPlaces = computed(() =>
+    scopedPlaces.value.filter((p) => p.status === 'occupée').length,
+  );
+
+  const scopedFreePlaces = computed(
+    () => scopedTotalPlaces.value - scopedOccupiedPlaces.value,
+  );
+
+  const scopedOccupationRate = computed(() => {
+    if (!scopedTotalPlaces.value) return 0;
+    return Math.round((scopedOccupiedPlaces.value / scopedTotalPlaces.value) * 100);
+  });
+
+  const scopedMarketOccupation = computed(() =>
+    scopedMarkets.value.map((market) => {
+      const marketPlaces = scopedPlaces.value.filter((p) => p.marketId == market.id);
+      const occupied = marketPlaces.filter((p) => p.status === 'occupée').length;
+      const total = marketPlaces.length || market.totalPlaces || 0;
+      return {
+        id: market.id,
+        name: market.name,
+        occupied,
+        total,
+        rate: total ? Math.round((occupied / total) * 100) : 0,
+      };
+    }),
+  );
+
+  const scopedWeeklyReceiptActivity = computed(() => {
+    const days = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+    const counts = days.map(() => 0);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 6);
+    weekAgo.setHours(0, 0, 0, 0);
+
+    scopedReceipts.value.forEach((receipt) => {
+      if (!receipt.submittedDate) return;
+      const date = new Date(receipt.submittedDate);
+      if (Number.isNaN(date.getTime()) || date < weekAgo) return;
+      counts[date.getDay()] += 1;
+    });
+
+    return days.map((label, index) => ({ label, value: counts[index] }));
+  });
+
+  const scopedReceiptStatusBreakdown = computed(() => {
+    const totals = { approved: 0, pending: 0, rejected: 0 };
+    scopedReceipts.value.forEach((receipt) => {
+      if (totals[receipt.status] !== undefined) {
+        totals[receipt.status] += receipt.amount;
+      }
+    });
+
+    return [
+      { label: 'Validés', value: totals.approved, color: '#2e7d32' },
+      { label: 'En attente', value: totals.pending, color: '#f9a825' },
+      { label: 'Rejetés', value: totals.rejected, color: '#e53935' },
+    ].filter((segment) => segment.value > 0);
   });
 
   const findMarket = (id) => markets.value.find((m) => m.id === id);
@@ -128,6 +203,17 @@ export function useAdminScope() {
     scopedRequests,
     scopedUsers,
     scopedReceipts,
+    scopedPendingRequests,
+    scopedPendingReceipts,
+    scopedApprovedReceipts,
+    scopedApprovedReceiptsTotal,
+    scopedTotalPlaces,
+    scopedOccupiedPlaces,
+    scopedFreePlaces,
+    scopedOccupationRate,
+    scopedMarketOccupation,
+    scopedWeeklyReceiptActivity,
+    scopedReceiptStatusBreakdown,
     findMarket,
     findMerchant,
   };

@@ -2,8 +2,6 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import {
-  Store,
-  Users,
   Package,
   MapPin,
   FileText,
@@ -12,7 +10,7 @@ import {
   DollarSign,
   CheckCircle,
 } from 'lucide-vue-next';
-import { useApp } from '../../../../composables/useApp.js';
+import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import StatCard from '../../StatCard.vue';
 import WeeklyBarChart from '../../dashboard/WeeklyBarChart.vue';
@@ -23,115 +21,52 @@ import Button from '../../ui/Button.vue';
 
 const router = useRouter();
 const {
-  currentUser,
-  markets,
-  merchants,
-  products,
-  places,
-  requests,
-  receipts,
-} = useApp();
+  isSuperAdmin,
+  isMarketAdmin,
+  isMerchant,
+  assignedMerchant,
+  scopedMerchants,
+  scopedProducts,
+  scopedPendingRequests,
+  scopedPendingReceipts,
+  scopedApprovedReceiptsTotal,
+  scopedOccupiedPlaces,
+  scopedTotalPlaces,
+  scopedFreePlaces,
+  scopedOccupationRate,
+  scopedMarketOccupation,
+  scopedWeeklyReceiptActivity,
+  scopedReceiptStatusBreakdown,
+  scopedRequests,
+  findMarket,
+} = useAdminScope();
 
-const isSuperAdmin = computed(() => currentUser.value.role === 'SUPER_ADMIN');
-const isMarketAdmin = computed(() => currentUser.value.role === 'ADMIN_MARCHE');
-const isMerchant = computed(() => currentUser.value.role === 'COMMERCANT');
-
-const assignedMarketId = computed(() =>
-  isMarketAdmin.value ? (currentUser.value.marketId || 'm1') : null,
-);
-
-const scopedMarkets = computed(() => {
-  if (isSuperAdmin.value) return markets.value;
-  if (assignedMarketId.value) {
-    return markets.value.filter((m) => m.id === assignedMarketId.value);
-  }
-  return markets.value;
+const pageTitle = computed(() => {
+  if (isMerchant.value) return 'Mon tableau de bord';
+  if (isMarketAdmin.value) return 'Tableau de bord du marché';
+  return 'Tableau de bord national';
 });
 
-const totalPlaces = computed(() =>
-  places.value
-    .filter((p) => !assignedMarketId.value || p.marketId === assignedMarketId.value)
-    .length,
-);
-
-const occupiedPlaces = computed(() =>
-  places.value.filter(
-    (p) =>
-      p.status === 'occupée' &&
-      (!assignedMarketId.value || p.marketId === assignedMarketId.value),
-  ).length,
-);
-
-const freePlaces = computed(() => totalPlaces.value - occupiedPlaces.value);
-
-const scopedMerchants = computed(() => {
+const pageSubtitle = computed(() => {
   if (isMerchant.value) {
-    return merchants.value.filter((m) => m.id === currentUser.value.merchantId);
+    return 'Suivez vos produits, reçus et activité commerciale.';
   }
-  if (assignedMarketId.value) {
-    return merchants.value.filter((m) => m.activeMarketId === assignedMarketId.value);
+  if (isMarketAdmin.value) {
+    return 'Statistiques et indicateurs de votre marché.';
   }
-  return merchants.value;
+  return 'Vue d\'ensemble de l\'activité sur tous les marchés.';
 });
 
-const scopedProducts = computed(() => {
-  if (isMerchant.value) {
-    return products.value.filter((p) => p.merchantId === currentUser.value.merchantId);
-  }
-  if (assignedMarketId.value) {
-    return products.value.filter((p) => p.marketId === assignedMarketId.value);
-  }
-  return products.value;
+const merchantPlaceLabel = computed(() => {
+  if (!assignedMerchant.value?.activePlaceNumber) return 'Non assigné';
+  return `Étal ${assignedMerchant.value.activePlaceNumber}`;
 });
-
-const pendingRequests = computed(() =>
-  requests.value.filter(
-    (r) =>
-      r.status === 'pending' &&
-      (!assignedMarketId.value || r.requestedMarketId === assignedMarketId.value),
-  ),
-);
-
-const pendingReceipts = computed(() =>
-  receipts.value.filter((r) => {
-    if (isMerchant.value) {
-      return r.merchantId === currentUser.value.merchantId && r.status === 'pending';
-    }
-    if (assignedMarketId.value) {
-      const merchantIds = merchants.value
-        .filter((m) => m.activeMarketId === assignedMarketId.value)
-        .map((m) => m.id);
-      return merchantIds.includes(r.merchantId) && r.status === 'pending';
-    }
-    return r.status === 'pending';
-  }),
-);
-
-const approvedReceiptsTotal = computed(() =>
-  receipts.value
-    .filter((r) => {
-      if (isMerchant.value) return r.merchantId === currentUser.value.merchantId && r.status === 'approved';
-      return r.status === 'approved';
-    })
-    .reduce((sum, r) => sum + r.amount, 0),
-);
 
 const recentRequests = computed(() =>
-  [...requests.value]
-    .filter(
-      (r) =>
-        !assignedMarketId.value || r.requestedMarketId === assignedMarketId.value,
-    )
+  [...scopedRequests.value]
     .sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
     .slice(0, 5),
 );
-
-const occupationRate = computed(() => {
-  if (!totalPlaces.value) return 0;
-  return Math.round((occupiedPlaces.value / totalPlaces.value) * 100);
-});
-
-const pageTitle = computed(() => 'Gestion Des Stats');
 
 const statusBadge = (status) => {
   const map = {
@@ -142,62 +77,43 @@ const statusBadge = (status) => {
   return map[status] || { label: status, variant: 'secondary' };
 };
 
-const findMarket = (id) => markets.value.find((m) => m.id === id);
-
 const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
-
-const weeklyActivity = computed(() => {
-  const days = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
-  const counts = days.map(() => 0);
-  scopedProducts.value.forEach((p) => {
-    counts[Math.floor(Math.random() * 7)] += 1;
-  });
-  const productCount = scopedProducts.value.length || 1;
-  return days.map((label, i) => ({
-    label,
-    value: i === 6 ? productCount : Math.max(0, Math.floor(productCount * (0.1 + i * 0.05))),
-  }));
-});
-
-const paymentBreakdown = computed(() => {
-  const total = approvedReceiptsTotal.value || 49000;
-  const cash = Math.round(total * 0.47);
-  const mobile = total - cash;
-  return [
-    { label: 'Espèces', value: cash, color: '#f9a825' },
-    { label: 'Mobile Money', value: mobile, color: '#e53935' },
-  ];
-});
 </script>
 
 <template>
   <div class="space-y-6">
-    <PageHeader
-      :title="pageTitle"
-      subtitle="Configuration et contrôle des éléments de votre marché."
-    />
+    <PageHeader :title="pageTitle" :subtitle="pageSubtitle" />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <StatCard
-        title="CA Mensuel"
-        :value="`${formatAmount(approvedReceiptsTotal)} BIF`"
+        :title="isMerchant ? 'Mes revenus validés' : 'CA validé'"
+        :value="`${formatAmount(scopedApprovedReceiptsTotal)} BIF`"
         :icon="DollarSign"
-        subtitle="Mois en cours"
+        :subtitle="isMerchant ? 'Total de mes reçus approuvés' : 'Reçus approuvés dans votre périmètre'"
         color="pink"
       />
       <StatCard
-        title="Étals Occupés"
-        :value="`${occupiedPlaces} / ${totalPlaces}`"
+        v-if="!isMerchant"
+        title="Étals occupés"
+        :value="`${scopedOccupiedPlaces} / ${scopedTotalPlaces}`"
         :icon="MapPin"
-        :trend="{ value: occupationRate + '%', isPositive: true }"
-        :subtitle="`${freePlaces} libre(s)`"
+        :trend="{ value: scopedOccupationRate + '%', isPositive: true }"
+        :subtitle="`${scopedFreePlaces} libre(s)`"
         color="success"
       />
       <StatCard
-        title="Produits Catalogue"
+        v-else
+        title="Mon emplacement"
+        :value="merchantPlaceLabel"
+        :icon="MapPin"
+        :subtitle="assignedMerchant?.activeMarketId ? findMarket(assignedMerchant.activeMarketId)?.name : 'Marché non défini'"
+        color="success"
+      />
+      <StatCard
+        :title="isMerchant ? 'Mes produits' : 'Produits catalogue'"
         :value="scopedProducts.length"
         :icon="CheckCircle"
-        :subtitle="`${scopedMerchants.length} commerçant(s) actif(s)`"
+        :subtitle="isMerchant ? 'Produits actifs dans mon catalogue' : `${scopedMerchants.length} commerçant(s) actif(s)`"
         color="success"
       />
     </div>
@@ -205,47 +121,48 @@ const paymentBreakdown = computed(() => {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <WeeklyBarChart
         title="Activité des 7 derniers jours"
-        subtitle="Évolution quotidienne des produits référencés"
-        :data="weeklyActivity"
+        subtitle="Nombre de reçus soumis par jour"
+        :data="scopedWeeklyReceiptActivity"
       />
       <PaymentDonutChart
         title="Répartition des reçus"
-        subtitle="Répartition du CA validé du mois"
-        :segments="paymentBreakdown"
+        subtitle="Montants par statut dans votre périmètre"
+        :segments="scopedReceiptStatusBreakdown"
       />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card class="bs-card border shadow-sm">
+      <Card v-if="!isMerchant" class="bs-card border shadow-sm">
         <CardHeader>
           <CardTitle class="text-base">Occupation par marché</CardTitle>
           <p class="text-sm text-muted-foreground">Taux d'occupation des emplacements</p>
         </CardHeader>
         <CardContent class="space-y-4">
           <div
-            v-for="market in scopedMarkets"
+            v-for="market in scopedMarketOccupation"
             :key="market.id"
             class="space-y-2"
           >
             <div class="flex items-center justify-between text-sm">
               <span class="font-medium">{{ market.name }}</span>
               <span class="text-muted-foreground">
-                {{ market.occupiedPlaces }}/{{ market.totalPlaces }}
+                {{ market.occupied }}/{{ market.total }}
               </span>
             </div>
             <div class="h-2.5 bg-muted rounded-full overflow-hidden">
               <div
                 class="h-full bg-primary rounded-full transition-all"
-                :style="{
-                  width: `${Math.round((market.occupiedPlaces / market.totalPlaces) * 100)}%`,
-                }"
+                :style="{ width: `${market.rate}%` }"
               />
             </div>
           </div>
+          <p v-if="!scopedMarketOccupation.length" class="text-sm text-muted-foreground">
+            Aucun marché dans votre périmètre.
+          </p>
         </CardContent>
       </Card>
 
-      <Card class="bs-card border shadow-sm">
+      <Card :class="['bs-card border shadow-sm', isMerchant && 'lg:col-span-2']">
         <CardHeader class="flex flex-row items-center justify-between">
           <div>
             <CardTitle class="text-base">Actions rapides</CardTitle>
@@ -278,7 +195,7 @@ const paymentBreakdown = computed(() => {
             @click="router.push('/admin/requests')"
           >
             <FileText class="w-5 h-5" />
-            <span class="text-xs">Demandes ({{ pendingRequests.length }})</span>
+            <span class="text-xs">Demandes ({{ scopedPendingRequests.length }})</span>
           </Button>
           <Button
             variant="outline"
@@ -286,13 +203,15 @@ const paymentBreakdown = computed(() => {
             @click="router.push('/admin/receipts')"
           >
             <Coins class="w-5 h-5" />
-            <span class="text-xs">Reçus ({{ pendingReceipts.length }})</span>
+            <span class="text-xs">
+              {{ isMerchant ? 'Mes reçus' : 'Reçus' }} ({{ scopedPendingReceipts.length }})
+            </span>
           </Button>
         </CardContent>
       </Card>
     </div>
 
-    <Card v-if="!isMerchant" class="bs-card border shadow-sm">
+    <Card v-if="isSuperAdmin || isMarketAdmin" class="bs-card border shadow-sm">
       <CardHeader>
         <CardTitle class="text-base">Demandes récentes</CardTitle>
         <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p>

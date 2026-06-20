@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApp } from '../../composables/useApp.js';
+import { useAdminScope } from '../../composables/useAdminScope.js';
 import {
   LayoutDashboard,
   Store,
@@ -37,18 +38,17 @@ import {
 const sidebarOpen = ref(true);
 const route = useRoute();
 const router = useRouter();
-const { currentUser, markets, requests, receipts } = useApp();
+const { currentUser } = useApp();
+const {
+  isSuperAdmin,
+  isMarketAdmin,
+  isMerchant,
+  scopedPendingRequests,
+  scopedPendingReceipts,
+} = useAdminScope();
 
-const isSuperAdmin = computed(() => currentUser.value.role === 'SUPER_ADMIN');
-const isMarketAdmin = computed(() => currentUser.value.role === 'ADMIN_MARCHE');
-const isMerchant = computed(() => currentUser.value.role === 'COMMERCANT');
-
-const pendingRequestsCount = computed(
-  () => requests.value.filter((r) => r.status === 'pending').length,
-);
-const pendingReceiptsCount = computed(
-  () => receipts.value.filter((r) => r.status === 'pending').length,
-);
+const pendingRequestsCount = computed(() => scopedPendingRequests.value.length);
+const pendingReceiptsCount = computed(() => scopedPendingReceipts.value.length);
 
 const userInitials = computed(() => {
   const name = currentUser.value?.name || 'U';
@@ -138,6 +138,7 @@ const navigation = computed(() => {
       name: 'Mes reçus',
       icon: Coins,
       path: '/admin/receipts',
+      badge: pendingReceiptsCount.value,
     });
   }
 
