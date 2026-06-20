@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Plus, Search, Store } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
+import { sameId } from '../../../../utils/ids.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
@@ -72,9 +73,9 @@ const avgOccupation = computed(() => {
 });
 
 const getMarketStats = (marketId) => ({
-  places: places.value.filter((p) => p.marketId === marketId).length,
-  merchants: merchants.value.filter((m) => m.activeMarketId === marketId).length,
-  products: products.value.filter((p) => p.marketId === marketId).length,
+  places: places.value.filter((p) => sameId(p.marketId, marketId)).length,
+  merchants: merchants.value.filter((m) => sameId(m.activeMarketId, marketId)).length,
+  products: products.value.filter((p) => sameId(p.marketId, marketId)).length,
 });
 
 const openCreate = () => {
@@ -99,10 +100,7 @@ const openDelete = (market) => {
 
 const handleFormSubmit = (payload) => {
   if (payload.id) {
-    updateMarket({
-      ...payload,
-      occupiedPlaces: Math.min(payload.occupiedPlaces ?? 0, payload.totalPlaces),
-    });
+    updateMarket(payload);
   } else {
     addMarket(payload);
   }

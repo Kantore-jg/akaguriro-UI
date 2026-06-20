@@ -69,5 +69,10 @@ export function extractList(response) {
 }
 
 export function getErrorMessage(error, fallback = 'Une erreur est survenue') {
-  return error.response?.data?.message || error.message || fallback;
+  const data = error.response?.data;
+  if (data?.errors) {
+    const first = Object.values(data.errors).flat().find(Boolean);
+    if (first) return first;
+  }
+  return data?.message || error.message || fallback;
 }

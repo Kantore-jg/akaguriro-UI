@@ -216,8 +216,6 @@ export function marketToApi(data) {
     description: data.description,
     total_places: data.totalPlaces,
     product_category_ids: data.productCategoryIds || [],
-    image: data.image,
-    cover_image: data.coverImage || data.image,
   };
 }
 
