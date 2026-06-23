@@ -1,14 +1,16 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { getErrorMessage } from '../api/client.js';
-import { ArrowLeft, Upload, User, Building2 } from 'lucide-vue-next';
+import { ArrowLeft, Upload, User } from 'lucide-vue-next';
 
 const router = useRouter();
+const route = useRoute();
 const { login, register, showToast } = useApp();
 
-const isLogin = ref(true);
+const isLogin = computed(() => route.meta.authMode !== 'register');
+
 const name = ref('');
 const email = ref('');
 const phone = ref('');
@@ -18,10 +20,39 @@ const avatarFile = ref(null);
 const avatarPreview = ref(null);
 const submitting = ref(false);
 
+watch(
+  () => route.name,
+  () => {
+    if (isLogin.value) {
+      passwordConfirmation.value = '';
+      avatarFile.value = null;
+      avatarPreview.value = null;
+    }
+  },
+);
+
 function onAvatarChange(e) {
   const file = e.target.files?.[0];
   avatarFile.value = file || null;
   avatarPreview.value = file ? URL.createObjectURL(file) : null;
+}
+
+function resolveRedirect(user) {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : null;
+  if (redirect && redirect.startsWith('/')) {
+    return redirect;
+  }
+  if (['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'].includes(user.role)) {
+    return '/admin';
+  }
+  return '/';
+}
+
+function goToAuthMode(mode) {
+  const target = mode === 'register' ? '/register' : '/login';
+  if (route.path !== target) {
+    router.push({ path: target, query: route.query });
+  }
 }
 
 async function handleSubmit(e) {
@@ -34,7 +65,7 @@ async function handleSubmit(e) {
         return;
       }
       const user = await login(email.value, password.value);
-      router.push(['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'].includes(user.role) ? '/admin' : '/');
+      router.push(resolveRedirect(user));
     } else {
       if (!name.value || !email.value || !password.value) {
         showToast('Veuillez remplir tous les champs obligatoires', 'error');
@@ -44,7 +75,7 @@ async function handleSubmit(e) {
         showToast('Les mots de passe ne correspondent pas', 'error');
         return;
       }
-      await register({
+      const user = await register({
         name: name.value,
         email: email.value,
         phone: phone.value || undefined,
@@ -52,7 +83,7 @@ async function handleSubmit(e) {
         password_confirmation: passwordConfirmation.value,
         avatar: avatarFile.value || undefined,
       });
-      router.push('/');
+      router.push(resolveRedirect(user));
     }
   } catch (error) {
     showToast(getErrorMessage(error), 'error');
@@ -75,10 +106,6 @@ async function handleSubmit(e) {
 
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
-        <!-- <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center mx-auto mb-4">
-          <Building2 class="w-7 h-7 text-white" />
-        </div> -->
-        <!-- <h1 class="text-2xl font-bold text-primary">AKAGURIRO</h1> -->
         <p class="text-sm text-muted-foreground mt-1">akaguririo</p>
       </div>
 
@@ -172,7 +199,11 @@ async function handleSubmit(e) {
 
         <p class="text-center text-xs text-muted-foreground mt-5">
           {{ isLogin ? "Pas encore de compte ?" : "Déjà inscrit ?" }}
-          <button type="button" class="text-primary hover:underline font-semibold" @click="isLogin = !isLogin">
+          <button
+            type="button"
+            class="text-primary hover:underline font-semibold"
+            @click="goToAuthMode(isLogin ? 'register' : 'login')"
+          >
             {{ isLogin ? "Créer un compte" : "Se connecter" }}
           </button>
         </p>

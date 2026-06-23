@@ -138,7 +138,7 @@ function findMarket(marketId) {
                   v-model="targetMarketId"
                   class="bg-transparent border-0 outline-none w-full text-xs cursor-pointer text-slate-700"
                 >
-                  <option v-for="m in markets" :key="m.id" :value="m.id">{{ m.name }} ({{ m.city }})</option>
+                  <option v-for="m in markets" :key="m.id" :value="m.id">{{ m.name }} </option>
                 </select>
               </div>
             </div>

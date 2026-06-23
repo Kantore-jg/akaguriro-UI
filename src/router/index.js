@@ -15,7 +15,13 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('../components/LoginPage.vue'),
-    meta: { public: true, standalone: true },
+    meta: { public: true, standalone: true, authMode: 'login' },
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../components/LoginPage.vue'),
+    meta: { public: true, standalone: true, authMode: 'register' },
   },
   {
     path: '/auth',
@@ -137,6 +143,11 @@ router.beforeEach((to, from, next) => {
   const user = getStoredUser();
   const role = user?.role;
   const hasToken = Boolean(getToken());
+
+  if ((to.name === 'Login' || to.name === 'Register') && hasToken && user?.id) {
+    next({ path: '/' });
+    return;
+  }
 
   if (to.matched.some((r) => r.meta.requiresToken)) {
     if (!hasToken || !user?.id) {

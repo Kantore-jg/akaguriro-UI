@@ -296,7 +296,7 @@ function handleHeroSearchSubmit(e) {
             Demander une place
           </button>
           <button
-            @click="router.push('/login')"
+            @click="router.push('/register')"
             class="bg-primary hover:bg-emerald-400 transition-all text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md text-center"
           >
             Créer mon compte

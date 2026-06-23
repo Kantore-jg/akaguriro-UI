@@ -360,7 +360,7 @@ function getVendor(merchantId) {
                     </div>
 
                     <p class="text-[11px] text-slate-300 italic bg-slate-950 p-2.5 rounded-lg border border-slate-850">
-                      "{{ activeStallMerchant.bio || 'Aucune description disponible pour ce commerçant.' }}"
+                      "{{ activeStallMerchant.bio || 'pas de description.' }}"
                     </p>
 
                     <div class="space-y-2">
