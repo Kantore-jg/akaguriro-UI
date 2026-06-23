@@ -193,7 +193,7 @@ async function handleSubmit(e) {
             :disabled="submitting"
             class="w-full bs-btn-primary py-3.5 disabled:opacity-50"
           >
-            {{ submitting ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire") }}
+            {{ submitting ? (isLogin ? 'Connexion...' : 'Inscription...') : (isLogin ? 'Se connecter' : "S'inscrire") }}
           </button>
         </form>
 

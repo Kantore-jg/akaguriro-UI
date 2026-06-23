@@ -38,7 +38,7 @@ import {
 const sidebarOpen = ref(true);
 const route = useRoute();
 const router = useRouter();
-const { currentUser } = useApp();
+const { currentUser, loading } = useApp();
 const {
   isSuperAdmin,
   isMarketAdmin,
@@ -218,7 +218,12 @@ const goToProfile = () => router.push('/profile');
     </aside>
 
     <div class="flex-1 flex flex-col min-h-screen min-w-0">
-      <header class="h-14 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20 shadow-sm">
+      <header class="h-14 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20 shadow-sm relative">
+        <div
+          v-if="loading"
+          class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary animate-pulse"
+          aria-hidden="true"
+        />
         <div class="flex items-center gap-3 min-w-0">
           <Button variant="ghost" size="sm" class="lg:hidden shrink-0" @click="sidebarOpen = !sidebarOpen">
             <Menu v-if="!sidebarOpen" class="w-5 h-5" />

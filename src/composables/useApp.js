@@ -158,45 +158,58 @@ export function createAppState() {
     }
   };
 
+  let refreshPromise = null;
+
   const refreshAll = async () => {
+    if (refreshPromise) return refreshPromise;
+
     loading.value = true;
-    try {
-      await loadPublicData();
-      if (currentUser.value?.id) {
-        await loadAuthenticatedData();
-      } else {
-        requests.value = [];
-        receipts.value = [];
+    refreshPromise = (async () => {
+      try {
+        await loadPublicData();
+        if (currentUser.value?.id) {
+          await loadAuthenticatedData();
+        } else {
+          requests.value = [];
+          receipts.value = [];
+        }
+      } catch (error) {
+        showToast(getErrorMessage(error, 'Erreur de chargement des données'), 'error');
+      } finally {
+        loading.value = false;
+        initialized.value = true;
+        refreshPromise = null;
       }
-    } catch (error) {
-      showToast(getErrorMessage(error, 'Erreur de chargement des données'), 'error');
-    } finally {
-      loading.value = false;
-      initialized.value = true;
-    }
+    })();
+
+    return refreshPromise;
+  };
+
+  const refreshInBackground = () => {
+    void refreshAll();
   };
 
   const setCurrentUser = (user) => {
     currentUser.value = user || GUEST_USER;
     saveUser(user?.id ? user : null);
     if (user?.id) {
-      refreshAll();
+      refreshInBackground();
     }
   };
 
   const login = async (email, password) => {
     const user = await apiLogin(email, password);
     currentUser.value = user;
-    await refreshAll();
     showToast(`Connexion réussie — ${user.name}`, 'success');
+    refreshInBackground();
     return user;
   };
 
   const register = async (payload) => {
     const user = await apiRegister(payload);
     currentUser.value = user;
-    await refreshAll();
     showToast('Inscription réussie', 'success');
+    refreshInBackground();
     return user;
   };
 
@@ -491,15 +504,16 @@ export function createAppState() {
     }
   };
 
-  onMounted(async () => {
-    await refreshAll();
+  onMounted(() => {
+    refreshInBackground();
     if (getStoredUser()) {
-      try {
-        const profile = await fetchProfile();
-        currentUser.value = profile;
-      } catch {
-        currentUser.value = GUEST_USER;
-      }
+      fetchProfile()
+        .then((profile) => {
+          currentUser.value = profile;
+        })
+        .catch(() => {
+          currentUser.value = GUEST_USER;
+        });
     }
   });
 
