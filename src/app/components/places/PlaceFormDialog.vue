@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
+import { useApp } from '../../../composables/useApp.js';
 import Button from '../ui/Button.vue';
 import Input from '../ui/Input.vue';
 import Label from '../ui/Label.vue';
@@ -28,6 +29,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:open', 'submit', 'create-block']);
+
+const { productCategories } = useApp();
 
 const form = ref({
   id: '',
@@ -140,8 +143,18 @@ const handleSubmit = () => {
         </div>
 
         <div class="space-y-2">
-          <Label for="category">Filière (optionnel)</Label>
-          <Input id="category" v-model="form.category" placeholder="Poissonnerie" />
+          <Label>Filière (optionnel)</Label>
+          <Select v-model="form.category">
+            <SelectTrigger>
+              <SelectValue placeholder="Choisir une catégorie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Aucune</SelectItem>
+              <SelectItem v-for="cat in productCategories" :key="cat.id" :value="cat.name">
+                {{ cat.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <DialogFooter>

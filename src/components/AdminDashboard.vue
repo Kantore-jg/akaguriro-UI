@@ -36,6 +36,7 @@ const {
   markets,
   merchants,
   products,
+  productCategories,
   places,
   requests,
   receipts,
@@ -68,7 +69,7 @@ const currentEditingProduct = ref(null);
 
 const pName = ref('');
 const pPrice = ref(0);
-const pCategory = ref('Poissons');
+const pCategory = ref('');
 const pUnit = ref('kg');
 const pDescription = ref('');
 const pStock = ref(50);
@@ -167,7 +168,7 @@ function handleOpenProductModal(prod = null) {
     currentEditingProduct.value = null;
     pName.value = '';
     pPrice.value = 10000;
-    pCategory.value = 'Fruits & Légumes';
+    pCategory.value = productCategories.value[0]?.name || '';
     pUnit.value = 'kg';
     pDescription.value = '';
     pStock.value = 100;
@@ -1055,11 +1056,9 @@ function getMerchantById(id) {
                 v-model="pCategory"
                 class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-2.5 outline-none font-medium cursor-pointer"
               >
-                <option value="Poissons">Poissons</option>
-                <option value="Café & Thé">Café & Thé</option>
-                <option value="Fruits & Légumes">Fruits & Légumes</option>
-                <option value="Vivres">Vivres</option>
-                <option value="Textiles">Textiles</option>
+                <option v-for="cat in productCategories" :key="cat.id" :value="cat.name">
+                  {{ cat.name }}
+                </option>
               </select>
             </div>
             <div class="space-y-1">

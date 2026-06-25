@@ -16,12 +16,19 @@ import {
 } from '../api/services/auth.js';
 import {
   fetchProductCategories,
+  fetchAllProductCategories,
+  createProductCategory,
+  updateProductCategoryApi,
+  deleteProductCategoryApi,
   fetchMarkets,
   fetchPlaces,
   fetchMerchants,
   fetchProducts,
   fetchPlaceRequests,
   fetchReceipts,
+  fetchSales,
+  fetchSale,
+  createSale,
   fetchUsers,
   createUser,
   updateUserApi,
@@ -68,6 +75,7 @@ export function createAppState() {
   const productCategories = ref([]);
   const requests = ref([]);
   const receipts = ref([]);
+  const sales = ref([]);
   const users = ref([]);
   const currentUser = ref(getStoredUser() || GUEST_USER);
   const loading = ref(false);
@@ -135,12 +143,14 @@ export function createAppState() {
   };
 
   const loadAuthenticatedData = async () => {
-    const [req, rec] = await Promise.all([
+    const [req, rec, sal] = await Promise.all([
       fetchPlaceRequests(),
       fetchReceipts(),
+      fetchSales(),
     ]);
     requests.value = req;
     receipts.value = rec;
+    sales.value = sal;
   };
 
   const loadUsers = async () => {
@@ -172,6 +182,7 @@ export function createAppState() {
         } else {
           requests.value = [];
           receipts.value = [];
+          sales.value = [];
         }
       } catch (error) {
         showToast(getErrorMessage(error, 'Erreur de chargement des données'), 'error');
@@ -222,6 +233,7 @@ export function createAppState() {
     currentUser.value = GUEST_USER;
     requests.value = [];
     receipts.value = [];
+    sales.value = [];
     showToast('Session déconnectée', 'info');
   };
 
@@ -254,6 +266,36 @@ export function createAppState() {
       showToast('Demande d\'octroi de place envoyée avec succès', 'success');
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const loadSales = async (params = {}) => {
+    try {
+      sales.value = await fetchSales(params);
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Erreur de chargement des ventes'), 'error');
+    }
+  };
+
+  const getSale = async (id) => {
+    try {
+      return await fetchSale(id);
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Vente introuvable'), 'error');
+      return null;
+    }
+  };
+
+  const addSale = async (sale) => {
+    try {
+      const created = await createSale(sale);
+      sales.value = [created, ...sales.value];
+      await loadPublicData();
+      showToast(`Vente enregistrée — ${created.invoiceNumber}`, 'success');
+      return created;
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+      return null;
     }
   };
 
@@ -370,6 +412,50 @@ export function createAppState() {
       return true;
     } catch (error) {
       showToast(getErrorMessage(error, 'Impossible de supprimer ce marché'), 'error');
+      return false;
+    }
+  };
+
+  const loadProductCategories = async () => {
+    try {
+      productCategories.value = await fetchAllProductCategories();
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Erreur de chargement des catégories'), 'error');
+    }
+  };
+
+  const addProductCategory = async (category) => {
+    try {
+      const created = await createProductCategory(category);
+      productCategories.value = [...productCategories.value, created].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+      showToast(`Catégorie "${category.name}" créée avec succès`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const updateProductCategory = async (category) => {
+    try {
+      const updated = await updateProductCategoryApi(category.id, category);
+      productCategories.value = productCategories.value
+        .map((c) => (c.id === category.id ? updated : c))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      showToast(`Catégorie "${category.name}" mise à jour`, 'success');
+    } catch (error) {
+      showToast(getErrorMessage(error), 'error');
+    }
+  };
+
+  const deleteProductCategory = async (id) => {
+    try {
+      await deleteProductCategoryApi(id);
+      productCategories.value = productCategories.value.filter((c) => c.id !== id);
+      showToast('Catégorie supprimée', 'success');
+      return true;
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Impossible de supprimer cette catégorie'), 'error');
       return false;
     }
   };
@@ -526,6 +612,7 @@ export function createAppState() {
     productCategories,
     requests,
     receipts,
+    sales,
     users,
     currentUser,
     loading,
@@ -553,11 +640,18 @@ export function createAppState() {
     setAdminActiveTab: (tab) => { adminActiveTab.value = tab; },
     addPlaceRequest,
     addPaymentReceipt,
+    loadSales,
+    getSale,
+    addSale,
     updateRequestStatus,
     updateReceiptStatus,
     addMarket,
     updateMarket,
     deleteMarket,
+    loadProductCategories,
+    addProductCategory,
+    updateProductCategory,
+    deleteProductCategory,
     addBlock,
     updateBlock,
     deleteBlock,

@@ -18,10 +18,13 @@ export function usePrintReport() {
       merchant: options.merchantId,
     });
 
+  const openInvoicePrint = (saleId) => openPrint('invoice', { sale: saleId });
+
   return {
     openPrint,
     openMerchantsPrint,
     openPlacesPrint,
     openProductsPrint,
+    openInvoicePrint,
   };
 }

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Search, Users, ShieldCheck, Package, Printer } from 'lucide-vue-next';
+import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import Button from '../../ui/Button.vue';
@@ -19,6 +20,8 @@ import {
   SelectValue,
 } from '../../ui/select';
 
+const { productCategories } = useApp();
+
 const {
   scopedMerchants,
   scopedMarkets,
@@ -35,10 +38,7 @@ const categoryFilter = ref('all');
 const viewOpen = ref(false);
 const viewingMerchant = ref(null);
 
-const categories = computed(() => {
-  const set = new Set(scopedMerchants.value.map((m) => m.category));
-  return Array.from(set).sort();
-});
+const categories = computed(() => productCategories.value);
 
 const filteredMerchants = computed(() =>
   scopedMerchants.value.filter((m) => {
@@ -149,7 +149,9 @@ const viewingProductsCount = computed(() => {
           <SelectTrigger class="bg-card"><SelectValue placeholder="Toutes" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes filières</SelectItem>
-            <SelectItem v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</SelectItem>
+            <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>

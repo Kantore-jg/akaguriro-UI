@@ -63,6 +63,12 @@ const routes = [
         meta: { title: 'Commerçants', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
       },
       {
+        path: 'categories',
+        name: 'AdminCategories',
+        component: () => import('../app/components/pages/admin/CategoriesPage.vue'),
+        meta: { title: 'Catégories', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+      },
+      {
         path: 'products',
         name: 'AdminProducts',
         component: () => import('../app/components/pages/admin/ProductsPage.vue'),
@@ -79,6 +85,12 @@ const routes = [
         name: 'AdminReceipts',
         component: () => import('../app/components/pages/admin/ReceiptsPage.vue'),
         meta: { title: 'Reçus' },
+      },
+      {
+        path: 'sales',
+        name: 'AdminSales',
+        component: () => import('../app/components/pages/admin/SalesPage.vue'),
+        meta: { title: 'Ventes' },
       },
       {
         path: 'prints',
@@ -109,6 +121,12 @@ const routes = [
         name: 'PrintProducts',
         component: () => import('../app/components/print/PrintProductsPage.vue'),
         meta: { title: 'Impression produits' },
+      },
+      {
+        path: 'invoice',
+        name: 'PrintInvoice',
+        component: () => import('../app/components/print/PrintInvoicePage.vue'),
+        meta: { title: 'Facture de vente' },
       },
     ],
   },

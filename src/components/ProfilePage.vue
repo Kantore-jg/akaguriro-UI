@@ -99,7 +99,7 @@ async function handlePasswordSubmit(e) {
       </Button>
       <div>
         <h1 class="text-2xl font-bold text-foreground">Mon profil</h1>
-        <p class="text-sm text-muted-foreground">Gérez vos informations personnelles et votre sécurité</p>
+        <!-- <p class="text-sm text-muted-foreground">Gérez vos informations personnelles et votre sécurité</p> -->
       </div>
     </div>
 
@@ -120,8 +120,8 @@ async function handlePasswordSubmit(e) {
               </AvatarFallback>
             </Avatar>
             <div class="space-y-2">
-              <p class="text-sm font-medium text-foreground">Photo de profil</p>
-              <p class="text-xs text-muted-foreground">JPG, PNG — max. 2 Mo</p>
+              <!-- <p class="text-sm font-medium text-foreground">Photo de profil</p> -->
+              <!-- <p class="text-xs text-muted-foreground">JPG, PNG — max. 2 Mo</p> -->
               <label class="inline-flex cursor-pointer">
                 <span class="inline-flex items-center gap-2 text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg hover:bg-primary/15 transition-colors">
                   <Upload class="w-4 h-4" />

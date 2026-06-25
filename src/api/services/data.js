@@ -2,13 +2,16 @@ import { apiClient, extractData, extractList } from '../client.js';
 import {
   mapMarket,
   mapProductCategory,
+  productCategoryToApi,
   mapBlock,
   mapPlace,
   mapMerchant,
   mapProduct,
   mapPlaceRequest,
   mapReceipt,
+  mapSale,
   mapUser,
+  saleToApi,
   marketToApi,
   userToApi,
   blockToApi,
@@ -78,6 +81,25 @@ export async function fetchProductCategories() {
   return extractList({ data }).map(mapProductCategory);
 }
 
+export async function fetchAllProductCategories() {
+  const { data } = await apiClient.get('/product-categories/manage');
+  return extractList({ data }).map(mapProductCategory);
+}
+
+export async function createProductCategory(category) {
+  const { data } = await apiClient.post('/product-categories', productCategoryToApi(category));
+  return mapProductCategory(extractData({ data }));
+}
+
+export async function updateProductCategoryApi(id, category) {
+  const { data } = await apiClient.put(`/product-categories/${id}`, productCategoryToApi(category));
+  return mapProductCategory(extractData({ data }));
+}
+
+export async function deleteProductCategoryApi(id) {
+  await apiClient.delete(`/product-categories/${id}`);
+}
+
 export async function fetchMarkets() {
   const { data } = await apiClient.get('/markets', { params: { per_page: PER_PAGE } });
   return extractList({ data }).map(mapMarket);
@@ -127,6 +149,28 @@ export async function fetchPlaceRequests() {
   } catch {
     return [];
   }
+}
+
+export async function fetchSales(params = {}) {
+  const user = getStoredUser();
+  const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
+  const endpoint = isAdmin ? '/sales' : '/my/sales';
+  try {
+    const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE, ...params } });
+    return extractList({ data }).map(mapSale);
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchSale(id) {
+  const { data } = await apiClient.get(`/sales/${id}`);
+  return mapSale(extractData({ data }));
+}
+
+export async function createSale(sale) {
+  const { data } = await apiClient.post('/sales', saleToApi(sale));
+  return mapSale(extractData({ data }));
 }
 
 export async function fetchReceipts() {

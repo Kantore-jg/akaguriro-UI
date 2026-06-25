@@ -26,9 +26,15 @@ export function mapProductCategory(c) {
     id: c.id,
     name: c.name,
     slug: c.slug,
-    icon: c.icon || null,
     description: c.description || '',
-    isActive: c.is_active ?? true,
+    productsCount: c.products_count ?? 0,
+  };
+}
+
+export function productCategoryToApi(data) {
+  return {
+    name: data.name,
+    description: data.description || null,
   };
 }
 
@@ -146,6 +152,59 @@ export function mapPlaceRequest(r) {
     status: REQUEST_STATUS_TO_UI[r.status] || r.status,
     rejectionReason: r.rejection_reason,
     placeId: r.place_id,
+  };
+}
+
+export function mapSaleItem(item) {
+  return {
+    id: item.id,
+    productId: item.product_id,
+    productName: item.product_name,
+    productUnit: item.product_unit || 'unit',
+    unitPrice: Number(item.unit_price),
+    quantity: item.quantity,
+    lineTotal: Number(item.line_total),
+  };
+}
+
+export function mapSale(s) {
+  return {
+    id: s.id,
+    invoiceNumber: s.invoice_number,
+    merchantId: s.user_id,
+    merchantName: s.merchant?.name || '',
+    merchantPhone: s.merchant?.phone || '',
+    merchantEmail: s.merchant?.email || '',
+    marketId: s.market_id,
+    marketName: s.market?.name || '',
+    placeId: s.place_id,
+    placeNumber: s.place?.number || '',
+    clientName: s.client_name,
+    clientPhone: s.client_phone || '',
+    clientEmail: s.client_email || '',
+    paymentType: s.payment_type,
+    subtotal: Number(s.subtotal),
+    total: Number(s.total),
+    notes: s.notes || '',
+    items: (s.items || []).map(mapSaleItem),
+    createdAt: s.created_at?.split('T')[0] || '',
+    createdAtFull: s.created_at || '',
+  };
+}
+
+export function saleToApi(data) {
+  return {
+    market_id: data.marketId,
+    place_id: data.placeId || null,
+    client_name: data.clientName,
+    client_phone: data.clientPhone || null,
+    client_email: data.clientEmail || null,
+    payment_type: data.paymentType,
+    notes: data.notes || null,
+    items: (data.items || []).map((item) => ({
+      product_id: item.productId,
+      quantity: item.quantity,
+    })),
   };
 }
 

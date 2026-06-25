@@ -68,8 +68,9 @@ const reports = computed(() => {
   <div class="space-y-6">
     <PageHeader
       title="Centre d'Impression"
-      subtitle="Générez des rapports HTML prêts à imprimer pour votre marché."
     />
+    <!-- subtitle="Générez des rapports HTML prêts à imprimer pour votre marché." -->
+
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <button

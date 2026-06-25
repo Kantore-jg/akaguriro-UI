@@ -9,6 +9,7 @@ import {
   MapPin,
   Users,
   Package,
+  Tags,
   FileText,
   Coins,
   Menu,
@@ -22,6 +23,7 @@ import {
   ChevronLeft,
   Circle,
   Printer,
+  ShoppingCart,
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
@@ -108,11 +110,27 @@ const navigation = computed(() => {
     );
   }
 
+  if (isSuperAdmin.value || isMarketAdmin.value) {
+    items.push({
+      id: 'categories',
+      name: 'Catégories',
+      icon: Tags,
+      path: '/admin/categories',
+    });
+  }
+
   items.push({
     id: 'products',
     name: 'Produits',
     icon: Package,
     path: '/admin/products',
+  });
+
+  items.push({
+    id: 'sales',
+    name: isMerchant.value ? 'Ventes' : 'Ventes',
+    icon: ShoppingCart,
+    path: '/admin/sales',
   });
 
   if (isSuperAdmin.value || isMarketAdmin.value || isMerchant.value) {

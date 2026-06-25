@@ -49,14 +49,11 @@ const editingProduct = ref(null);
 const productToDelete = ref(null);
 const saving = ref(false);
 
-const categories = computed(() => {
-  const set = new Set(scopedProducts.value.map((p) => p.category));
-  return Array.from(set).sort();
-});
+const categories = computed(() => productCategories.value);
 
 const categoryCards = computed(() =>
   productCategories.value
-    .filter((c) => c.isActive !== false)
+
     .map((cat) => ({
       ...cat,
       count: scopedProducts.value.filter(
@@ -72,7 +69,10 @@ const filteredProducts = computed(() =>
       !q ||
       p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q);
-    const matchesCat = categoryFilter.value === 'all' || p.category === categoryFilter.value;
+    const matchesCat =
+      categoryFilter.value === 'all' ||
+      p.category === categoryFilter.value ||
+      String(p.categoryId) === String(categoryFilter.value);
     const matchesMerchant =
       merchantFilter.value === 'all' || p.merchantId == merchantFilter.value;
     return matchesQuery && matchesCat && matchesMerchant;
@@ -151,11 +151,12 @@ const filterByCategory = (name) => {
   <div class="space-y-6">
     <PageHeader
       :title="pageTitle"
-      subtitle="Configuration et contrôle des éléments de votre marché."
       action-label="Ajouter un produit"
       :action-icon="Plus"
       @action="openCreate"
     >
+    <!-- subtitle="Configuration et contrôle des éléments de votre marché." -->
+
       <template #actions>
         <Button variant="outline" class="rounded-full" @click="handlePrint">
           <Printer class="w-4 h-4" />
@@ -202,8 +203,8 @@ const filterByCategory = (name) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes catégories</SelectItem>
-            <SelectItem v-for="cat in categories" :key="cat" :value="cat">
-              {{ cat }}
+            <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
             </SelectItem>
           </SelectContent>
         </Select>

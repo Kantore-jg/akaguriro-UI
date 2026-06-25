@@ -4,24 +4,58 @@
  */
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useApp } from '../composables/useApp.js';
+import { categoriesForMarket, findMarketById } from '../utils/categories.js';
 import { Store, User, Phone, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle } from 'lucide-vue-next';
 
 const {
   markets,
+  productCategories,
   requests,
   addPlaceRequest,
   currentUser,
-  showToast
+  showToast,
 } = useApp();
 
 const candidateName = ref(currentUser.value?.name || '');
 const candidatePhone = ref(currentUser.value?.phone || '');
 const activity = ref('');
-const category = ref('Poissonnerie');
+const category = ref('');
 const targetMarketId = ref(markets.value[0]?.id ?? null);
 const description = ref('');
+
+const selectedMarket = computed(() =>
+  findMarketById(markets.value, targetMarketId.value),
+);
+
+const availableCategories = computed(() =>
+  categoriesForMarket(selectedMarket.value, productCategories.value),
+);
+
+watch(
+  markets,
+  (items) => {
+    if (!targetMarketId.value && items.length) {
+      targetMarketId.value = items[0].id;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  availableCategories,
+  (cats) => {
+    if (!cats.length) {
+      category.value = '';
+      return;
+    }
+    if (!cats.some((c) => c.name === category.value)) {
+      category.value = cats[0].name;
+    }
+  },
+  { immediate: true },
+);
 
 function handleSubmit(e) {
   e.preventDefault();
@@ -37,6 +71,10 @@ function handleSubmit(e) {
     showToast('Aucun marché disponible.', 'error');
     return;
   }
+  if (!category.value) {
+    showToast('Aucune catégorie disponible pour ce marché.', 'error');
+    return;
+  }
 
   addPlaceRequest({
     merchantName: candidateName.value,
@@ -44,7 +82,7 @@ function handleSubmit(e) {
     activityType: activity.value,
     category: category.value,
     requestedMarketId: targetMarketId.value,
-    description: description.value
+    description: description.value,
   });
 
   activity.value = '';
@@ -52,26 +90,19 @@ function handleSubmit(e) {
 }
 
 function findMarket(marketId) {
-  return markets.value.find(m => m.id === marketId);
+  return findMarketById(markets.value, marketId);
 }
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-    <!-- Header -->
     <div class="space-y-1">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Formulaire Citoyen</h3>
-      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+      <h1>
         Demande Publique d'Octroi d'Emplacement
       </h1>
-      <!-- <p class="text-slate-500 text-sm max-w-2xl font-medium">
-        Postulez en ligne pour obtenir un étalage légal et sécurisé dans l'un des marchés publics connectés du Burundi.
-      </p> -->
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-      <!-- Left: Demande Form Component -->
       <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
         <h2 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
           <Store class="w-5 h-5 text-primary" />
@@ -79,7 +110,6 @@ function findMarket(marketId) {
         </h2>
 
         <form @submit="handleSubmit" class="space-y-4 text-xs font-bold text-slate-700">
-
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1">
               <label class="text-slate-500 block">Nom du Candidat</label>
@@ -112,25 +142,6 @@ function findMarket(marketId) {
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1">
-              <label class="text-slate-500 block">Filière / Catégorie d'activité</label>
-              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2 mr-1">
-                <Briefcase class="w-4 h-4 text-slate-400 shrink-0" />
-                <select
-                  v-model="category"
-                  class="bg-transparent border-0 outline-none w-full text-xs cursor-pointer text-slate-700"
-                >
-                  <option value="Poissonnerie"> Poissonnerie</option>
-                  <option value="Café & Thé">Café & Thé de Montagne</option>
-                  <option value="Fruits & Légumes"> Fruits & Légumes</option>
-                  <option value="Vivres"> Vivres Alimentaires</option>
-                  <option value="Textiles"> Textiles & Couture</option>
-                  <option value="Artisanat"> Vanerie & Artisanat</option>
-                  <option value="Électronique"> Tech / Services</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="space-y-1">
               <label class="text-slate-500 block">Marché Souhaité</label>
               <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2 mr-1">
                 <Store class="w-4 h-4 text-slate-400 shrink-0" />
@@ -138,10 +149,31 @@ function findMarket(marketId) {
                   v-model="targetMarketId"
                   class="bg-transparent border-0 outline-none w-full text-xs cursor-pointer text-slate-700"
                 >
-                  <option v-for="m in markets" :key="m.id" :value="m.id">{{ m.name }} </option>
+                  <option v-for="m in markets" :key="m.id" :value="m.id">{{ m.name }}</option>
                 </select>
               </div>
             </div>
+            <div class="space-y-1">
+              <label class="text-slate-500 block">Catégorie d'activité</label>
+              <div class="flex items-center gap-2 bg-background border border-slate-200 rounded-xl px-3 py-2 mr-1">
+                <Briefcase class="w-4 h-4 text-slate-400 shrink-0" />
+                <select
+                  v-model="category"
+                  class="bg-transparent border-0 outline-none w-full text-xs cursor-pointer text-slate-700"
+                  :disabled="!availableCategories.length"
+                  required
+                >
+                  <option v-if="!availableCategories.length" value="" disabled>
+                    Aucune catégorie disponible
+                  </option>
+                  <option v-for="cat in availableCategories" :key="cat.id" :value="cat.name">
+                    {{ cat.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            
           </div>
 
           <div class="space-y-1">
@@ -172,21 +204,17 @@ function findMarket(marketId) {
           <button
             type="submit"
             class="w-full bg-primary hover:bg-primary transition-all text-white font-extrabold py-3.5 rounded-xl text-center text-xs tracking-wide shadow shadow-emerald-700/30 pt-3.5"
+            :disabled="!availableCategories.length"
           >
-            Soumettre</button>
-
+            Soumettre
+          </button>
         </form>
       </div>
 
-      <!-- Right: Previous requests states -->
       <div class="lg:col-span-5 space-y-6">
         <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl border border-slate-800 space-y-5 shadow-sm">
-
           <div class="space-y-1">
             <h3 class="text-xs font-black uppercase text-primary tracking-wider">Tableau des Candidatures Actives</h3>
-            <p class="text-[11.5px] text-slate-400">
-              Suivez en direct l'état d'affectation de vos demandes soumises :
-            </p>
           </div>
 
           <div v-if="requests.length === 0" class="text-center py-8 text-slate-500 text-xs">
@@ -213,7 +241,7 @@ function findMarket(marketId) {
                   v-else-if="item.status === 'approved'"
                   class="inline-flex items-center gap-1 bg-emerald-50 text-primary border border-primary/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
                 >
-                  <CheckCircle2 class="w-3 h-3" /> Demande Approuvée (Stall Alloué)
+                  <CheckCircle2 class="w-3 h-3" /> Demande Approuvée
                 </span>
                 <span
                   v-else-if="item.status === 'rejected'"
@@ -227,11 +255,6 @@ function findMarket(marketId) {
                 <p><strong class="text-white">Activité :</strong> {{ item.activityType }}</p>
                 <p><strong class="text-white">Filière d'affaire :</strong> {{ item.category }}</p>
                 <p><strong class="text-white">Marché :</strong> {{ findMarket(item.requestedMarketId)?.name || 'Inconnu' }}</p>
-                <div
-                  v-if="item.status === 'approved'"
-                  class="mt-2 text-[10px] text-primary font-extrabold bg-emerald-950/40 p-2 rounded border border-emerald-900/35"
-                >
-                  🎉 Félicitations ! vous avez été enregistré comme marchand officiel.               </div>
               </div>
 
               <div class="flex justify-end text-[9.5px] font-bold text-slate-500">
@@ -239,14 +262,8 @@ function findMarket(marketId) {
               </div>
             </div>
           </div>
-
         </div>
-
-        <!-- <div class="bg-slate-100/70 border border-slate-200/40 p-4 rounded-2xl text-xs text-slate-500 font-medium">
-          💡 <strong>Note de simulation :</strong> Pour tester le processus de validation de bout-en-bout, soumettez une demande ici, puis basculez sur le profil <strong>🔑 Super Admin</strong> ou <strong>🏢 Admin Marché</strong> via la barre de simu au sommet, allez sur le Dashboard à la colonne <strong>"Demandes"</strong> pour approuver le dossier. Le système mettra en œuvre l'étalage en un instant !
-        </div> -->
       </div>
-
     </div>
   </div>
 </template>

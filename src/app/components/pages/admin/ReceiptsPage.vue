@@ -88,11 +88,11 @@ const merchantMarketName = computed(() => {
   <div class="space-y-6">
     <PageHeader
       :title="isMerchant ? 'Gestion De Mes Reçus' : 'Gestion Des Reçus'"
-      subtitle="Suivi des redevances mensuelles des commerçants."
       :action-label="isMerchant ? 'Transmettre un reçu' : ''"
       :action-icon="Plus"
       @action="formOpen = true"
     />
+    <!-- subtitle="Suivi des redevances mensuelles des commerçants." -->
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard title="Reçus" :value="scopedReceipts.length" :icon="Coins" color="primary" />

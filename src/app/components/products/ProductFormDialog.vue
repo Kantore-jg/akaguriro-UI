@@ -56,9 +56,7 @@ const submitting = ref(false);
 
 const isEditing = computed(() => Boolean(props.product?.id));
 
-const categories = computed(() =>
-  productCategories.value.filter((c) => c.isActive !== false),
-);
+const categories = computed(() => productCategories.value);
 
 const merchantsForMarket = computed(() => {
   if (!form.value.marketId) return props.merchants;

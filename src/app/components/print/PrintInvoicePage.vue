@@ -1,0 +1,142 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useApp } from '../../../composables/useApp.js';
+import PrintLayout from './PrintLayout.vue';
+
+const route = useRoute();
+const { getSale } = useApp();
+
+const sale = ref(null);
+const loading = ref(true);
+
+const saleId = computed(() => route.query.sale);
+
+onMounted(async () => {
+  if (saleId.value) {
+    sale.value = await getSale(saleId.value);
+  }
+  loading.value = false;
+});
+
+const formatPrice = (n) => Number(n || 0).toLocaleString('fr-FR');
+
+const paymentLabel = computed(() => {
+  if (!sale.value) return '';
+  return sale.value.paymentType === 'cash' ? 'Espèces (Cash)' : 'Électronique';
+});
+
+const saleDate = computed(() => {
+  if (!sale.value?.createdAtFull) return '';
+  return new Date(sale.value.createdAtFull).toLocaleString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+});
+
+const printedAt = computed(() =>
+  new Date().toLocaleString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }),
+);
+</script>
+
+<template>
+  <PrintLayout back-path="/admin/sales" title="Facture de vente">
+    <div v-if="loading" class="print-document text-center py-20 text-gray-500">
+      Chargement de la facture...
+    </div>
+
+    <div v-else-if="!sale" class="print-document text-center py-20 text-gray-500">
+      Facture introuvable.
+    </div>
+
+    <div v-else class="print-document">
+      <header class="print-document__header">
+        <div class="flex justify-between items-start gap-6">
+          <div>
+            <p class="print-document__brand">AKAGURIRO</p>
+            <p class="print-document__subtitle">Système de gestion des marchés</p>
+          </div>
+          <div class="text-right">
+            <p class="text-2xl font-bold text-gray-900">FACTURE</p>
+            <p class="font-mono text-sm text-gray-600 mt-1">{{ sale.invoiceNumber }}</p>
+          </div>
+        </div>
+        <div class="print-document__meta mt-4">
+          <span><strong>Date :</strong> {{ saleDate }}</span>
+          <span><strong>Marché :</strong> {{ sale.marketName }}</span>
+          <span v-if="sale.placeNumber"><strong>Emplacement :</strong> {{ sale.placeNumber }}</span>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div class="rounded-lg border border-gray-200 p-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Commerçant</p>
+          <p class="font-semibold">{{ sale.merchantName }}</p>
+          <p v-if="sale.merchantPhone" class="text-sm text-gray-600">{{ sale.merchantPhone }}</p>
+          <p v-if="sale.merchantEmail" class="text-sm text-gray-600">{{ sale.merchantEmail }}</p>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Client</p>
+          <p class="font-semibold">{{ sale.clientName }}</p>
+          <p v-if="sale.clientPhone" class="text-sm text-gray-600">{{ sale.clientPhone }}</p>
+          <p v-if="sale.clientEmail" class="text-sm text-gray-600">{{ sale.clientEmail }}</p>
+        </div>
+      </div>
+
+      <table class="print-table w-full mb-6">
+        <thead>
+          <tr>
+            <th class="text-left">Produit</th>
+            <th class="text-center">Qté</th>
+            <th class="text-right">Prix unit.</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in sale.items" :key="item.id">
+            <td>
+              {{ item.productName }}
+              <span class="text-gray-500 text-xs">({{ item.productUnit }})</span>
+            </td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-right">{{ formatPrice(item.unitPrice) }} FBU</td>
+            <td class="text-right font-medium">{{ formatPrice(item.lineTotal) }} FBU</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-right font-semibold pt-4">Sous-total</td>
+            <td class="text-right font-semibold pt-4">{{ formatPrice(sale.subtotal) }} FBU</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="text-right font-bold text-lg">Total</td>
+            <td class="text-right font-bold text-lg text-red-600">{{ formatPrice(sale.total) }} FBU</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-8">
+        <p class="text-sm">
+          <strong>Mode de paiement :</strong> {{ paymentLabel }}
+        </p>
+        <p v-if="sale.notes" class="text-sm mt-2">
+          <strong>Notes :</strong> {{ sale.notes }}
+        </p>
+      </div>
+
+      <footer class="text-center text-xs text-gray-500 border-t border-gray-200 pt-4">
+        <p>Merci pour votre achat !</p>
+        <p class="mt-1">Document généré le {{ printedAt }}</p>
+      </footer>
+    </div>
+  </PrintLayout>
+</template>

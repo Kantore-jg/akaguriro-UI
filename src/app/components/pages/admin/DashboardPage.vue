@@ -49,7 +49,7 @@ const pageTitle = computed(() => {
 
 const pageSubtitle = computed(() => {
   if (isMerchant.value) {
-    return 'Suivez vos produits, reçus et activité commerciale.';
+    return '';
   }
   if (isMarketAdmin.value) {
     return 'Statistiques et indicateurs de votre marché.';
@@ -89,9 +89,10 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         :title="isMerchant ? 'Mes revenus validés' : 'CA validé'"
         :value="`${formatAmount(scopedApprovedReceiptsTotal)} BIF`"
         :icon="DollarSign"
-        :subtitle="isMerchant ? 'Total de mes reçus approuvés' : 'Reçus approuvés dans votre périmètre'"
         color="pink"
       />
+      <!-- :subtitle="isMerchant ? 'Total de mes reçus approuvés' : 'Reçus approuvés dans votre périmètre'" -->
+
       <StatCard
         v-if="!isMerchant"
         title="Étals occupés"
@@ -106,29 +107,33 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         title="Mon emplacement"
         :value="merchantPlaceLabel"
         :icon="MapPin"
-        :subtitle="assignedMerchant?.activeMarketId ? findMarket(assignedMerchant.activeMarketId)?.name : 'Marché non défini'"
         color="success"
       />
+      <!-- :subtitle="assignedMerchant?.activeMarketId ? findMarket(assignedMerchant.activeMarketId)?.name : 'Marché non défini'" -->
+
       <StatCard
         :title="isMerchant ? 'Mes produits' : 'Produits catalogue'"
         :value="scopedProducts.length"
         :icon="CheckCircle"
-        :subtitle="isMerchant ? 'Produits actifs dans mon catalogue' : `${scopedMerchants.length} commerçant(s) actif(s)`"
         color="success"
       />
+        <!-- :subtitle="isMerchant ? 'Produits actifs dans mon catalogue' : `${scopedMerchants.length} commerçant(s) actif(s)`" -->
+
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <WeeklyBarChart
         title="Activité des 7 derniers jours"
-        subtitle="Nombre de reçus soumis par jour"
         :data="scopedWeeklyReceiptActivity"
       />
+      <!-- subtitle="Nombre de reçus soumis par jour" -->
+
       <PaymentDonutChart
         title="Répartition des reçus"
-        subtitle="Montants par statut dans votre périmètre"
         :segments="scopedReceiptStatusBreakdown"
       />
+      <!-- subtitle="Montants par statut dans votre périmètre" -->
+
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

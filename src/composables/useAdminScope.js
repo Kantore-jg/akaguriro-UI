@@ -11,6 +11,7 @@ export function useAdminScope() {
     products,
     requests,
     receipts,
+    sales,
     users,
   } = useApp();
 
@@ -102,6 +103,16 @@ export function useAdminScope() {
     scopedRequests.value.filter((r) => r.status === 'pending'),
   );
 
+  const scopedSales = computed(() => {
+    if (isMerchant.value && assignedMerchantId.value) {
+      return sales.value.filter((s) => s.merchantId === assignedMerchantId.value);
+    }
+    if (assignedMarketId.value) {
+      return sales.value.filter((s) => s.marketId == assignedMarketId.value);
+    }
+    return sales.value;
+  });
+
   const scopedPendingReceipts = computed(() =>
     scopedReceipts.value.filter((r) => r.status === 'pending'),
   );
@@ -188,6 +199,7 @@ export function useAdminScope() {
     products,
     requests,
     receipts,
+    sales,
     users,
     isSuperAdmin,
     isMarketAdmin,
@@ -203,6 +215,7 @@ export function useAdminScope() {
     scopedRequests,
     scopedUsers,
     scopedReceipts,
+    scopedSales,
     scopedPendingRequests,
     scopedPendingReceipts,
     scopedApprovedReceipts,

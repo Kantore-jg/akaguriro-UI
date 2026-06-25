@@ -7,6 +7,7 @@
 import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
+import { categoriesForMarket } from '../utils/categories.js';
 import { sameId } from '../utils/ids.js';
 import {
   MapPin,
@@ -25,6 +26,7 @@ const {
   places,
   merchants,
   products,
+  productCategories,
   selectedMarketId,
   initialized,
 } = useApp();
@@ -79,16 +81,9 @@ const activeStallMerchantProducts = computed(() => {
   return products.value.filter((p) => sameId(p.merchantId, selectedPlace.value.merchantId));
 });
 
-const availableGategories = computed(() => {
-  if (!market.value) return [];
-  return Array.from(
-    new Set(
-      products.value
-        .filter((p) => sameId(p.marketId, market.value.id))
-        .map((p) => p.category),
-    ),
-  );
-});
+const marketCategoryOptions = computed(() =>
+  categoriesForMarket(market.value, productCategories.value),
+);
 
 function handlePlaceClick(place) {
   selectedPlace.value = place;
@@ -214,11 +209,9 @@ function getVendor(merchantId) {
             class="bg-background border border-slate-200 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer text-slate-700"
           >
             <option value="all">Toutes les catégories</option>
-            <option value="Poissonnerie"> Poissonnerie</option>
-            <option value="Céréales & Café"> Café / Céréales</option>
-            <option value="Fruits & Légumes"> Fruits & Légumes</option>
-            <option value="Vivres"> Vivres</option>
-            <option value="Textiles"> Textiles</option>
+            <option v-for="cat in marketCategoryOptions" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
+            </option>
           </select>
         </div>
       </div>
@@ -502,7 +495,9 @@ function getVendor(merchantId) {
             class="bg-white border border-slate-200 text-xs font-semibold rounded-xl px-2.5 py-1.5 focus:outline-none"
           >
             <option value="all">Filière / Tout</option>
-            <option v-for="cat in availableGategories" :key="cat" :value="cat">{{ cat }}</option>
+            <option v-for="cat in marketCategoryOptions" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
+            </option>
           </select>
         </div>
       </div>
