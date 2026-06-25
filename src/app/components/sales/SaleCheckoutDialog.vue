@@ -80,27 +80,11 @@ const handleSubmit = () => {
     <DialogContent class="sm:max-w-lg">
       <DialogHeader>
         <DialogTitle>Valider le paiement</DialogTitle>
-        <DialogDescription>
-          Renseignez le client et le mode de paiement pour finaliser la vente.
-        </DialogDescription>
+       
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
-        <div class="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-          <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">Récapitulatif</p>
-          <div
-            v-for="item in cart"
-            :key="item.id"
-            class="flex justify-between text-sm"
-          >
-            <span>{{ item.name }} × {{ item.quantity }}</span>
-            <span class="font-medium">{{ formatPrice(item.price * item.quantity) }} FBU</span>
-          </div>
-          <div class="flex justify-between pt-2 border-t border-border font-semibold">
-            <span>Total</span>
-            <span class="text-primary">{{ formatPrice(cartTotal) }} FBU</span>
-          </div>
-        </div>
+        
 
         <div class="space-y-2">
           <Label for="client-name">Nom du client *</Label>
