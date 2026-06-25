@@ -100,14 +100,14 @@ onMounted(() => {
       </header>
 
       <div class="print-document__stats">
-        <div class="print-document__stat">
+        <!-- <div class="print-document__stat">
           <div class="print-document__stat-label">Total produits</div>
           <div class="print-document__stat-value">{{ products.length }}</div>
-        </div>
-        <div class="print-document__stat">
+        </div> -->
+        <!-- <div class="print-document__stat">
           <div class="print-document__stat-label">Disponibles</div>
           <div class="print-document__stat-value">{{ availableCount }}</div>
-        </div>
+        </div> -->
         <div v-if="!isMerchant" class="print-document__stat">
           <div class="print-document__stat-label">Commerçants</div>
           <div class="print-document__stat-value">{{ scopedMerchants.length }}</div>

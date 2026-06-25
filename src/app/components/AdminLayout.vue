@@ -184,8 +184,13 @@ const goToProfile = () => router.push('/profile');
         sidebarOpen ? 'w-60' : 'w-0 lg:w-[68px]',
       ]"
     >
-      <div class="p-5 border-b border-sidebar-border">
-        <div class="flex items-center gap-3">
+      <div :class="['border-b border-sidebar-border', sidebarOpen ? 'p-5' : 'p-3']">
+        <div
+          :class="[
+            'flex items-center',
+            sidebarOpen ? 'gap-3' : 'flex-col gap-2',
+          ]"
+        >
           <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0">
             <Building2 class="w-5 h-5 text-white" />
           </div>
@@ -193,6 +198,14 @@ const goToProfile = () => router.push('/profile');
             <h1 class="text-sm font-bold text-foreground tracking-tight truncate">AKAGURIRO</h1>
             <p class="text-[10px] text-primary font-semibold uppercase tracking-wider">Espace Contrôle</p>
           </div>
+          <button
+            type="button"
+            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors shrink-0"
+            :aria-label="sidebarOpen ? 'Réduire la barre latérale' : 'Étendre la barre latérale'"
+            @click="sidebarOpen = !sidebarOpen"
+          >
+            <ChevronLeft :class="['w-4 h-4 transition-transform', !sidebarOpen && 'rotate-180']" />
+          </button>
         </div>
       </div>
 
@@ -217,22 +230,7 @@ const goToProfile = () => router.push('/profile');
         </button>
       </nav>
 
-      <div class="p-3 border-t border-sidebar-border space-y-1">
-        <button
-          @click="sidebarOpen = !sidebarOpen"
-          class="w-full hidden lg:flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent transition-colors text-sm"
-        >
-          <ChevronLeft :class="['w-4 h-4 transition-transform', !sidebarOpen && 'rotate-180']" />
-          <span v-if="sidebarOpen">Réduire</span>
-        </button>
-        <!-- <button
-          @click="goToPortal"
-          class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-primary transition-colors text-sm"
-        >
-          <Eye class="w-4 h-4" />
-          <span v-if="sidebarOpen">Portail public</span>
-        </button> -->
-      </div>
+
     </aside>
 
     <div class="flex-1 flex flex-col min-h-screen min-w-0">

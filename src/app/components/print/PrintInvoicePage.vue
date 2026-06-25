@@ -63,7 +63,7 @@ const printedAt = computed(() =>
         <div class="flex justify-between items-start gap-6">
           <div>
             <p class="print-document__brand">AKAGURIRO</p>
-            <p class="print-document__subtitle">Système de gestion des marchés</p>
+            <!-- <p class="print-document__subtitle">Système de gestion des marchés</p> -->
           </div>
           <div class="text-right">
             <p class="text-2xl font-bold text-gray-900">FACTURE</p>
@@ -123,7 +123,7 @@ const printedAt = computed(() =>
           </tr>
         </tfoot>
       </table>
-
+<!-- 
       <div class="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-8">
         <p class="text-sm">
           <strong>Mode de paiement :</strong> {{ paymentLabel }}
@@ -131,11 +131,11 @@ const printedAt = computed(() =>
         <p v-if="sale.notes" class="text-sm mt-2">
           <strong>Notes :</strong> {{ sale.notes }}
         </p>
-      </div>
+      </div> -->
 
       <footer class="text-center text-xs text-gray-500 border-t border-gray-200 pt-4">
         <p>Merci pour votre achat !</p>
-        <p class="mt-1">Document généré le {{ printedAt }}</p>
+        <!-- <p class="mt-1">Document généré le {{ printedAt }}</p> -->
       </footer>
     </div>
   </PrintLayout>
