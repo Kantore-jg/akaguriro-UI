@@ -45,7 +45,7 @@ const statusLabel = (status) => {
           <TableHead>Étal</TableHead>
           <TableHead>Marché</TableHead>
           <TableHead>Bloc / Allée</TableHead>
-          <TableHead>Filière</TableHead>
+          <TableHead>Catégories</TableHead>
           <TableHead>Occupant</TableHead>
           <TableHead>Statut</TableHead>
           <TableHead class="text-right">Actions</TableHead>
@@ -63,7 +63,10 @@ const statusLabel = (status) => {
           <TableCell class="text-sm text-muted-foreground">
             {{ place.blockName }} · {{ place.rowName }}
           </TableCell>
-          <TableCell>{{ place.category || '—' }}</TableCell>
+          <TableCell>
+            <span v-if="place.categories?.length" class="text-sm">{{ place.categories.join(', ') }}</span>
+            <span v-else class="text-sm text-muted-foreground">—</span>
+          </TableCell>
           <TableCell>
             <div v-if="getMerchant(place.merchantId)" class="flex items-center gap-2">
               <img

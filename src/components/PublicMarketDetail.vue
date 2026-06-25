@@ -7,7 +7,7 @@
 import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
-import { categoriesForMarket } from '../utils/categories.js';
+import { categoriesForMarket, placeHasCategory } from '../utils/categories.js';
 import { sameId } from '../utils/ids.js';
 import {
   MapPin,
@@ -252,7 +252,7 @@ function getVendor(merchantId) {
                 class="cursor-pointer rounded-xl border p-2.5 transition-all flex flex-col justify-between h-20 shadow-sm relative group select-none"
                 :class="[
                   currentStallAvailabilityColor(pl.status),
-                  (mapCategoryHighlight !== 'all' && pl.category === mapCategoryHighlight && pl.status === 'occupée')
+                  (mapCategoryHighlight !== 'all' && placeHasCategory(pl, mapCategoryHighlight) && pl.status === 'occupée')
                     ? 'ring-2 ring-emerald-500 ring-offset-2 scale-102 border-emerald-500 bg-emerald-50/25 animate-pulseGlow'
                     : ''
                 ]"
@@ -269,7 +269,7 @@ function getVendor(merchantId) {
                     {{ getStallOccupantName(pl).split(' ')[0] }}
                   </p>
                   <p class="text-[9px] text-slate-400 dark:text-slate-300 font-semibold truncate leading-none mt-1">
-                    {{ pl.category || (pl.status === 'libre' ? 'Vacant' : '—') }}
+                    {{ pl.categories?.length ? pl.categories.join(', ') : (pl.status === 'libre' ? 'Vacant' : '—') }}
                   </p>
                 </div>
               </div>

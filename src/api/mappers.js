@@ -81,6 +81,10 @@ export function mapBlock(b) {
 
 export function mapPlace(p) {
   const status = PLACE_STATUS_TO_UI[p.status] || p.status;
+  const categoryNames = p.category
+    ? p.category.split(',').map((name) => name.trim()).filter(Boolean)
+    : [];
+
   return {
     id: p.number || String(p.id),
     placeId: p.id,
@@ -90,7 +94,9 @@ export function mapPlace(p) {
     rowName: p.number || '',
     status,
     merchantId: p.chief?.id || null,
-    category: p.category || '',
+    category: p.category || categoryNames.join(', '),
+    categoryIds: p.product_category_ids || [],
+    categories: categoryNames,
     marketId: p.market_id,
     qrCode: p.qr_code,
     latitude: p.latitude,
@@ -300,7 +306,7 @@ export function placeToApi(data) {
     market_block_id: data.blockId || null,
     number: data.id || data.number,
     status: PLACE_STATUS_TO_API[data.status] || data.status || 'available',
-    category: data.category,
+    product_category_ids: data.productCategoryIds || [],
   };
 }
 

@@ -39,6 +39,7 @@ const {
   addBlock,
   updateBlock,
   deleteBlock,
+  showToast,
 } = useApp();
 
 const {
@@ -92,7 +93,8 @@ const filteredPlaces = computed(() =>
       !q ||
       p.id.toLowerCase().includes(q) ||
       p.blockName.toLowerCase().includes(q) ||
-      p.category?.toLowerCase().includes(q);
+      p.category?.toLowerCase().includes(q) ||
+      p.categories?.some((c) => c.toLowerCase().includes(q));
     const matchesMarket = marketFilter.value === 'all' || p.marketId === marketFilter.value;
     const matchesStatus = statusFilter.value === 'all' || p.status === statusFilter.value;
     return matchesQuery && matchesMarket && matchesStatus;
@@ -161,7 +163,10 @@ const handleAddPlace = (payload) => {
   const exists = scopedPlaces.value.some(
     (p) => p.id === payload.id && p.marketId === payload.marketId,
   );
-  if (exists) return;
+  if (exists) {
+    showToast(`L'étal ${payload.id} existe déjà dans ce marché.`, 'error');
+    return;
+  }
   addPlace(payload);
 };
 

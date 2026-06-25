@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
-import { useApp } from '../../../composables/useApp.js';
+import { categoriesForMarket } from '../../../utils/categories.js';
+import ProductCategoryMultiSelect from '../markets/ProductCategoryMultiSelect.vue';
 import Button from '../ui/Button.vue';
 import Input from '../ui/Input.vue';
 import Label from '../ui/Label.vue';
@@ -30,17 +31,23 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'submit', 'create-block']);
 
-const { productCategories } = useApp();
-
 const form = ref({
   id: '',
   marketId: '',
   blockId: '',
-  category: '',
+  productCategoryIds: [],
 });
 
 const blocksForMarket = computed(() =>
   props.blocks.filter((b) => String(b.marketId) === String(form.value.marketId)),
+);
+
+const selectedMarket = computed(() =>
+  props.markets.find((m) => String(m.id) === String(form.value.marketId)) || null,
+);
+
+const availableCategories = computed(() =>
+  categoriesForMarket(selectedMarket.value),
 );
 
 watch(
@@ -51,7 +58,7 @@ watch(
       id: '',
       marketId: props.defaultMarketId || props.markets[0]?.id || '',
       blockId: props.defaultBlockId ? String(props.defaultBlockId) : '',
-      category: '',
+      productCategoryIds: [],
     };
   },
 );
@@ -59,14 +66,19 @@ watch(
 watch(
   () => form.value.marketId,
   () => {
-    const stillValid = blocksForMarket.value.some(
+    const stillValidBlock = blocksForMarket.value.some(
       (b) => String(b.id) === String(form.value.blockId),
     );
-    if (!stillValid) {
+    if (!stillValidBlock) {
       form.value.blockId = blocksForMarket.value[0]?.id
         ? String(blocksForMarket.value[0].id)
         : '';
     }
+
+    const allowed = new Set(availableCategories.value.map((c) => String(c.id)));
+    form.value.productCategoryIds = form.value.productCategoryIds.filter((id) =>
+      allowed.has(String(id)),
+    );
   },
 );
 
@@ -74,11 +86,13 @@ const close = () => emit('update:open', false);
 
 const handleSubmit = () => {
   if (!form.value.id.trim() || !form.value.marketId || !form.value.blockId) return;
+  if (!form.value.productCategoryIds.length) return;
+
   emit('submit', {
     id: form.value.id.trim(),
     marketId: form.value.marketId,
     blockId: Number(form.value.blockId) || form.value.blockId,
-    category: form.value.category.trim() || undefined,
+    productCategoryIds: form.value.productCategoryIds,
   });
   close();
 };
@@ -143,23 +157,27 @@ const handleSubmit = () => {
         </div>
 
         <div class="space-y-2">
-          <Label>Filière (optionnel)</Label>
-          <Select v-model="form.category">
-            <SelectTrigger>
-              <SelectValue placeholder="Choisir une catégorie" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Aucune</SelectItem>
-              <SelectItem v-for="cat in productCategories" :key="cat.id" :value="cat.name">
-                {{ cat.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <Label>Catégories d'activité</Label>
+          <ProductCategoryMultiSelect
+            v-model="form.productCategoryIds"
+            :options="availableCategories"
+            placeholder="Choisir catégories..."
+            :disabled="!availableCategories.length"
+          />
+          <p v-if="!availableCategories.length" class="text-xs text-muted-foreground">
+            Aucune catégorie configurée pour ce marché.
+          </p>
+          
         </div>
 
         <DialogFooter>
           <Button type="button" variant="outline" @click="close">Annuler</Button>
-          <Button type="submit" :disabled="!form.blockId">Créer</Button>
+          <Button
+            type="submit"
+            :disabled="!form.blockId || !form.productCategoryIds.length || !availableCategories.length"
+          >
+            Créer
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>
