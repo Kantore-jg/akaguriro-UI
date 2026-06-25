@@ -54,7 +54,6 @@ const statusBadge = (status) => {
   <div class="space-y-6">
     <PageHeader
       title="Gestion Des Demandes"
-      subtitle="Validation des dossiers d'octroi d'étals par la mairie."
     />
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

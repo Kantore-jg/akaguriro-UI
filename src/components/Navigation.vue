@@ -10,14 +10,21 @@ import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import {
   Building2,
-  ShoppingBag,
   User,
   LogOut,
   Menu,
   X,
   LayoutDashboard,
-  Tv,
 } from 'lucide-vue-next';
+import { Avatar, AvatarImage, AvatarFallback } from '../app/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../app/components/ui/dropdown-menu';
 
 const route = useRoute();
 const router = useRouter();
@@ -43,6 +50,10 @@ const userInitials = computed(() => {
   const name = currentUser.value?.name || 'U';
   return name.substring(0, 2).toUpperCase();
 });
+
+const roleLabel = computed(() =>
+  (currentUser.value?.role || '').replace(/_/g, ' '),
+);
 
 const mobileMenuOpen = ref(false);
 const roleSwitcherOpen = ref(false);
@@ -104,6 +115,13 @@ function goToLed() {
 
 function goToProfile() {
   router.push('/profile');
+  mobileMenuOpen.value = false;
+}
+
+async function handleLogout() {
+  await logout();
+  router.push('/');
+  goToTab('home');
   mobileMenuOpen.value = false;
 }
 </script>
@@ -187,33 +205,49 @@ function goToProfile() {
             </button>
           </template>
           <template v-else>
-            <!-- <span v-if="isLoggedIn" class="hidden md:inline text-xs text-muted-foreground">
-              Connecté : <span class="font-medium text-foreground">{{ currentUser.name }}</span>
-            </span> -->
-            <button
-              v-if="canAccessAdmin"
-              @click="goToAdmin"
-              class="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
-              :class="isAdminRoute ? 'text-primary border-primary/30 bg-primary/5' : 'text-muted-foreground'"
-            >
-              <LayoutDashboard class="w-3.5 h-3.5" />
-              Admin
-            </button>
-            <button
-              @click="goToProfile"
-              class="w-8 h-8 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center hover:bg-primary/90 transition-colors"
-              :title="currentUser.name"
-            >
-              {{ userInitials }}
-            </button>
-            <button
-              @click="handleRoleChange('VISITOR')"
-              class="bs-btn-primary text-xs hidden sm:inline-flex"
-              title="Se déconnecter"
-            >
-              <LogOut class="w-3.5 h-3.5" />
-              Déconnexion
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <button
+                  class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 hover:bg-accent transition-colors"
+                  :title="currentUser.name"
+                >
+                <span class="hidden sm:inline text-sm font-medium text-foreground max-w-[140px] truncate">
+                    {{ currentUser.name }}
+                  </span>
+                  <Avatar class="w-8 h-8">
+                    <AvatarImage
+                      v-if="currentUser.avatar"
+                      :src="currentUser.avatar"
+                      :alt="currentUser.name"
+                    />
+                    <AvatarFallback class="bg-primary text-white text-xs font-bold">
+                      {{ userInitials }}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="w-56">
+                <DropdownMenuLabel>
+                  <p class="font-medium">{{ currentUser.name }}</p>
+                  <p class="text-xs text-muted-foreground font-normal">{{ roleLabel }}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="goToProfile">
+                  <User class="w-4 h-4 mr-2" />
+                  Mon profil
+                </DropdownMenuItem>
+                <DropdownMenuItem v-if="canAccessAdmin" @click="goToAdmin">
+                  <LayoutDashboard class="w-4 h-4 mr-2" />
+                  Espace Admin
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="handleLogout">
+                  <LogOut class="w-4 h-4 mr-2" />
+                  Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </template>
 
           <button
@@ -260,7 +294,7 @@ function goToProfile() {
             <LayoutDashboard class="w-4 h-4" /> Espace Admin
           </button>
           <button
-            @click="handleRoleChange('VISITOR'); mobileMenuOpen = false"
+            @click="handleLogout"
             class="w-full bs-btn-primary text-center"
           >
             Déconnexion

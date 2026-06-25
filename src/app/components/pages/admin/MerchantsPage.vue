@@ -91,7 +91,6 @@ const viewingProductsCount = computed(() => {
   <div class="space-y-6">
     <PageHeader
       title="Gestion Des Commerçants"
-      subtitle="Répertoire des exploitants habilités sur les marchés connectés."
     >
       <template #actions>
         <Button variant="outline" class="rounded-full" @click="handlePrint">

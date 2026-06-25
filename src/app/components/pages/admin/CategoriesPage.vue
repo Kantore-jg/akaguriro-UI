@@ -87,7 +87,6 @@ const confirmDelete = () => {
   <div class="space-y-6">
     <PageHeader
       title="Catégories de produits"
-      subtitle="Gérez les types de produits disponibles dans les marchés."
       action-label="Ajouter une catégorie"
       :action-icon="Plus"
       @action="openCreate"

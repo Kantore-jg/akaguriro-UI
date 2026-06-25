@@ -219,7 +219,7 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
     <Card v-if="isSuperAdmin || isMarketAdmin" class="bs-card border shadow-sm">
       <CardHeader>
         <CardTitle class="text-base">Demandes récentes</CardTitle>
-        <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p>
+        <!-- <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p> -->
       </CardHeader>
       <CardContent>
         <div v-if="recentRequests.length" class="space-y-2">
