@@ -55,6 +55,7 @@ export function mapMarket(m) {
     image: resolveStorageUrl(m.image),
     coverImage: resolveStorageUrl(m.cover_image || m.image),
     productCategories: categories.map((c) => c.name),
+    marketProductCategories: categories,
     productCategoryIds: m.product_category_ids?.length
       ? m.product_category_ids
       : categories.map((c) => c.id).filter(Boolean),
@@ -139,12 +140,18 @@ export function mapProduct(p) {
 }
 
 export function mapPlaceRequest(r) {
+  const categoryNames = r.category
+    ? r.category.split(',').map((name) => name.trim()).filter(Boolean)
+    : [];
+
   return {
     id: r.id,
     merchantName: r.merchant_name,
     merchantPhone: r.merchant_phone,
-    activityType: r.category || r.description?.slice(0, 60) || '',
+    activityType: r.description?.split('\n\n')[0] || categoryNames.join(', ') || '',
     category: r.category || '',
+    categoryIds: r.product_category_ids || [],
+    categories: categoryNames,
     requestedMarketId: r.market_id,
     marketName: r.market?.name,
     description: r.description || '',
@@ -319,11 +326,13 @@ export function productToApi(data) {
 }
 
 export function placeRequestToApi(data) {
+  const descriptionParts = [data.activityType, data.description].filter(Boolean);
+
   return {
     market_id: data.requestedMarketId,
     merchant_name: data.merchantName,
     merchant_phone: data.merchantPhone,
-    category: data.category || data.activityType,
-    description: data.description,
+    product_category_ids: data.productCategoryIds || [],
+    description: descriptionParts.join('\n\n') || null,
   };
 }

@@ -112,7 +112,7 @@ const statusBadge = (status) => {
 
           <div class="text-sm bg-muted/40 rounded-lg p-4 space-y-1 border border-border">
             <p><span class="font-medium">Activité :</span> {{ item.activityType }}</p>
-            <p><span class="font-medium">Filière :</span> {{ item.category }}</p>
+            <p><span class="font-medium">Catégories :</span> {{ item.category }}</p>
             <p class="text-muted-foreground">{{ item.description }}</p>
           </div>
 

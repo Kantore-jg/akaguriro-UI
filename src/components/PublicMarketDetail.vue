@@ -26,7 +26,6 @@ const {
   places,
   merchants,
   products,
-  productCategories,
   selectedMarketId,
   initialized,
 } = useApp();
@@ -81,9 +80,7 @@ const activeStallMerchantProducts = computed(() => {
   return products.value.filter((p) => sameId(p.merchantId, selectedPlace.value.merchantId));
 });
 
-const marketCategoryOptions = computed(() =>
-  categoriesForMarket(market.value, productCategories.value),
-);
+const marketCategoryOptions = computed(() => categoriesForMarket(market.value));
 
 function handlePlaceClick(place) {
   selectedPlace.value = place;
