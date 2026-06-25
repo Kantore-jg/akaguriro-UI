@@ -155,7 +155,7 @@ function getVendor(merchantId) {
           <!-- <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
             En direct de {{ market.city }}
           </span> -->
-          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
+          <h1 >
             {{ market.name }}
           </h1>
           <p class="text-slate-200 text-xs sm:text-sm max-w-2xl leading-relaxed font-medium">
@@ -190,13 +190,7 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div class="space-y-1">
-          <!-- <div class="flex items-center gap-2">
-            <Compass class="w-5 h-5 text-primary shrink-0" />
-            <h2 class="text-lg font-extrabold text-slate-900 tracking-tight font-display">Plan Géomatique Indoor Interactif</h2>
-          </div> -->
-          <p class="text-xs text-slate-500 font-medium">
-            Représentation en temps réel des étals physiques du marché. Cliquez sur un carré d'étal pour visiter le commerçant et voir ses produits.
-          </p>
+          
         </div>
 
         <div class="flex items-center gap-2">
@@ -426,7 +420,7 @@ function getVendor(merchantId) {
     <!-- 4. COMMERÇANTS ACTIFS -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
+        <h2 >
           Commerçants actifs
         </h2>
       </div>
@@ -471,7 +465,7 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-3">
         <div>
-          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
+          <h2 >
             Catalogue Alimentaire & Produits du Marché
           </h2>
         </div>
