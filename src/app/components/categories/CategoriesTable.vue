@@ -33,17 +33,18 @@ const emit = defineEmits(['edit', 'delete']);
         <TableRow>
           <TableHead>Catégorie</TableHead>
           <TableHead>Produits</TableHead>
+          <TableHead>Marchés</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-if="loading">
-          <TableCell colspan="3" class="text-center py-8 text-muted-foreground">
+          <TableCell colspan="4" class="text-center py-8 text-muted-foreground">
             Chargement...
           </TableCell>
         </TableRow>
         <TableRow v-else-if="!categories.length">
-          <TableCell colspan="3" class="text-center py-8 text-muted-foreground">
+          <TableCell colspan="4" class="text-center py-8 text-muted-foreground">
             Aucune catégorie trouvée.
           </TableCell>
         </TableRow>
@@ -62,7 +63,10 @@ const emit = defineEmits(['edit', 'delete']);
             </div>
           </TableCell>
           <TableCell>
-            <span class="text-sm font-medium">{{ category.productsCount }}</span>
+            <span class="text-sm font-medium">{{ category.productsCount ?? 0 }}</span>
+          </TableCell>
+          <TableCell>
+            <span class="text-sm font-medium">{{ category.marketsCount ?? 0 }}</span>
           </TableCell>
           <TableCell class="text-right">
             <DropdownMenu>

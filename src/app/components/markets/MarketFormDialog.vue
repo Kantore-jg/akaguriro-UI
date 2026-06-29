@@ -114,9 +114,9 @@ const handleSubmit = () => {
           <Store class="w-5 h-5 text-primary" />
           {{ isEditing ? 'Modifier le marché' : 'Nouveau marché' }}
         </DialogTitle>
-        <DialogDescription>
+        <!-- <DialogDescription>
           {{ isEditing ? 'Mettez à jour les informations du marché public.' : 'Enregistrez un nouveau marché dans le réseau Akaguriro.' }}
-        </DialogDescription>
+        </DialogDescription> -->
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">

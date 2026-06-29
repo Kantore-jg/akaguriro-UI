@@ -178,7 +178,7 @@ function findMarket(marketId) {
               <FileText class="w-4 h-4 text-slate-400 shrink-0 self-start mt-1" />
               <input
                 type="text"
-                placeholder="ex. Vente de poisson frais de Rumonge sur étal ventilé."
+                placeholder="ex. Vente de poisson frais de Rumonge"
                 v-model="activity"
                 class="bg-transparent border-0 outline-none text-xs w-full text-slate-800 font-medium"
                 required

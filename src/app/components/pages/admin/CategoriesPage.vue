@@ -2,15 +2,22 @@
 import { ref, computed, onMounted } from 'vue';
 import { Plus, Search, Tags } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
+import {
+  fetchAllProductCategories,
+  createProductCategory,
+  updateProductCategoryApi,
+  deleteProductCategoryApi,
+} from '../../../../api/services/data.js';
+import { getErrorMessage } from '../../../../api/client.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import CategoriesTable from '../../categories/CategoriesTable.vue';
 import CategoryFormDialog from '../../categories/CategoryFormDialog.vue';
 import Input from '../../ui/Input.vue';
+import Button from '../../ui/Button.vue';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -19,29 +26,35 @@ import {
   AlertDialogTitle,
 } from '../../ui/alert-dialog';
 
-const {
-  productCategories,
-  loadProductCategories,
-  addProductCategory,
-  updateProductCategory,
-  deleteProductCategory,
-} = useApp();
+const { showToast, loadProductCategories } = useApp();
 
+const categories = ref([]);
 const searchQuery = ref('');
 const formOpen = ref(false);
 const deleteOpen = ref(false);
 const editingCategory = ref(null);
 const categoryToDelete = ref(null);
 const loading = ref(false);
+const deleting = ref(false);
 
-onMounted(async () => {
+async function refreshCategories() {
   loading.value = true;
-  await loadProductCategories();
-  loading.value = false;
+  try {
+    categories.value = await fetchAllProductCategories();
+    await loadProductCategories();
+  } catch (error) {
+    showToast(getErrorMessage(error, 'Erreur de chargement des catégories'), 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  void refreshCategories();
 });
 
 const filteredCategories = computed(() =>
-  productCategories.value.filter((c) => {
+  categories.value.filter((c) => {
     const q = searchQuery.value.toLowerCase();
     return (
       !q ||
@@ -66,20 +79,36 @@ const openDelete = (category) => {
   deleteOpen.value = true;
 };
 
-const handleFormSubmit = (payload) => {
-  if (payload.id) {
-    updateProductCategory(payload);
-  } else {
-    addProductCategory(payload);
+const handleFormSubmit = async (payload) => {
+  try {
+    if (payload.id) {
+      await updateProductCategoryApi(payload.id, payload);
+      showToast(`Catégorie "${payload.name}" mise à jour`, 'success');
+    } else {
+      await createProductCategory(payload);
+      showToast(`Catégorie "${payload.name}" créée avec succès`, 'success');
+    }
+    formOpen.value = false;
+    await refreshCategories();
+  } catch (error) {
+    showToast(getErrorMessage(error), 'error');
   }
 };
 
-const confirmDelete = () => {
-  if (categoryToDelete.value) {
-    deleteProductCategory(categoryToDelete.value.id);
+const confirmDelete = async () => {
+  if (!categoryToDelete.value || deleting.value) return;
+  deleting.value = true;
+  try {
+    await deleteProductCategoryApi(categoryToDelete.value.id);
+    showToast('Catégorie supprimée', 'success');
+    deleteOpen.value = false;
+    categoryToDelete.value = null;
+    await refreshCategories();
+  } catch (error) {
+    showToast(getErrorMessage(error, 'Impossible de supprimer cette catégorie'), 'error');
+  } finally {
+    deleting.value = false;
   }
-  deleteOpen.value = false;
-  categoryToDelete.value = null;
 };
 </script>
 
@@ -95,13 +124,13 @@ const confirmDelete = () => {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <StatCard
         title="Total catégories"
-        :value="productCategories.length"
+        :value="categories.length"
         :icon="Tags"
         color="primary"
       />
       <StatCard
         title="Produits référencés"
-        :value="productCategories.reduce((sum, c) => sum + (c.productsCount || 0), 0)"
+        :value="categories.reduce((sum, c) => sum + (c.productsCount || 0), 0)"
         :icon="Tags"
         color="secondary"
       />
@@ -135,19 +164,24 @@ const confirmDelete = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Supprimer cette catégorie ?</AlertDialogTitle>
           <AlertDialogDescription>
-            Cette action est irréversible. La catégorie
-            <strong>{{ categoryToDelete?.name }}</strong>
-            sera retirée du catalogue. Les catégories utilisées par des produits ou des marchés ne peuvent pas être supprimées.
+            La catégorie <strong>{{ categoryToDelete?.name }}</strong> sera définitivement supprimée.
+            <span v-if="categoryToDelete?.productsCount">
+              {{ categoryToDelete.productsCount }} produit(s) perdront leur catégorie.
+            </span>
+            <span v-if="categoryToDelete?.marketsCount">
+              Elle sera retirée de {{ categoryToDelete.marketsCount }} marché(s).
+            </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
-          <AlertDialogAction
+          <AlertDialogCancel :disabled="deleting">Annuler</AlertDialogCancel>
+          <Button
             class="bg-destructive text-white hover:bg-destructive/90"
+            :disabled="deleting"
             @click="confirmDelete"
           >
-            Supprimer
-          </AlertDialogAction>
+            {{ deleting ? 'Suppression...' : 'Supprimer' }}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

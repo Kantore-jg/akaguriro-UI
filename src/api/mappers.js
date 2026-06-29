@@ -28,6 +28,7 @@ export function mapProductCategory(c) {
     slug: c.slug,
     description: c.description || '',
     productsCount: c.products_count ?? 0,
+    marketsCount: c.markets_count ?? 0,
   };
 }
 

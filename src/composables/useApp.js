@@ -55,6 +55,7 @@ import {
   rejectReceipt,
 } from '../api/services/data.js';
 import { getErrorMessage } from '../api/client.js';
+import { sameId } from '../utils/ids.js';
 
 const APP_KEY = Symbol('app');
 
@@ -127,6 +128,7 @@ export function createAppState() {
   };
 
   const loadPublicData = async () => {
+    const categoriesRevision = productCategoriesRevision;
     const [m, p, pr, pl, tags] = await Promise.all([
       fetchMarkets(),
       fetchPlaces(),
@@ -134,7 +136,9 @@ export function createAppState() {
       fetchMerchants(),
       fetchProductCategories(),
     ]);
-    productCategories.value = tags;
+    if (categoriesRevision === productCategoriesRevision) {
+      productCategories.value = tags;
+    }
     markets.value = m;
     places.value = p;
     products.value = pr;
@@ -169,6 +173,7 @@ export function createAppState() {
   };
 
   let refreshPromise = null;
+  let productCategoriesRevision = 0;
 
   const refreshAll = async () => {
     if (refreshPromise) return refreshPromise;
@@ -417,19 +422,36 @@ export function createAppState() {
   };
 
   const loadProductCategories = async () => {
+    const categoriesRevision = productCategoriesRevision;
     try {
-      productCategories.value = await fetchAllProductCategories();
+      const categories = await fetchAllProductCategories();
+      if (categoriesRevision !== productCategoriesRevision) return;
+      productCategories.value = categories;
     } catch (error) {
       showToast(getErrorMessage(error, 'Erreur de chargement des catégories'), 'error');
     }
   };
 
+  const syncCategoriesAfterMutation = async () => {
+    productCategoriesRevision += 1;
+    const categoriesRevision = productCategoriesRevision;
+    try {
+      const [categories, m] = await Promise.all([
+        fetchAllProductCategories(),
+        fetchMarkets(),
+      ]);
+      if (categoriesRevision !== productCategoriesRevision) return;
+      productCategories.value = categories;
+      markets.value = m;
+    } catch (error) {
+      showToast(getErrorMessage(error, 'Erreur de synchronisation des catégories'), 'error');
+    }
+  };
+
   const addProductCategory = async (category) => {
     try {
-      const created = await createProductCategory(category);
-      productCategories.value = [...productCategories.value, created].sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
+      await createProductCategory(category);
+      await syncCategoriesAfterMutation();
       showToast(`Catégorie "${category.name}" créée avec succès`, 'success');
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
@@ -438,10 +460,8 @@ export function createAppState() {
 
   const updateProductCategory = async (category) => {
     try {
-      const updated = await updateProductCategoryApi(category.id, category);
-      productCategories.value = productCategories.value
-        .map((c) => (c.id === category.id ? updated : c))
-        .sort((a, b) => a.name.localeCompare(b.name));
+      await updateProductCategoryApi(category.id, category);
+      await syncCategoriesAfterMutation();
       showToast(`Catégorie "${category.name}" mise à jour`, 'success');
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
@@ -451,7 +471,8 @@ export function createAppState() {
   const deleteProductCategory = async (id) => {
     try {
       await deleteProductCategoryApi(id);
-      productCategories.value = productCategories.value.filter((c) => c.id !== id);
+      productCategories.value = productCategories.value.filter((c) => !sameId(c.id, id));
+      await syncCategoriesAfterMutation();
       showToast('Catégorie supprimée', 'success');
       return true;
     } catch (error) {

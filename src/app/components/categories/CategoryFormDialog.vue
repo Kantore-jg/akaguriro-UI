@@ -67,9 +67,7 @@ const handleSubmit = () => {
           <Tags class="w-5 h-5 text-primary" />
           {{ isEditing ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
         </DialogTitle>
-        <DialogDescription>
-          {{ isEditing ? 'Mettez à jour les informations de la catégorie.' : 'Ajoutez une catégorie de produits au catalogue.' }}
-        </DialogDescription>
+        
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
