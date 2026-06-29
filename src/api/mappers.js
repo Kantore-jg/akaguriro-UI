@@ -265,15 +265,25 @@ export function mapUser(u) {
   };
 }
 
+function normalizePhone(phone) {
+  if (phone === undefined || phone === null) return null;
+  const normalized = String(phone).trim().replace(/\s+/g, '');
+  return normalized || null;
+}
+
 export function userToApi(data) {
   const payload = {
     name: data.name,
     email: data.email,
-    phone: data.phone || null,
     role: data.role,
     is_active: data.isActive ?? true,
     managed_market_id: data.role === 'ADMIN_MARCHE' ? (data.marketId || null) : null,
   };
+
+  const phone = normalizePhone(data.phone);
+  if (phone) {
+    payload.phone = phone;
+  }
 
   if (data.password) {
     payload.password = data.password;

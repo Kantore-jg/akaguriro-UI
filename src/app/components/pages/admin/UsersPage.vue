@@ -3,6 +3,14 @@ import { ref, computed, onMounted } from 'vue';
 import { Plus, Search, UserCog, UserCheck, UserX } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import {
+  fetchUsers,
+  createUser,
+  updateUserApi,
+  deleteUserApi,
+} from '../../../../api/services/data.js';
+import { getErrorMessage } from '../../../../api/client.js';
+import { sameId } from '../../../../utils/ids.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
@@ -19,7 +27,6 @@ import {
 } from '../../ui/select';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -28,18 +35,10 @@ import {
   AlertDialogTitle,
 } from '../../ui/alert-dialog';
 
-const {
-  currentUser,
-  usersLoading,
-  loadUsers,
-  addUser,
-  updateUser,
-  deleteUser,
-  toggleUserActive,
-} = useApp();
+const { currentUser, showToast, loadUsers } = useApp();
+const { isSuperAdmin, scopedMarkets } = useAdminScope();
 
-const { isSuperAdmin, scopedUsers, scopedMarkets } = useAdminScope();
-
+const users = ref([]);
 const searchQuery = ref('');
 const roleFilter = ref('all');
 const statusFilter = ref('all');
@@ -48,6 +47,8 @@ const formOpen = ref(false);
 const deleteOpen = ref(false);
 const editingUser = ref(null);
 const userToDelete = ref(null);
+const loading = ref(false);
+const deleting = ref(false);
 
 const ALL_ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Administrateur' },
@@ -62,12 +63,24 @@ const ROLES = computed(() =>
     : ALL_ROLES.filter((r) => ['COMMERCANT', 'USER'].includes(r.value)),
 );
 
+async function refreshUsers() {
+  loading.value = true;
+  try {
+    users.value = await fetchUsers();
+    await loadUsers();
+  } catch (error) {
+    showToast(getErrorMessage(error, 'Erreur de chargement des utilisateurs'), 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
 onMounted(() => {
-  loadUsers();
+  void refreshUsers();
 });
 
 const filteredUsers = computed(() =>
-  scopedUsers.value.filter((u) => {
+  users.value.filter((u) => {
     const q = searchQuery.value.toLowerCase();
     const matchesQuery =
       !q ||
@@ -80,13 +93,13 @@ const filteredUsers = computed(() =>
       (statusFilter.value === 'active' && u.isActive) ||
       (statusFilter.value === 'inactive' && !u.isActive);
     const matchesMarket =
-      marketFilter.value === 'all' || u.marketId === marketFilter.value;
+      marketFilter.value === 'all' || sameId(u.marketId, marketFilter.value);
     return matchesQuery && matchesRole && matchesStatus && matchesMarket;
   }),
 );
 
-const activeCount = computed(() => scopedUsers.value.filter((u) => u.isActive).length);
-const inactiveCount = computed(() => scopedUsers.value.filter((u) => !u.isActive).length);
+const activeCount = computed(() => users.value.filter((u) => u.isActive).length);
+const inactiveCount = computed(() => users.value.filter((u) => !u.isActive).length);
 
 const openCreate = () => {
   editingUser.value = null;
@@ -103,24 +116,47 @@ const openDelete = (user) => {
   deleteOpen.value = true;
 };
 
-const handleFormSubmit = (payload) => {
-  if (payload.id) {
-    updateUser(payload);
-  } else {
-    addUser(payload);
+const handleFormSubmit = async (payload) => {
+  try {
+    if (payload.id) {
+      await updateUserApi(payload.id, payload);
+      showToast(`Utilisateur "${payload.name}" mis à jour`, 'success');
+    } else {
+      await createUser(payload);
+      showToast(`Utilisateur "${payload.name}" créé avec succès`, 'success');
+    }
+    formOpen.value = false;
+    await refreshUsers();
+  } catch (error) {
+    showToast(getErrorMessage(error), 'error');
   }
 };
 
-const confirmDelete = () => {
-  if (userToDelete.value) {
-    deleteUser(userToDelete.value.id);
+const confirmDelete = async () => {
+  if (!userToDelete.value || deleting.value) return;
+  deleting.value = true;
+  try {
+    await deleteUserApi(userToDelete.value.id);
+    showToast('Utilisateur supprimé', 'success');
+    deleteOpen.value = false;
+    userToDelete.value = null;
+    await refreshUsers();
+  } catch (error) {
+    showToast(getErrorMessage(error, 'Impossible de supprimer cet utilisateur'), 'error');
+  } finally {
+    deleting.value = false;
   }
-  deleteOpen.value = false;
-  userToDelete.value = null;
 };
 
-const handleToggleActive = (user, isActive) => {
-  toggleUserActive(user.id, isActive);
+const handleToggleActive = async (user, isActive) => {
+  try {
+    await updateUserApi(user.id, { ...user, isActive });
+    showToast(`Compte ${isActive ? 'activé' : 'désactivé'}`, isActive ? 'success' : 'info');
+    await refreshUsers();
+  } catch (error) {
+    showToast(getErrorMessage(error), 'error');
+    await refreshUsers();
+  }
 };
 </script>
 
@@ -139,7 +175,7 @@ const handleToggleActive = (user, isActive) => {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard
         title="Utilisateurs enregistrés"
-        :value="scopedUsers.length"
+        :value="users.length"
         :icon="UserCog"
         color="primary"
       />
@@ -195,7 +231,7 @@ const handleToggleActive = (user, isActive) => {
           <SelectTrigger class="bg-card"><SelectValue placeholder="Tous" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les marchés</SelectItem>
-            <SelectItem v-for="m in scopedMarkets" :key="m.id" :value="m.id">{{ m.name }}</SelectItem>
+            <SelectItem v-for="m in scopedMarkets" :key="m.id" :value="String(m.id)">{{ m.name }}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -204,7 +240,7 @@ const handleToggleActive = (user, isActive) => {
     <UsersTable
       :users="filteredUsers"
       :current-user-id="currentUser.id"
-      :loading="usersLoading"
+      :loading="loading"
       @edit="openEdit"
       @delete="openDelete"
       @toggle-active="handleToggleActive"
@@ -221,19 +257,19 @@ const handleToggleActive = (user, isActive) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Supprimer cet utilisateur ?</AlertDialogTitle>
           <AlertDialogDescription>
-            Cette action est irréversible. Le compte
-            <strong>{{ userToDelete?.name }}</strong>
+            Le compte <strong>{{ userToDelete?.name }}</strong> ({{ userToDelete?.email }})
             sera définitivement supprimé du système.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
-          <AlertDialogAction
+          <AlertDialogCancel :disabled="deleting">Annuler</AlertDialogCancel>
+          <Button
             class="bg-destructive text-white hover:bg-destructive/90"
+            :disabled="deleting"
             @click="confirmDelete"
           >
-            Supprimer
-          </AlertDialogAction>
+            {{ deleting ? 'Suppression...' : 'Supprimer' }}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

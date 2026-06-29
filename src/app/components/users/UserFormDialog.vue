@@ -112,13 +112,12 @@ const handleSubmit = () => {
     ...(props.user || {}),
     name: form.value.name.trim(),
     email: form.value.email.trim(),
-    phone: form.value.phone.trim(),
+    phone: form.value.phone.trim() || null,
     password: form.value.password.trim() || undefined,
     role: isSelf.value ? props.user.role : form.value.role,
     isActive: form.value.isActive,
     marketId: form.value.marketId,
   });
-  close();
 };
 </script>
 
@@ -130,11 +129,7 @@ const handleSubmit = () => {
           <UserCog class="w-5 h-5 text-primary" />
           {{ isEditing ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur' }}
         </DialogTitle>
-        <DialogDescription>
-          {{ isEditing
-            ? 'Mettez à jour les informations et le rôle de l\'utilisateur.'
-            : 'Créez un compte avec un rôle et un statut d\'accès.' }}
-        </DialogDescription>
+       
       </DialogHeader>
 
       <form class="space-y-4" @submit.prevent="handleSubmit">
@@ -149,8 +144,9 @@ const handleSubmit = () => {
             <Input id="user-email" v-model="form.email" type="email" placeholder="email@exemple.bi" required />
           </div>
           <div class="space-y-2">
-            <Label for="user-phone">Téléphone</Label>
-            <Input id="user-phone" v-model="form.phone" placeholder="+257..." />
+            <Label for="user-phone">Téléphone (optionnel)</Label>
+            <Input id="user-phone" v-model="form.phone" placeholder="+25779123456" />
+            <p class="text-xs text-muted-foreground">Laissez vide si non disponible. Doit être unique.</p>
           </div>
         </div>
 

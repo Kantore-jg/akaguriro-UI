@@ -550,25 +550,29 @@ export function createAppState() {
       const created = await createUser(user);
       users.value = [created, ...users.value];
       showToast(`Utilisateur "${user.name}" créé avec succès`, 'success');
+      return created;
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
+      return null;
     }
   };
 
   const updateUser = async (user) => {
     try {
       const updated = await updateUserApi(user.id, user);
-      users.value = users.value.map((u) => (u.id === user.id ? updated : u));
+      users.value = users.value.map((u) => (sameId(u.id, user.id) ? updated : u));
       showToast(`Utilisateur "${user.name}" mis à jour`, 'success');
+      return updated;
     } catch (error) {
       showToast(getErrorMessage(error), 'error');
+      return null;
     }
   };
 
   const deleteUser = async (id) => {
     try {
       await deleteUserApi(id);
-      users.value = users.value.filter((u) => u.id !== id);
+      users.value = users.value.filter((u) => !sameId(u.id, id));
       showToast('Utilisateur supprimé', 'success');
       return true;
     } catch (error) {
@@ -578,11 +582,11 @@ export function createAppState() {
   };
 
   const toggleUserActive = async (id, isActive) => {
-    const user = users.value.find((u) => u.id === id);
+    const user = users.value.find((u) => sameId(u.id, id));
     if (!user) return;
     try {
       const updated = await updateUserApi(id, { ...user, isActive });
-      users.value = users.value.map((u) => (u.id === id ? updated : u));
+      users.value = users.value.map((u) => (sameId(u.id, id) ? updated : u));
       showToast(
         `Compte ${isActive ? 'activé' : 'désactivé'}`,
         isActive ? 'success' : 'info',

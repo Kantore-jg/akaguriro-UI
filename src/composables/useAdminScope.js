@@ -78,16 +78,8 @@ export function useAdminScope() {
     ),
   );
 
-  const scopedUsers = computed(() => {
-    if (assignedMarketId.value) {
-      return users.value.filter(
-        (u) =>
-          u.id === currentUser.value.id ||
-          u.marketId == assignedMarketId.value,
-      );
-    }
-    return users.value;
-  });
+  // L'API filtre déjà les utilisateurs selon le rôle de l'acteur.
+  const scopedUsers = computed(() => users.value);
 
   const scopedReceipts = computed(() => {
     if (isMerchant.value && assignedMerchantId.value) {

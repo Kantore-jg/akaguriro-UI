@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
+import { sameId } from '../../../utils/ids.js';
+
 defineProps({
   users: { type: Array, required: true },
   currentUserId: { type: [Number, String], default: null },
@@ -93,7 +95,7 @@ const initials = (name) => (name || 'U').substring(0, 2).toUpperCase();
             <div class="flex items-center gap-2">
               <Switch
                 :checked="user.isActive"
-                :disabled="user.id === currentUserId"
+                :disabled="sameId(user.id, currentUserId)"
                 @update:checked="emit('toggle-active', user, $event)"
               />
               <Badge :variant="user.isActive ? 'default' : 'destructive'">
@@ -118,7 +120,7 @@ const initials = (name) => (name || 'U').substring(0, 2).toUpperCase();
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   class="text-destructive focus:text-destructive"
-                  :disabled="user.id === currentUserId"
+                  :disabled="sameId(user.id, currentUserId)"
                   @click="emit('delete', user)"
                 >
                   <Trash2 class="w-4 h-4 mr-2" />
