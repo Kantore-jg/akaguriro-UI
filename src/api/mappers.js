@@ -142,6 +142,7 @@ export function mapProduct(p) {
     isTrending: p.is_trending ?? false,
     stock: p.stock ?? 0,
     viewCount: p.view_count ?? 0,
+    createdAt: p.created_at?.split('T')[0] || '',
   };
 }
 

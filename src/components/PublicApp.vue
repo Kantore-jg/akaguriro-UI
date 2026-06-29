@@ -10,6 +10,7 @@ import PublicMarketsList from './PublicMarketsList.vue';
 import PublicMarketDetail from './PublicMarketDetail.vue';
 import PublicProductDetails from './PublicProductDetails.vue';
 import PublicRequestPlace from './PublicRequestPlace.vue';
+import PublicPriceTrends from './PublicPriceTrends.vue';
 import ProfilePage from './ProfilePage.vue';
 import { Search, MessageSquare, ShieldCheck } from 'lucide-vue-next';
 
@@ -191,6 +192,8 @@ const navigateHome = () => goHome();
         </div>
       </template>
 
+      <PublicPriceTrends v-else-if="publicTab === 'price-trends'" />
+
       <div v-else-if="publicTab === 'merchants'" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
         <div class="space-y-1.5">
           <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Habilités par Mairies</h3> -->
@@ -273,6 +276,7 @@ const navigateHome = () => goHome();
             <button @click="navigateHome" class="text-left hover:text-white">Accueil</button>
             <button @click="goToTab('markets')" class="text-left hover:text-white">Marchés Connectés</button>
             <button @click="goToTab('products')" class="text-left hover:text-white">Produits phares</button>
+            <button @click="goToTab('price-trends')" class="text-left hover:text-white">Tendances prix</button>
             <button @click="goToTab('merchants')" class="text-left hover:text-white">Annuaire Commerçants</button>
             <button @click="goToTab('request')" class="text-left hover:text-white text-primary">Demander une place</button>
           </div>

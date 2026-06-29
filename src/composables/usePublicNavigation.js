@@ -19,6 +19,7 @@ export function usePublicNavigation() {
       markets: '/markets',
       products: '/products',
       merchants: '/merchants',
+      'price-trends': '/price-trends',
       request: '/request',
       auth: '/login',
     };

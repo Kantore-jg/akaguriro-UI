@@ -68,6 +68,7 @@ const navItems = [
   { id: 'home', label: 'Accueil', path: '/' },
   { id: 'markets', label: 'Marchés', path: '/markets' },
   { id: 'products', label: 'Produits', path: '/products' },
+  { id: 'price-trends', label: 'Tendances prix', path: '/price-trends' },
   { id: 'merchants', label: 'Commerçants', path: '/merchants' },
 ];
 
