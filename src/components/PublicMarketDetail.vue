@@ -466,7 +466,7 @@ function getVendor(merchantId) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-3">
         <div>
           <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
-            Catalogue Alimentaire & Produits du Marché
+            Produits du Marché
           </h2>
         </div>
 
