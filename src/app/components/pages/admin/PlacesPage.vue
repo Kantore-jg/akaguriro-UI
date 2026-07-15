@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Plus, Search, MapPin, LayoutGrid, Printer } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
@@ -33,6 +33,7 @@ import {
 
 const {
   blocks,
+  loadBlocks,
   updatePlaceStatus,
   addPlace,
   deletePlace,
@@ -84,6 +85,14 @@ const scopedBlocks = computed(() =>
   blocks.value.filter(
     (b) => !assignedMarketId.value || b.marketId == assignedMarketId.value,
   ),
+);
+
+watch(
+  () => scopedMarkets.value.map((market) => market.id),
+  (marketIds) => {
+    void loadBlocks(marketIds);
+  },
+  { immediate: true },
 );
 
 const filteredPlaces = computed(() =>

@@ -11,6 +11,7 @@ import {
   getCommuneOptions,
   getZoneOptions,
   getCollineOptions,
+  getAdministrativeLocationLabel,
 } from '../../../utils/burundiLocations.js';
 import {
   Dialog,
@@ -130,8 +131,14 @@ watch(
 const close = () => emit('update:open', false);
 
 const handleSubmit = () => {
-  if (!form.value.name.trim() || !form.value.location.trim()) return;
+  if (!form.value.name.trim()) return;
   if (!isEditing.value && !imageFile.value) return;
+  const location = getAdministrativeLocationLabel({
+    province: form.value.province,
+    commune: form.value.commune,
+    zone: form.value.zone,
+    colline: form.value.colline,
+  });
 
   emit('submit', {
     ...(props.market || {}),
@@ -140,7 +147,7 @@ const handleSubmit = () => {
     commune: form.value.commune,
     zone: form.value.zone,
     colline: form.value.colline,
-    location: props.market?.location || '',
+    location,
     description: form.value.description.trim(),
     totalPlaces: Number(form.value.totalPlaces) || 0,
     productCategoryIds: form.value.productCategoryIds,

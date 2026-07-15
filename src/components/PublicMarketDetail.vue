@@ -164,7 +164,7 @@ function getVendor(merchantId) {
           </p>
           <p class="text-slate-400 text-xs font-semibold flex items-center gap-1">
             <MapPin class="w-4 h-4 text-primary shrink-0" />
-            {{ market.location }}
+            {{ getAdministrativeLocationLabel(market) || market.location }}
           </p>
         </div>
 

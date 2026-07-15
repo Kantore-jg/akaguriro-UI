@@ -49,7 +49,7 @@ const provinces = computed(() => {
 const filteredMarkets = computed(() => {
   return markets.value.filter((m) => {
     const q = searchQuery.value.toLowerCase();
-    const locationLabel = [m.province, m.commune, m.zone, m.colline, m.location].filter(Boolean).join(' ');
+    const locationLabel = [m.province, m.commune, m.zone, m.colline].filter(Boolean).join(' ');
     const matchesQuery =
       !q ||
       m.name.toLowerCase().includes(q) ||
@@ -158,7 +158,7 @@ const viewingStats = computed(() => {
         <label class="text-xs font-medium text-muted-foreground">Recherche</label>
         <div class="relative">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input v-model="searchQuery" placeholder="Nom, province ou localisation..." class="pl-9 bg-card" />
+          <Input v-model="searchQuery" placeholder="Nom, province ou commune..." class="pl-9 bg-card" />
         </div>
       </div>
       <div class="space-y-1 w-full sm:w-48">

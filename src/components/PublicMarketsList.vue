@@ -56,9 +56,9 @@ watch(selectedZone, () => {
 
 const filteredMarkets = computed(() =>
   markets.value.filter(m => {
+    const administrativeLocation = getAdministrativeLocationLabel(m);
     const matchesSearch = m.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                          m.location.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                          getAdministrativeLocationLabel(m).toLowerCase().includes(searchQuery.value.toLowerCase());
+                          administrativeLocation.toLowerCase().includes(searchQuery.value.toLowerCase());
     const marketProvince = (m.province || '').toLowerCase();
     const marketCommune = (m.commune || '').toLowerCase();
     const marketZone = (m.zone || '').toLowerCase();
@@ -98,7 +98,7 @@ function resetFilters() {
         <Search class="w-4 h-4 text-slate-400" />
         <input
           type="text"
-          placeholder="Rechercher un marché par nom, adresse..."
+          placeholder="Rechercher un marché par nom ou localisation..."
           v-model="searchQuery"
           class="bg-transparent border-0 outline-none text-xs w-full text-slate-700"
         />
@@ -181,7 +181,7 @@ function resetFilters() {
             </h2>
           <p class="text-xs text-slate-400 font-medium flex items-center gap-1">
             <MapPin class="w-3.5 h-3.5 text-primary shrink-0" />
-            {{ m.location }}
+            {{ getAdministrativeLocationLabel(m) || m.location }}
           </p>
           <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">
             {{ getAdministrativeLocationLabel(m) }}

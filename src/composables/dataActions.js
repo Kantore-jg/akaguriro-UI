@@ -61,13 +61,10 @@ export function createDataActions(state) {
     state.blocks.value = results.flat();
   };
 
-  const loadPublicData = async () => {
+  const loadPublicCoreData = async () => {
     const categoriesRevision = productCategoriesRevision;
-    const [markets, places, products, merchants, tags] = await Promise.all([
+    const [markets, tags] = await Promise.all([
       fetchMarkets(),
-      fetchPlaces(),
-      fetchProducts(),
-      fetchMerchants(),
       fetchProductCategories(),
     ]);
 
@@ -76,10 +73,22 @@ export function createDataActions(state) {
     }
 
     state.markets.value = markets;
+  };
+
+  const loadPublicSupplementalData = async () => {
+    const [places, products, merchants] = await Promise.all([
+      fetchPlaces(),
+      fetchProducts(),
+      fetchMerchants(),
+    ]);
     state.places.value = places;
     state.products.value = products;
     state.merchants.value = merchants;
-    await loadBlocks(markets.map((market) => market.id));
+  };
+
+  const loadPublicData = async () => {
+    await loadPublicCoreData();
+    await loadPublicSupplementalData();
   };
 
   const loadAuthenticatedData = async () => {
@@ -473,6 +482,8 @@ export function createDataActions(state) {
   return {
     bindRefreshers,
     loadBlocks,
+    loadPublicCoreData,
+    loadPublicSupplementalData,
     loadPublicData,
     loadAuthenticatedData,
     loadUsers,

@@ -630,7 +630,7 @@ function getMerchantById(id) {
                   <img :src="m.image" class="w-9 h-9 rounded-lg object-cover" />
                   <span class="font-extrabold text-slate-900">{{ m.name }}</span>
                 </td>
-                <td class="py-4 px-4">{{ getAdministrativeLocationLabel(m) }} • {{ m.location }}</td>
+                <td class="py-4 px-4">{{ getAdministrativeLocationLabel(m) || m.location }}</td>
                 <td class="py-4 px-4">
                   <span class="font-bold text-slate-900">{{ m.occupiedPlaces }} / {{ m.totalPlaces }} occupied</span>
                 </td>

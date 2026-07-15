@@ -74,7 +74,7 @@ const statusVariant = (percent) => {
                 <p class="font-medium text-sm truncate">{{ market.name }}</p>
                 <p class="text-xs text-muted-foreground truncate flex items-center gap-1">
                   <MapPin class="w-3 h-3 shrink-0" />
-                  {{ market.location }}
+                  {{ getAdministrativeLocationLabel(market) || market.location }}
                 </p>
               </div>
             </div>

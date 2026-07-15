@@ -69,9 +69,16 @@ export function createAppState() {
     loading.value = true;
     refreshPromise = (async () => {
       try {
-        await dataActions.loadPublicData();
+        await dataActions.loadPublicCoreData();
+        initialized.value = true;
+
+        void dataActions.loadPublicSupplementalData().catch((error) => {
+          showToast(getErrorMessage(error, 'Erreur de chargement des données complémentaires'), 'error');
+        });
         if (currentUser.value?.id) {
-          await dataActions.loadAuthenticatedData();
+          void dataActions.loadAuthenticatedData().catch((error) => {
+            showToast(getErrorMessage(error, 'Erreur de chargement des données utilisateur'), 'error');
+          });
         } else {
           requests.value = [];
           receipts.value = [];
@@ -81,7 +88,6 @@ export function createAppState() {
         showToast(getErrorMessage(error, 'Erreur de chargement des données'), 'error');
       } finally {
         loading.value = false;
-        initialized.value = true;
         refreshPromise = null;
       }
     })();

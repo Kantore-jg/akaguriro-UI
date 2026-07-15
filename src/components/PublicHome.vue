@@ -86,7 +86,7 @@ function handleHeroSearchSubmit(e) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3> -->
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Nos Marchés Publics Connectés</h2>
+          <h2 >Nos Marchés Publics Connectés</h2>
         </div>
         <button
           @click="goToTab('markets')"

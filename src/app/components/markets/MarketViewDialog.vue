@@ -46,7 +46,7 @@ const goToPlaces = () => {
         <DialogTitle>{{ market.name }}</DialogTitle>
         <DialogDescription class="flex items-center gap-1">
           <MapPin class="w-3.5 h-3.5" />
-          {{ getAdministrativeLocationLabel(market) }} — {{ market.location }}
+          {{ getAdministrativeLocationLabel(market) || market.location }}
         </DialogDescription>
       </DialogHeader>
 
