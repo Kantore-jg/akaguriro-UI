@@ -155,7 +155,7 @@ function getVendor(merchantId) {
           <!-- <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
             En direct de {{ market.city }}
           </span> -->
-          <h1 >
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">
             {{ market.name }}
           </h1>
           <p class="text-slate-200 text-xs sm:text-sm max-w-2xl leading-relaxed font-medium">
@@ -420,7 +420,7 @@ function getVendor(merchantId) {
     <!-- 4. COMMERÇANTS ACTIFS -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h2 >
+        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
           Commerçants actifs
         </h2>
       </div>
@@ -465,7 +465,7 @@ function getVendor(merchantId) {
 
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-3">
         <div>
-          <h2 >
+          <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
             Catalogue Alimentaire & Produits du Marché
           </h2>
         </div>

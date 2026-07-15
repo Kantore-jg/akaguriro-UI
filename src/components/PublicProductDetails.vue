@@ -103,7 +103,7 @@ function handleViewPlaceOnMap() {
       <div class="lg:col-span-6 space-y-6">
 
         <div class="space-y-2">
-          <h1 ">
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
             {{ product.name }}
           </h1>
 
@@ -210,7 +210,7 @@ function handleViewPlaceOnMap() {
     <!-- 4. SIMILAR SUGGESTED PRODUCTS -->
     <section class="space-y-6">
       <div class="border-b border-slate-100 pb-3">
-        <h2 ">
+        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
           Dans la même filière alimentaire ({{ product.category }})
         </h2>
       </div>

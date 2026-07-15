@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Search, MessageSquare, ShieldCheck } from 'lucide-vue-next';
+import { Search } from 'lucide-vue-next';
 import { sameId } from '../utils/ids.js';
+import PublicMerchantCard from './PublicMerchantCard.vue';
 
 const props = defineProps({
   merchants: { type: Array, default: () => [] },
@@ -57,34 +58,13 @@ const filteredMerchants = computed(() =>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div
+      <PublicMerchantCard
         v-for="m in filteredMerchants"
         :key="m.id"
-        class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex gap-4 items-center relative group"
-      >
-        <img :src="m.image" :alt="m.name" class="w-16 h-16 rounded-2xl object-cover bg-background shrink-0" />
-        <div class="min-w-0 flex-1 space-y-1 text-xs">
-          <h3 class="text-sm font-extrabold text-slate-900 truncate flex items-center gap-1">
-            {{ m.name }}
-            <ShieldCheck class="w-4.5 h-4.5 text-primary inline shrink-0" />
-          </h3>
-          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
-          <p v-if="getMarketById(m.activeMarketId)" class="text-slate-500 font-medium">
-            {{ getMarketById(m.activeMarketId)?.city }} • Étale {{ m.activePlaceNumber || m.activePlaceId }}
-          </p>
-        </div>
-        <div class="absolute bottom-4 right-4 flex gap-1">
-          <a
-            :href="`https://wa.me/${(m.phone || '').replace(/\s+/g, '')}`"
-            target="_blank"
-            rel="noreferrer"
-            class="p-1.5 bg-emerald-50 text-primary rounded-lg border border-emerald-110 shadow-sm hover:bg-primary hover:text-white transition-colors"
-            title="Contacter sur WhatsApp"
-          >
-            <MessageSquare class="w-4 h-4" />
-          </a>
-        </div>
-      </div>
+        :merchant="m"
+        :market-name="getMarketById(m.activeMarketId)?.name || ''"
+        :market-city="getMarketById(m.activeMarketId)?.city || ''"
+      />
     </div>
   </div>
 </template>

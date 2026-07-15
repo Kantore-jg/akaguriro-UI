@@ -8,8 +8,6 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
-
-const router = useRouter();
 import {
   Search,
   MapPin,
@@ -87,7 +85,7 @@ function handleHeroSearchSubmit(e) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Infrastructures du Pays</h3> -->
-          <h2 class="">Nos Marchés Publics Connectés</h2>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Nos Marchés Publics Connectés</h2>
         </div>
         <button
           @click="goToTab('markets')"
@@ -118,7 +116,7 @@ function handleHeroSearchSubmit(e) {
 
           <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <h4 ">
+              <h4 class="text-sm sm:text-base font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
                 {{ m.name }}
               </h4>
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -218,7 +216,7 @@ function handleHeroSearchSubmit(e) {
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <!-- <h3 class="text-sm font-bold text-primary uppercase tracking-wider">Catalogue National</h3> -->
-          <h2 >Produits Tendances</h2>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Produits Tendances</h2>
         </div>
         <button
           @click="goToTab('products')"
@@ -257,10 +255,10 @@ function handleHeroSearchSubmit(e) {
             </span>
           </div>
 
-          <div class="space-y-1">
-            <span class="text-[10px] font-bold text-primary uppercase tracking-wide">
-              {{ p.category }}
-            </span>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-primary uppercase tracking-wide">
+                {{ p.category }}
+              </span>
             <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
               {{ p.name }}
             </h4>

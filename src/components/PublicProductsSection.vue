@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Search } from 'lucide-vue-next';
 import { sameId } from '../utils/ids.js';
+import PublicProductCard from './PublicProductCard.vue';
 
 const props = defineProps({
   products: { type: Array, default: () => [] },
@@ -76,34 +77,13 @@ const filteredProducts = computed(() =>
       Aucun aliment ou produit trouvé pour ces paramètres.
     </div>
     <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-      <div
+      <PublicProductCard
         v-for="p in filteredProducts"
         :key="p.id"
-        @click="onSelectProduct(p.id)"
-        class="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3.5 transition-all cursor-pointer"
-      >
-        <div class="relative rounded-xl overflow-hidden aspect-square bg-background">
-          <img
-            :src="p.image"
-            :alt="p.name"
-            class="w-full h-full object-cover transition-transform duration-300"
-          />
-        </div>
-        <div class="space-y-1">
-          <span class="text-[9.5px] font-bold text-primary block uppercase tracking-wide">{{ p.category }}</span>
-          <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 line-clamp-1 transition-colors">{{ p.name }}</h4>
-          <p class="text-[10.5px] text-slate-400 font-semibold truncate">
-            {{ getMarketById(p.marketId)?.name || '—' }} (étal {{ p.placeNumber }})
-          </p>
-        </div>
-        <div class="border-t border-slate-50 pt-2.5 flex items-center justify-between">
-          <div>
-            <span class="text-xs sm:text-sm font-black text-slate-950">{{ p.price.toLocaleString('fr-FR') }} BIF</span>
-            <span class="text-[8.5px] text-slate-400 font-medium font-mono ml-0.5">/ {{ p.unit }}</span>
-          </div>
-          <span class="text-[10px] font-black text-primary">Détails</span>
-        </div>
-      </div>
+        :product="p"
+        :market-name="getMarketById(p.marketId)?.name || '—'"
+        :on-select-product="onSelectProduct"
+      />
     </div>
   </div>
 </template>

@@ -37,10 +37,9 @@ function resetFilters() {
     <!-- Header -->
     <div class="space-y-2">
       <!-- <h3 class="text-xs font-bold uppercase tracking-wider text-primary">Plateforme Nationale</h3> -->
-      <h1 ">
+      <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">
         Marchés Publics Numérisés du Burundi
       </h1>
-    
     </div>
 
     <!-- Filters & Search Panel -->
