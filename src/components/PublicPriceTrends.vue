@@ -4,6 +4,7 @@ import { useApp } from '../composables/useApp.js';
 import { fetchProducts } from '../api/services/data.js';
 import { sameId } from '../utils/ids.js';
 import { Search, Download, Trash2, ArrowUpDown, Loader2 } from 'lucide-vue-next';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 
 const { markets, merchants, products: allProducts, initialized } = useApp();
 
@@ -54,7 +55,7 @@ function getMarketName(marketId) {
 }
 
 function getMarketCity(marketId) {
-  return markets.value.find((m) => sameId(m.id, marketId))?.city || '—';
+  return getAdministrativeLocationLabel(markets.value.find((m) => sameId(m.id, marketId))) || '—';
 }
 
 function getMerchantName(merchantId) {
@@ -172,7 +173,7 @@ const priceStats = computed(() => {
 function exportCsv() {
   if (!displayedRows.value.length) return;
 
-  const headers = ['#', 'Produit', 'Catégorie', 'Marché', 'Ville', 'Unité', 'Prix (BIF)', 'Commerçant', 'Date'];
+  const headers = ['#', 'Produit', 'Catégorie', 'Marché', 'Localisation', 'Unité', 'Prix (BIF)', 'Commerçant', 'Date'];
   const lines = displayedRows.value.map((r, i) => [
     i + 1,
     r.name,
@@ -202,7 +203,7 @@ const columns = [
   { key: 'name', label: 'Nom du produit' },
   { key: 'category', label: 'Catégorie' },
   { key: 'marketName', label: 'Marché' },
-  { key: 'city', label: 'Ville' },
+  { key: 'city', label: 'Localisation' },
   { key: 'unitLabel', label: 'Unité' },
   { key: 'price', label: 'Prix (BIF)', highlight: true },
   { key: 'merchantName', label: 'Commerçant' },
@@ -227,7 +228,7 @@ const columns = [
           >
             <option value="all">Tous les marchés</option>
             <option v-for="m in markets" :key="m.id" :value="m.id">
-              {{ m.name }} ({{ m.city }})
+              {{ m.name }} ({{ getAdministrativeLocationLabel(m) }})
             </option>
           </select>
         </div>

@@ -1,7 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Search } from 'lucide-vue-next';
 import { sameId } from '../utils/ids.js';
+import {
+  getProvinceOptions,
+  getCommuneOptions,
+  getZoneOptions,
+  getCollineOptions,
+  getAdministrativeLocationLabel,
+} from '../utils/burundiLocations.js';
 import PublicProductCard from './PublicProductCard.vue';
 
 const props = defineProps({
@@ -13,18 +20,61 @@ const props = defineProps({
 
 const globalProdQuery = ref('');
 const globalProdCat = ref('all');
-const globalProdCity = ref('all');
+const globalProdProvince = ref('all');
+const globalProdCommune = ref('all');
+const globalProdZone = ref('all');
+const globalProdColline = ref('all');
 
 const getMarketById = (marketId) => props.markets.find((market) => sameId(market.id, marketId));
+
+const provinceOptions = computed(() => getProvinceOptions());
+const communeOptions = computed(() => {
+  if (globalProdProvince.value === 'all') return [];
+  return getCommuneOptions(globalProdProvince.value);
+});
+const zoneOptions = computed(() => {
+  if (globalProdProvince.value === 'all' || globalProdCommune.value === 'all') return [];
+  return getZoneOptions(globalProdProvince.value, globalProdCommune.value);
+});
+const collineOptions = computed(() => {
+  if (globalProdProvince.value === 'all' || globalProdCommune.value === 'all' || globalProdZone.value === 'all') return [];
+  return getCollineOptions(globalProdProvince.value, globalProdCommune.value, globalProdZone.value);
+});
+
+watch(globalProdProvince, () => {
+  globalProdCommune.value = 'all';
+  globalProdZone.value = 'all';
+  globalProdColline.value = 'all';
+});
+
+watch(globalProdCommune, () => {
+  globalProdZone.value = 'all';
+  globalProdColline.value = 'all';
+});
+
+watch(globalProdZone, () => {
+  globalProdColline.value = 'all';
+});
 
 const filteredProducts = computed(() =>
   props.products.filter((p) => {
     const query = globalProdQuery.value.toLowerCase();
-    const matchesQuery = p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
-    const matchesCat = globalProdCat.value === 'all' || p.category === globalProdCat.value;
     const market = getMarketById(p.marketId);
-    const matchesCity = globalProdCity.value === 'all' || (market ? market.city === globalProdCity.value : false);
-    return matchesQuery && matchesCat && matchesCity;
+    const marketLocation = market ? getAdministrativeLocationLabel(market).toLowerCase() : '';
+    const matchesQuery =
+      p.name.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query) ||
+      marketLocation.includes(query);
+    const matchesCat = globalProdCat.value === 'all' || p.category === globalProdCat.value;
+    const marketProvince = (market?.province || market?.city || '').toLowerCase();
+    const marketCommune = (market?.commune || '').toLowerCase();
+    const marketZone = (market?.zone || '').toLowerCase();
+    const marketColline = (market?.colline || '').toLowerCase();
+    const matchesProvince = globalProdProvince.value === 'all' || marketProvince === globalProdProvince.value.toLowerCase();
+    const matchesCommune = globalProdCommune.value === 'all' || marketCommune === globalProdCommune.value.toLowerCase();
+    const matchesZone = globalProdZone.value === 'all' || marketZone === globalProdZone.value.toLowerCase();
+    const matchesColline = globalProdColline.value === 'all' || marketColline === globalProdColline.value.toLowerCase();
+    return matchesQuery && matchesCat && matchesProvince && matchesCommune && matchesZone && matchesColline;
   }),
 );
 </script>
@@ -61,14 +111,43 @@ const filteredProducts = computed(() =>
           </option>
         </select>
         <select
-          v-model="globalProdCity"
+          v-model="globalProdProvince"
           class="bg-background hover:bg-slate-100/60 border border-slate-200/60 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer text-slate-700"
         >
-          <option value="all">Ville / Tout</option>
-          <option value="Bujumbura">Bujumbura</option>
-          <option value="Gitega">Gitega</option>
-          <option value="Ngozi">Ngozi</option>
-          <option value="Rumonge">Rumonge</option>
+          <option value="all">Province / Tout</option>
+          <option v-for="province in provinceOptions" :key="province.value" :value="province.value">
+            {{ province.label }}
+          </option>
+        </select>
+        <select
+          v-model="globalProdCommune"
+          :disabled="globalProdProvince === 'all'"
+          class="bg-background hover:bg-slate-100/60 border border-slate-200/60 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <option value="all">Commune / Tout</option>
+          <option v-for="commune in communeOptions" :key="commune.value" :value="commune.value">
+            {{ commune.label }}
+          </option>
+        </select>
+        <select
+          v-model="globalProdZone"
+          :disabled="globalProdProvince === 'all' || globalProdCommune === 'all'"
+          class="bg-background hover:bg-slate-100/60 border border-slate-200/60 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <option value="all">Zone / Tout</option>
+          <option v-for="zone in zoneOptions" :key="zone.value" :value="zone.value">
+            {{ zone.label }}
+          </option>
+        </select>
+        <select
+          v-model="globalProdColline"
+          :disabled="globalProdProvince === 'all' || globalProdCommune === 'all' || globalProdZone === 'all'"
+          class="bg-background hover:bg-slate-100/60 border border-slate-200/60 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <option value="all">Colline / Tout</option>
+          <option v-for="colline in collineOptions" :key="colline.value" :value="colline.value">
+            {{ colline.label }}
+          </option>
         </select>
       </div>
     </div>

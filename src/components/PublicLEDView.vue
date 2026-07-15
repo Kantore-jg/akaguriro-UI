@@ -6,6 +6,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { useLedDisplay } from '../composables/useLedDisplay.js';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import {
   Tv,
   TrendingUp,
@@ -128,7 +129,7 @@ const formatRefreshTime = (date) =>
               <span class="text-[9.5px] font-black text-emerald-400 uppercase block tracking-wider">{{ p.category }}</span>
               <h3 class="text-xs sm:text-sm font-black text-white truncate">{{ p.name }}</h3>
               <p class="text-[10.5px] text-slate-400 font-bold truncate">
-                {{ currentMarket?.city || 'Burundi' }}
+                {{ getAdministrativeLocationLabel(currentMarket) || 'Burundi' }}
               </p>
               <div class="text-sm font-black text-yellow-400 flex items-baseline gap-1">
                 {{ p.price.toLocaleString('fr-FR') }} BIF

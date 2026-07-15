@@ -4,32 +4,79 @@
  */
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import { MapPin, Search, ChevronRight, CheckCircle } from 'lucide-vue-next';
-import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
+import {
+  getAdministrativeLocationLabel,
+  getProvinceOptions,
+  getCommuneOptions,
+  getZoneOptions,
+  getCollineOptions,
+} from '../utils/burundiLocations.js';
 
 const { markets } = useApp();
 const { goToMarket } = usePublicNavigation();
 
 const searchQuery = ref('');
 const selectedProvince = ref('all');
+const selectedCommune = ref('all');
+const selectedZone = ref('all');
+const selectedColline = ref('all');
 
-const provinces = ['all', 'BUJUMBURA', 'GITEGA', 'BUHUMUZA', 'BURUNGA', 'BUTANYERERA'];
+const provinceOptions = computed(() => getProvinceOptions());
+const communeOptions = computed(() => {
+  if (selectedProvince.value === 'all') return [];
+  return getCommuneOptions(selectedProvince.value);
+});
+const zoneOptions = computed(() => {
+  if (selectedProvince.value === 'all' || selectedCommune.value === 'all') return [];
+  return getZoneOptions(selectedProvince.value, selectedCommune.value);
+});
+const collineOptions = computed(() => {
+  if (selectedProvince.value === 'all' || selectedCommune.value === 'all' || selectedZone.value === 'all') return [];
+  return getCollineOptions(selectedProvince.value, selectedCommune.value, selectedZone.value);
+});
+
+watch(selectedProvince, () => {
+  selectedCommune.value = 'all';
+  selectedZone.value = 'all';
+  selectedColline.value = 'all';
+});
+
+watch(selectedCommune, () => {
+  selectedZone.value = 'all';
+  selectedColline.value = 'all';
+});
+
+watch(selectedZone, () => {
+  selectedColline.value = 'all';
+});
 
 const filteredMarkets = computed(() =>
   markets.value.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                          m.location.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesProvince = selectedProvince.value === 'all' || (m.province || m.city).toLowerCase() === selectedProvince.value.toLowerCase();
-    return matchesSearch && matchesProvince;
+                          m.location.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                          getAdministrativeLocationLabel(m).toLowerCase().includes(searchQuery.value.toLowerCase());
+    const marketProvince = (m.province || m.city || '').toLowerCase();
+    const marketCommune = (m.commune || '').toLowerCase();
+    const marketZone = (m.zone || '').toLowerCase();
+    const marketColline = (m.colline || '').toLowerCase();
+    const matchesProvince = selectedProvince.value === 'all' || marketProvince === selectedProvince.value.toLowerCase();
+    const matchesCommune = selectedCommune.value === 'all' || marketCommune === selectedCommune.value.toLowerCase();
+    const matchesZone = selectedZone.value === 'all' || marketZone === selectedZone.value.toLowerCase();
+    const matchesColline = selectedColline.value === 'all' || marketColline === selectedColline.value.toLowerCase();
+    return matchesSearch && matchesProvince && matchesCommune && matchesZone && matchesColline;
   })
 );
 
 function resetFilters() {
   searchQuery.value = '';
   selectedProvince.value = 'all';
+  selectedCommune.value = 'all';
+  selectedZone.value = 'all';
+  selectedColline.value = 'all';
 }
 </script>
 
@@ -57,19 +104,46 @@ function resetFilters() {
         />
       </div>
 
-      <!-- Province Filter pills -->
-      <div class="w-full md:w-auto flex flex-wrap gap-1.5 self-start md:self-auto">
-        <button
-          v-for="province in provinces"
-          :key="province"
-          @click="selectedProvince = province"
-          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all border"
-          :class="selectedProvince === province
-            ? 'bg-slate-900 text-white border-slate-900'
-            : 'bg-background text-slate-600 border-slate-200/50 hover:bg-slate-100'"
-        >
-          {{ province === 'all' ? ' Toutes les Provinces' : province }}
-        </button>
+      <div class="grid w-full gap-3 md:grid-cols-4">
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Province</label>
+          <select v-model="selectedProvince" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none">
+            <option value="all">Toutes les provinces</option>
+            <option v-for="province in provinceOptions" :key="province.value" :value="province.value">
+              {{ province.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Commune</label>
+          <select v-model="selectedCommune" :disabled="selectedProvince === 'all'" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none disabled:cursor-not-allowed disabled:bg-slate-50">
+            <option value="all">Toutes les communes</option>
+            <option v-for="commune in communeOptions" :key="commune.value" :value="commune.value">
+              {{ commune.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Zone</label>
+          <select v-model="selectedZone" :disabled="selectedProvince === 'all' || selectedCommune === 'all'" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none disabled:cursor-not-allowed disabled:bg-slate-50">
+            <option value="all">Toutes les zones</option>
+            <option v-for="zone in zoneOptions" :key="zone.value" :value="zone.value">
+              {{ zone.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Colline</label>
+          <select v-model="selectedColline" :disabled="selectedProvince === 'all' || selectedCommune === 'all' || selectedZone === 'all'" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none disabled:cursor-not-allowed disabled:bg-slate-50">
+            <option value="all">Toutes les collines</option>
+            <option v-for="colline in collineOptions" :key="colline.value" :value="colline.value">
+              {{ colline.label }}
+            </option>
+          </select>
+        </div>
       </div>
 
     </div>

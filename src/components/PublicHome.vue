@@ -8,6 +8,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import {
   Search,
   MapPin,
@@ -110,7 +111,7 @@ function handleHeroSearchSubmit(e) {
             />
             <!-- <div class="absolute top-3 left-3 bg-slate-900/80 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
               <MapPin class="w-3 h-3 text-primary" />
-              {{ m.city }}
+              {{ getAdministrativeLocationLabel(m) }}
             </div> -->
           </div>
 
@@ -119,6 +120,9 @@ function handleHeroSearchSubmit(e) {
               <h4 class="text-sm sm:text-base font-extrabold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">
                 {{ m.name }}
               </h4>
+              <p class="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                {{ getAdministrativeLocationLabel(m) }}
+              </p>
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                 {{ m.description }}
               </p>
@@ -263,7 +267,7 @@ function handleHeroSearchSubmit(e) {
               {{ p.name }}
             </h4>
             <p class="text-[11px] text-slate-400 font-medium">
-              {{ markets.find(m => m.id === p.marketId)?.city }} • Étale {{ p.placeNumber }}
+              {{ getAdministrativeLocationLabel(markets.find(m => m.id === p.marketId)) }} • Étale {{ p.placeNumber }}
             </p>
           </div>
 

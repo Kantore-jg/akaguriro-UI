@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Search } from 'lucide-vue-next';
 import { sameId } from '../utils/ids.js';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import PublicMerchantCard from './PublicMerchantCard.vue';
 
 const props = defineProps({
@@ -63,7 +64,7 @@ const filteredMerchants = computed(() =>
         :key="m.id"
         :merchant="m"
         :market-name="getMarketById(m.activeMarketId)?.name || ''"
-        :market-city="getMarketById(m.activeMarketId)?.city || ''"
+        :market-city="getAdministrativeLocationLabel(getMarketById(m.activeMarketId)) || ''"
       />
     </div>
   </div>
