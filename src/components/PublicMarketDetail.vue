@@ -8,6 +8,7 @@ import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import { categoriesForMarket, placeHasCategory } from '../utils/categories.js';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import { sameId } from '../utils/ids.js';
 import {
   MapPin,
@@ -134,7 +135,7 @@ function getVendor(merchantId) {
         Retour aux marchés publics
       </button>
       <!-- <span class="text-xs font-semibold text-slate-400 bg-background px-2.5 py-1 rounded-full">
-        Système ID: {{ String(market.id).toUpperCase() }} • {{ market.city }}
+        Système ID: {{ String(market.id).toUpperCase() }} • {{ getAdministrativeLocationLabel(market) }}
       </span> -->
     </div>
 
@@ -153,7 +154,7 @@ function getVendor(merchantId) {
 
         <div class="lg:col-span-8 space-y-4">
           <!-- <span class="inline-block bg-primary/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
-            En direct de {{ market.city }}
+            En direct de {{ getAdministrativeLocationLabel(market) }}
           </span> -->
           <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">
             {{ market.name }}
@@ -405,7 +406,7 @@ function getVendor(merchantId) {
           </template>
 
           <!-- <div class="border-t border-slate-800 pt-3 text-[9.5px] text-slate-400 font-bold flex justify-between items-center bg-slate-900 select-none">
-            <span>GPS: {{ market.city.toUpperCase() }}_PLAN_LIVE</span>
+            <span>GPS: {{ (market.province || market.city || 'BURUNDI').toUpperCase() }}_PLAN_LIVE</span>
             <span class="text-primary flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               STABLE OMNI

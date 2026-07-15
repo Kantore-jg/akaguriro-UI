@@ -8,27 +8,28 @@ import { ref, computed } from 'vue';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
 import { MapPin, Search, ChevronRight, CheckCircle } from 'lucide-vue-next';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 
 const { markets } = useApp();
 const { goToMarket } = usePublicNavigation();
 
 const searchQuery = ref('');
-const selectedCity = ref('all');
+const selectedProvince = ref('all');
 
-const cities = ['all', 'Bujumbura', 'Gitega', 'Ngozi', 'Rumonge'];
+const provinces = ['all', 'BUJUMBURA', 'GITEGA', 'BUHUMUZA', 'BURUNGA', 'BUTANYERERA'];
 
 const filteredMarkets = computed(() =>
   markets.value.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                           m.location.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesCity = selectedCity.value === 'all' || m.city.toLowerCase() === selectedCity.value.toLowerCase();
-    return matchesSearch && matchesCity;
+    const matchesProvince = selectedProvince.value === 'all' || (m.province || m.city).toLowerCase() === selectedProvince.value.toLowerCase();
+    return matchesSearch && matchesProvince;
   })
 );
 
 function resetFilters() {
   searchQuery.value = '';
-  selectedCity.value = 'all';
+  selectedProvince.value = 'all';
 }
 </script>
 
@@ -56,18 +57,18 @@ function resetFilters() {
         />
       </div>
 
-      <!-- City Filter pills -->
+      <!-- Province Filter pills -->
       <div class="w-full md:w-auto flex flex-wrap gap-1.5 self-start md:self-auto">
         <button
-          v-for="city in cities"
-          :key="city"
-          @click="selectedCity = city"
+          v-for="province in provinces"
+          :key="province"
+          @click="selectedProvince = province"
           class="px-3 py-1.5 rounded-full text-xs font-bold transition-all border"
-          :class="selectedCity === city
+          :class="selectedProvince === province
             ? 'bg-slate-900 text-white border-slate-900'
             : 'bg-background text-slate-600 border-slate-200/50 hover:bg-slate-100'"
         >
-          {{ city === 'all' ? ' Tous les Marchés' : city }}
+          {{ province === 'all' ? ' Toutes les Provinces' : province }}
         </button>
       </div>
 
@@ -107,13 +108,16 @@ function resetFilters() {
             <h2 class="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-primary transition-colors">
               {{ m.name }}
             </h2>
-            <p class="text-xs text-slate-400 font-medium flex items-center gap-1">
-              <MapPin class="w-3.5 h-3.5 text-primary shrink-0" />
-              {{ m.location }}
-            </p>
-            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed pt-1 font-medium">
-              {{ m.description }}
-            </p>
+          <p class="text-xs text-slate-400 font-medium flex items-center gap-1">
+            <MapPin class="w-3.5 h-3.5 text-primary shrink-0" />
+            {{ m.location }}
+          </p>
+          <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">
+            {{ getAdministrativeLocationLabel(m) }}
+          </p>
+          <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed pt-1 font-medium">
+            {{ m.description }}
+          </p>
           </div>
 
           <!-- Progress gauge and actions -->

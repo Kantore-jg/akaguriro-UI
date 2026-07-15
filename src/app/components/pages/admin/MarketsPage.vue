@@ -33,7 +33,7 @@ import {
 const { markets, places, merchants, products, addMarket, updateMarket, deleteMarket } = useApp();
 
 const searchQuery = ref('');
-const cityFilter = ref('all');
+const provinceFilter = ref('all');
 const formOpen = ref(false);
 const viewOpen = ref(false);
 const deleteOpen = ref(false);
@@ -41,21 +41,21 @@ const editingMarket = ref(null);
 const viewingMarket = ref(null);
 const marketToDelete = ref(null);
 
-const cities = computed(() => {
-  const set = new Set(markets.value.map((m) => m.city));
+const provinces = computed(() => {
+  const set = new Set(markets.value.map((m) => m.province || m.city).filter(Boolean));
   return Array.from(set).sort();
 });
 
 const filteredMarkets = computed(() => {
   return markets.value.filter((m) => {
     const q = searchQuery.value.toLowerCase();
+    const locationLabel = [m.province, m.commune, m.zone, m.colline, m.location].filter(Boolean).join(' ');
     const matchesQuery =
       !q ||
       m.name.toLowerCase().includes(q) ||
-      m.city.toLowerCase().includes(q) ||
-      m.location.toLowerCase().includes(q);
-    const matchesCity = cityFilter.value === 'all' || m.city === cityFilter.value;
-    return matchesQuery && matchesCity;
+      locationLabel.toLowerCase().includes(q);
+    const matchesProvince = provinceFilter.value === 'all' || (m.province || m.city) === provinceFilter.value;
+    return matchesQuery && matchesProvince;
   });
 });
 
@@ -153,23 +153,23 @@ const viewingStats = computed(() => {
       />
     </div>
 
-    <FilterBar :show-clear="searchQuery || cityFilter !== 'all'" @clear="searchQuery = ''; cityFilter = 'all'">
+    <FilterBar :show-clear="searchQuery || provinceFilter !== 'all'" @clear="searchQuery = ''; provinceFilter = 'all'">
       <div class="flex-1 space-y-1 w-full">
         <label class="text-xs font-medium text-muted-foreground">Recherche</label>
         <div class="relative">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input v-model="searchQuery" placeholder="Nom, ville ou adresse..." class="pl-9 bg-card" />
+          <Input v-model="searchQuery" placeholder="Nom, province ou localisation..." class="pl-9 bg-card" />
         </div>
       </div>
       <div class="space-y-1 w-full sm:w-48">
-        <label class="text-xs font-medium text-muted-foreground">Ville</label>
-        <Select v-model="cityFilter">
+        <label class="text-xs font-medium text-muted-foreground">Province</label>
+        <Select v-model="provinceFilter">
           <SelectTrigger class="bg-card">
-            <SelectValue placeholder="Toutes les villes" />
+            <SelectValue placeholder="Toutes les provinces" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les villes</SelectItem>
-            <SelectItem v-for="city in cities" :key="city" :value="city">{{ city }}</SelectItem>
+            <SelectItem value="all">Toutes les provinces</SelectItem>
+            <SelectItem v-for="province in provinces" :key="province" :value="province">{{ province }}</SelectItem>
           </SelectContent>
         </Select>
       </div>

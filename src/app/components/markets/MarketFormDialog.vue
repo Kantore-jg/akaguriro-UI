@@ -7,6 +7,12 @@ import Input from '../ui/Input.vue';
 import Label from '../ui/Label.vue';
 import ProductCategoryMultiSelect from './ProductCategoryMultiSelect.vue';
 import {
+  getProvinceOptions,
+  getCommuneOptions,
+  getZoneOptions,
+  getCollineOptions,
+} from '../../../utils/burundiLocations.js';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -31,12 +37,25 @@ const emit = defineEmits(['update:open', 'submit']);
 
 const { productCategories } = useApp();
 
-const CITIES = ['Bujumbura', 'Gitega', 'Ngozi', 'Rumonge', 'Muyinga', 'Kirundo', 'Makamba'];
+const PROVINCE_OPTIONS = getProvinceOptions();
+
+const createEmptyForm = (market = null) => ({
+  name: market?.name || '',
+  province: market?.province || market?.city || PROVINCE_OPTIONS[0]?.value || '',
+  commune: market?.commune || '',
+  zone: market?.zone || '',
+  colline: market?.colline || '',
+  description: market?.description || '',
+  totalPlaces: market?.totalPlaces || 50,
+  productCategoryIds: [...(market?.productCategoryIds || [])],
+});
 
 const form = ref({
   name: '',
-  city: 'Bujumbura',
-  location: '',
+  province: PROVINCE_OPTIONS[0]?.value || '',
+  commune: '',
+  zone: '',
+  colline: '',
   description: '',
   totalPlaces: 50,
   productCategoryIds: [],
@@ -46,6 +65,9 @@ const imageFile = ref(null);
 const imagePreview = ref(null);
 
 const isEditing = computed(() => Boolean(props.market?.id));
+const communeOptions = computed(() => getCommuneOptions(form.value.province));
+const zoneOptions = computed(() => getZoneOptions(form.value.province, form.value.commune));
+const collineOptions = computed(() => getCollineOptions(form.value.province, form.value.commune, form.value.zone));
 
 function resetImage(marketImage = null) {
   imageFile.value = null;
@@ -63,27 +85,46 @@ watch(
   (isOpen) => {
     if (!isOpen) return;
     if (props.market) {
-      form.value = {
-        name: props.market.name || '',
-        city: props.market.city || 'Bujumbura',
-        location: props.market.location || '',
-        description: props.market.description || '',
-        totalPlaces: props.market.totalPlaces || 50,
-        productCategoryIds: [...(props.market.productCategoryIds || [])],
-      };
+      form.value = createEmptyForm(props.market);
       resetImage(props.market.image || props.market.coverImage);
     } else {
-      form.value = {
-        name: '',
-        city: 'Bujumbura',
-        location: '',
-        description: '',
-        totalPlaces: 50,
-        productCategoryIds: [],
-      };
+      form.value = createEmptyForm();
       resetImage();
     }
   },
+);
+
+watch(
+  () => form.value.province,
+  (province) => {
+    const communes = getCommuneOptions(province);
+    if (!communes.some((item) => item.value === form.value.commune)) {
+      form.value.commune = communes[0]?.value || '';
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => form.value.commune,
+  (commune) => {
+    const zones = getZoneOptions(form.value.province, commune);
+    if (!zones.some((item) => item.value === form.value.zone)) {
+      form.value.zone = zones[0]?.value || '';
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => form.value.zone,
+  (zone) => {
+    const collines = getCollineOptions(form.value.province, form.value.commune, zone);
+    if (!collines.some((item) => item.value === form.value.colline)) {
+      form.value.colline = collines[0]?.value || '';
+    }
+  },
+  { immediate: true },
 );
 
 const close = () => emit('update:open', false);
@@ -95,8 +136,12 @@ const handleSubmit = () => {
   emit('submit', {
     ...(props.market || {}),
     name: form.value.name.trim(),
-    city: form.value.city,
-    location: form.value.location.trim(),
+    city: form.value.province,
+    province: form.value.province,
+    commune: form.value.commune,
+    zone: form.value.zone,
+    colline: form.value.colline,
+    location: props.market?.location || '',
     description: form.value.description.trim(),
     totalPlaces: Number(form.value.totalPlaces) || 0,
     productCategoryIds: form.value.productCategoryIds,
@@ -127,14 +172,14 @@ const handleSubmit = () => {
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-2">
-            <Label>Ville</Label>
-            <Select v-model="form.city">
+            <Label>Province</Label>
+            <Select v-model="form.province">
               <SelectTrigger>
-                <SelectValue placeholder="Choisir une ville" />
+                <SelectValue placeholder="Choisir une province" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="city in CITIES" :key="city" :value="city">
-                  {{ city }}
+                <SelectItem v-for="province in PROVINCE_OPTIONS" :key="province.value" :value="province.value">
+                  {{ province.label }}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -145,9 +190,46 @@ const handleSubmit = () => {
           </div>
         </div>
 
-        <div class="space-y-2">
-          <Label for="market-location">Adresse / Localisation</Label>
-          <Input id="market-location" v-model="form.location" placeholder="Quartier, avenue..." required />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="space-y-2">
+            <Label>Commune</Label>
+            <Select v-model="form.commune">
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une commune" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="commune in communeOptions" :key="commune.value" :value="commune.value">
+                  {{ commune.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div class="space-y-2">
+            <Label>Zone</Label>
+            <Select v-model="form.zone">
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une zone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="zone in zoneOptions" :key="zone.value" :value="zone.value">
+                  {{ zone.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div class="space-y-2">
+            <Label>Colline</Label>
+            <Select v-model="form.colline">
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une colline" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="colline in collineOptions" :key="colline.value" :value="colline.value">
+                  {{ colline.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div class="space-y-2">

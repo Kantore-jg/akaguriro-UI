@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { MapPin, Store, Users, Package } from 'lucide-vue-next';
 import Button from '../ui/Button.vue';
 import Badge from '../ui/Badge.vue';
+import { getAdministrativeLocationLabel } from '../../../utils/burundiLocations.js';
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,7 @@ const goToPlaces = () => {
         <DialogTitle>{{ market.name }}</DialogTitle>
         <DialogDescription class="flex items-center gap-1">
           <MapPin class="w-3.5 h-3.5" />
-          {{ market.city }} — {{ market.location }}
+          {{ getAdministrativeLocationLabel(market) }} — {{ market.location }}
         </DialogDescription>
       </DialogHeader>
 

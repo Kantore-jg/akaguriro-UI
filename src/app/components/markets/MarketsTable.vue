@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { getAdministrativeLocationLabel } from '../../../utils/burundiLocations.js';
 
 defineProps({
   markets: { type: Array, required: true },
@@ -44,7 +45,7 @@ const statusVariant = (percent) => {
       <TableHeader>
         <TableRow>
           <TableHead>Marché</TableHead>
-          <TableHead>Ville</TableHead>
+          <TableHead>Localisation</TableHead>
           <TableHead>Occupation</TableHead>
           <TableHead>Statut</TableHead>
           <TableHead class="text-right">Actions</TableHead>
@@ -79,7 +80,7 @@ const statusVariant = (percent) => {
             </div>
           </TableCell>
           <TableCell>
-            <span class="text-sm">{{ market.city }}</span>
+            <span class="text-sm">{{ getAdministrativeLocationLabel(market) }}</span>
           </TableCell>
           <TableCell>
             <div class="space-y-1">

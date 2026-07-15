@@ -43,6 +43,10 @@ function marketToFormData(market) {
 
   appendScalar(formData, 'name', api.name);
   appendScalar(formData, 'city', api.city);
+  appendScalar(formData, 'province', api.province);
+  appendScalar(formData, 'commune', api.commune);
+  appendScalar(formData, 'zone', api.zone);
+  appendScalar(formData, 'colline', api.colline);
   appendScalar(formData, 'location', api.location);
   appendScalar(formData, 'description', api.description);
   appendScalar(formData, 'total_places', api.total_places);

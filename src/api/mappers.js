@@ -43,18 +43,25 @@ export function mapMarket(m) {
   const categories = m.product_categories?.length
     ? m.product_categories.map(mapProductCategory)
     : [];
+  const province = m.province || m.city || '';
+  const administrativeLocation = [province, m.commune, m.zone, m.colline].filter(Boolean).join(' > ');
 
   return {
     id: m.id,
     name: m.name,
     slug: m.slug,
-    city: m.city,
+    city: province,
+    province,
+    commune: m.commune || '',
+    zone: m.zone || '',
+    colline: m.colline || '',
     location: m.location || '',
     description: m.description || '',
     totalPlaces: m.total_places ?? 0,
     occupiedPlaces: m.occupied_places ?? 0,
     image: resolveStorageUrl(m.image),
     coverImage: resolveStorageUrl(m.cover_image || m.image),
+    administrativeLocation,
     productCategories: categories.map((c) => c.name),
     marketProductCategories: categories,
     productCategoryIds: m.product_category_ids?.length
@@ -293,9 +300,14 @@ export function userToApi(data) {
 }
 
 export function marketToApi(data) {
+  const province = data.province || data.city || '';
   return {
     name: data.name,
-    city: data.city,
+    city: province,
+    province,
+    commune: data.commune || null,
+    zone: data.zone || null,
+    colline: data.colline || null,
     location: data.location,
     description: data.description,
     total_places: data.totalPlaces,
