@@ -76,6 +76,11 @@ function productToFormData(product) {
   return formData;
 }
 
+async function fetchScopedList(endpoint, params = {}) {
+  const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE, ...params } });
+  return extractList({ data });
+}
+
 export async function fetchProductCategories() {
   const { data } = await apiClient.get('/product-categories');
   return extractList({ data }).map(mapProductCategory);
@@ -101,23 +106,19 @@ export async function deleteProductCategoryApi(id) {
 }
 
 export async function fetchMarkets() {
-  const { data } = await apiClient.get('/markets', { params: { per_page: PER_PAGE } });
-  return extractList({ data }).map(mapMarket);
+  return (await fetchScopedList('/markets')).map(mapMarket);
 }
 
 export async function fetchPlaces(params = {}) {
-  const { data } = await apiClient.get('/places', { params: { per_page: PER_PAGE, ...params } });
-  return extractList({ data }).map(mapPlace);
+  return (await fetchScopedList('/places', params)).map(mapPlace);
 }
 
 export async function fetchMerchants(params = {}) {
-  const { data } = await apiClient.get('/merchants', { params: { per_page: PER_PAGE, ...params } });
-  return extractList({ data }).map(mapMerchant);
+  return (await fetchScopedList('/merchants', params)).map(mapMerchant);
 }
 
 export async function fetchUsers(params = {}) {
-  const { data } = await apiClient.get('/users', { params: { per_page: PER_PAGE, ...params } });
-  return extractList({ data }).map(mapUser);
+  return (await fetchScopedList('/users', params)).map(mapUser);
 }
 
 export async function createUser(user) {
@@ -135,32 +136,21 @@ export async function deleteUserApi(id) {
 }
 
 export async function fetchProducts(params = {}) {
-  const { data } = await apiClient.get('/products', { params: { per_page: PER_PAGE, ...params } });
-  return extractList({ data }).map(mapProduct);
+  return (await fetchScopedList('/products', params)).map(mapProduct);
 }
 
 export async function fetchPlaceRequests() {
   const user = getStoredUser();
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/place-requests' : '/my/place-requests';
-  try {
-    const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE } });
-    return extractList({ data }).map(mapPlaceRequest);
-  } catch {
-    return [];
-  }
+  return (await fetchScopedList(endpoint)).map(mapPlaceRequest);
 }
 
 export async function fetchSales(params = {}) {
   const user = getStoredUser();
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/sales' : '/my/sales';
-  try {
-    const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE, ...params } });
-    return extractList({ data }).map(mapSale);
-  } catch {
-    return [];
-  }
+  return (await fetchScopedList(endpoint, params)).map(mapSale);
 }
 
 export async function fetchSale(id) {
@@ -177,12 +167,7 @@ export async function fetchReceipts() {
   const user = getStoredUser();
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/receipts' : '/my/receipts';
-  try {
-    const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE } });
-    return extractList({ data }).map(mapReceipt);
-  } catch {
-    return [];
-  }
+  return (await fetchScopedList(endpoint)).map(mapReceipt);
 }
 
 export async function createMarket(market) {

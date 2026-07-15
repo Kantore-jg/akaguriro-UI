@@ -1,0 +1,90 @@
+<script setup>
+import { ref, computed } from 'vue';
+import { Search, MessageSquare, ShieldCheck } from 'lucide-vue-next';
+import { sameId } from '../utils/ids.js';
+
+const props = defineProps({
+  merchants: { type: Array, default: () => [] },
+  markets: { type: Array, default: () => [] },
+  productCategories: { type: Array, default: () => [] },
+});
+
+const merchantQuery = ref('');
+const merchantCategory = ref('all');
+
+const getMarketById = (marketId) => props.markets.find((market) => sameId(market.id, marketId));
+
+const filteredMerchants = computed(() =>
+  props.merchants.filter((m) => {
+    const query = merchantQuery.value.toLowerCase();
+    const matchesQuery = m.name.toLowerCase().includes(query) || m.category.toLowerCase().includes(query);
+    const matchesCategory = merchantCategory.value === 'all' || m.category === merchantCategory.value;
+    return matchesQuery && matchesCategory;
+  }),
+);
+</script>
+
+<template>
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+    <div class="space-y-1.5">
+      <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">
+        Public des Commerçants
+      </h1>
+      <p class="text-slate-500 text-sm max-w-xl font-medium">
+        Consultez les commerçants habilités et leur ancrage dans les marchés.
+      </p>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="w-full md:w-80 flex items-center gap-2 px-3 py-2 bg-background border border-slate-200/60 rounded-xl focus-within:bg-white focus-within:border-primary/30 transition-all">
+        <Search class="w-4 h-4 text-slate-400" />
+        <input
+          v-model="merchantQuery"
+          type="text"
+          placeholder="Rechercher par nom d'exploitant ou filière..."
+          class="bg-transparent border-0 outline-none text-xs w-full text-slate-700"
+        />
+      </div>
+      <select
+        v-model="merchantCategory"
+        class="bg-background hover:bg-slate-100/60 border border-slate-200/60 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer text-slate-700 w-full md:w-auto"
+      >
+        <option value="all">Spécialité / Tout</option>
+        <option v-for="cat in productCategories" :key="cat.id" :value="cat.name">
+          {{ cat.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-for="m in filteredMerchants"
+        :key="m.id"
+        class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex gap-4 items-center relative group"
+      >
+        <img :src="m.image" :alt="m.name" class="w-16 h-16 rounded-2xl object-cover bg-background shrink-0" />
+        <div class="min-w-0 flex-1 space-y-1 text-xs">
+          <h3 class="text-sm font-extrabold text-slate-900 truncate flex items-center gap-1">
+            {{ m.name }}
+            <ShieldCheck class="w-4.5 h-4.5 text-primary inline shrink-0" />
+          </h3>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ m.category }}</p>
+          <p v-if="getMarketById(m.activeMarketId)" class="text-slate-500 font-medium">
+            {{ getMarketById(m.activeMarketId)?.city }} • Étale {{ m.activePlaceNumber || m.activePlaceId }}
+          </p>
+        </div>
+        <div class="absolute bottom-4 right-4 flex gap-1">
+          <a
+            :href="`https://wa.me/${(m.phone || '').replace(/\s+/g, '')}`"
+            target="_blank"
+            rel="noreferrer"
+            class="p-1.5 bg-emerald-50 text-primary rounded-lg border border-emerald-110 shadow-sm hover:bg-primary hover:text-white transition-colors"
+            title="Contacter sur WhatsApp"
+          >
+            <MessageSquare class="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
