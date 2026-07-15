@@ -2,7 +2,7 @@
 defineProps({
   merchant: { type: Object, required: true },
   marketName: { type: String, default: '' },
-  marketCity: { type: String, default: '' },
+  marketLocation: { type: String, default: '' },
 });
 </script>
 
@@ -18,7 +18,7 @@ defineProps({
       </h3>
       <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ merchant.category }}</p>
       <p v-if="marketName" class="text-slate-500 font-medium">
-        {{ marketCity }} • Étale {{ merchant.activePlaceNumber || merchant.activePlaceId }}
+        {{ marketLocation }} • Étale {{ merchant.activePlaceNumber || merchant.activePlaceId }}
       </p>
     </div>
     <div class="absolute bottom-4 right-4 flex gap-1">

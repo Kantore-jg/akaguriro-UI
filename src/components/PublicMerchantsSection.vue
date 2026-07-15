@@ -64,7 +64,7 @@ const filteredMerchants = computed(() =>
         :key="m.id"
         :merchant="m"
         :market-name="getMarketById(m.activeMarketId)?.name || ''"
-        :market-city="getAdministrativeLocationLabel(getMarketById(m.activeMarketId)) || ''"
+        :market-location="getAdministrativeLocationLabel(getMarketById(m.activeMarketId)) || ''"
       />
     </div>
   </div>

@@ -54,7 +54,7 @@ function getMarketName(marketId) {
   return markets.value.find((m) => sameId(m.id, marketId))?.name || '—';
 }
 
-function getMarketCity(marketId) {
+function getMarketLocation(marketId) {
   return getAdministrativeLocationLabel(markets.value.find((m) => sameId(m.id, marketId))) || '—';
 }
 
@@ -69,7 +69,7 @@ function buildRows(products) {
     category: p.category,
     marketId: p.marketId,
     marketName: getMarketName(p.marketId),
-    city: getMarketCity(p.marketId),
+    location: getMarketLocation(p.marketId),
     unit: p.unit,
     unitLabel: unitLabel(p.unit),
     price: p.price,
@@ -135,7 +135,7 @@ const displayedRows = computed(() => {
         r.name.toLowerCase().includes(q) ||
         r.category.toLowerCase().includes(q) ||
         r.marketName.toLowerCase().includes(q) ||
-        r.city.toLowerCase().includes(q) ||
+        r.location.toLowerCase().includes(q) ||
         r.merchantName.toLowerCase().includes(q),
     );
   }
@@ -179,7 +179,7 @@ function exportCsv() {
     r.name,
     r.category,
     r.marketName,
-    r.city,
+    r.location,
     r.unitLabel,
     r.price,
     r.merchantName,
@@ -203,7 +203,7 @@ const columns = [
   { key: 'name', label: 'Nom du produit' },
   { key: 'category', label: 'Catégorie' },
   { key: 'marketName', label: 'Marché' },
-  { key: 'city', label: 'Localisation' },
+  { key: 'location', label: 'Localisation' },
   { key: 'unitLabel', label: 'Unité' },
   { key: 'price', label: 'Prix (BIF)', highlight: true },
   { key: 'merchantName', label: 'Commerçant' },
@@ -357,7 +357,7 @@ const columns = [
               <td class="px-4 py-3 font-medium text-slate-800">{{ row.name }}</td>
               <td class="px-4 py-3 text-slate-600 text-xs">{{ row.category }}</td>
               <td class="px-4 py-3 text-slate-600 text-xs">{{ row.marketName }}</td>
-              <td class="px-4 py-3 text-slate-600 text-xs">{{ row.city }}</td>
+              <td class="px-4 py-3 text-slate-600 text-xs">{{ row.location }}</td>
               <td class="px-4 py-3 text-slate-600 text-xs">{{ row.unitLabel }}</td>
               <td class="px-4 py-3 font-bold text-slate-900 bg-sky-50/50">
                 {{ row.price.toLocaleString('fr-FR') }} BIF

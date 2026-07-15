@@ -42,7 +42,6 @@ function marketToFormData(market) {
   const api = marketToApi(market);
 
   appendScalar(formData, 'name', api.name);
-  appendScalar(formData, 'city', api.city);
   appendScalar(formData, 'province', api.province);
   appendScalar(formData, 'commune', api.commune);
   appendScalar(formData, 'zone', api.zone);

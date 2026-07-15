@@ -66,7 +66,7 @@ const filteredProducts = computed(() =>
       p.category.toLowerCase().includes(query) ||
       marketLocation.includes(query);
     const matchesCat = globalProdCat.value === 'all' || p.category === globalProdCat.value;
-    const marketProvince = (market?.province || market?.city || '').toLowerCase();
+    const marketProvince = (market?.province || '').toLowerCase();
     const marketCommune = (market?.commune || '').toLowerCase();
     const marketZone = (market?.zone || '').toLowerCase();
     const marketColline = (market?.colline || '').toLowerCase();

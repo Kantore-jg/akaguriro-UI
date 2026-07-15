@@ -42,7 +42,7 @@ const viewingMarket = ref(null);
 const marketToDelete = ref(null);
 
 const provinces = computed(() => {
-  const set = new Set(markets.value.map((m) => m.province || m.city).filter(Boolean));
+  const set = new Set(markets.value.map((m) => m.province).filter(Boolean));
   return Array.from(set).sort();
 });
 
@@ -54,7 +54,7 @@ const filteredMarkets = computed(() => {
       !q ||
       m.name.toLowerCase().includes(q) ||
       locationLabel.toLowerCase().includes(q);
-    const matchesProvince = provinceFilter.value === 'all' || (m.province || m.city) === provinceFilter.value;
+    const matchesProvince = provinceFilter.value === 'all' || m.province === provinceFilter.value;
     return matchesQuery && matchesProvince;
   });
 });

@@ -7,6 +7,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
+import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -538,7 +539,7 @@ function getMerchantById(id) {
               {{ isMerchant ? 'Ét. ' + assignedMerchantObj?.activePlaceId : filteredPlaces.length }}
             </strong>
             <span class="text-[9px] text-slate-400 block font-medium">
-              {{ isMerchant ? assignedMarketObj?.city : vacantPlacesCount + ' vacant(s)' }}
+              {{ isMerchant ? getAdministrativeLocationLabel(assignedMarketObj) : vacantPlacesCount + ' vacant(s)' }}
             </span>
           </div>
 
@@ -618,7 +619,7 @@ function getMerchantById(id) {
             <thead>
               <tr class="bg-slate-50 border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                 <th class="py-3 px-4">image & nom</th>
-                <th class="py-3 px-4">ville & adresse</th>
+                <th class="py-3 px-4">localisation</th>
                 <th class="py-3 px-4">places occupées</th>
                 <th class="py-3 px-4">statut de réseau</th>
               </tr>
@@ -629,7 +630,7 @@ function getMerchantById(id) {
                   <img :src="m.image" class="w-9 h-9 rounded-lg object-cover" />
                   <span class="font-extrabold text-slate-900">{{ m.name }}</span>
                 </td>
-                <td class="py-4 px-4">{{ m.city }} • {{ m.location }}</td>
+                <td class="py-4 px-4">{{ getAdministrativeLocationLabel(m) }} • {{ m.location }}</td>
                 <td class="py-4 px-4">
                   <span class="font-bold text-slate-900">{{ m.occupiedPlaces }} / {{ m.totalPlaces }} occupied</span>
                 </td>
@@ -747,7 +748,7 @@ function getMerchantById(id) {
                 </td>
                 <td class="py-4 px-4">{{ m.phone }}</td>
                 <td class="py-4 px-4">
-                  <span class="font-bold text-slate-800">{{ getMarketById(m.activeMarketId) ? getMarketById(m.activeMarketId).city : 'Siyoni' }}</span> • Place {{ m.activePlaceId }}
+                  <span class="font-bold text-slate-800">{{ getAdministrativeLocationLabel(getMarketById(m.activeMarketId)) || 'Siyoni' }}</span> • Place {{ m.activePlaceId }}
                 </td>
                 <td class="py-4 px-4">{{ m.category }}</td>
                 <td class="py-4 px-4">
@@ -822,7 +823,7 @@ function getMerchantById(id) {
                 <td class="py-3.5 px-4">
                   <div>
                     <span class="text-slate-900 font-bold block">{{ getMerchantById(p.merchantId) ? getMerchantById(p.merchantId).name : '—' }}</span>
-                    <span class="text-slate-400 text-[10px] block">{{ getMarketById(p.marketId) ? getMarketById(p.marketId).city : 'Siyoni' }} ({{ p.placeNumber }})</span>
+                    <span class="text-slate-400 text-[10px] block">{{ getAdministrativeLocationLabel(getMarketById(p.marketId)) || 'Siyoni' }} ({{ p.placeNumber }})</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4">

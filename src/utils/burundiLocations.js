@@ -15025,7 +15025,7 @@ export function getAdministrativeLocationParts(market) {
   }
 
   return {
-    province: market.province || market.city || '',
+    province: market.province || '',
     commune: market.commune || '',
     zone: market.zone || '',
     colline: market.colline || '',
@@ -15036,5 +15036,5 @@ export function getAdministrativeLocationLabel(market) {
   const parts = getAdministrativeLocationParts(market);
   const formatted = formatAdministrativeLocation(parts);
   if (formatted) return formatted;
-  return market?.city || market?.location || '';
+  return market?.province || market?.location || '';
 }

@@ -406,7 +406,7 @@ function getVendor(merchantId) {
           </template>
 
           <!-- <div class="border-t border-slate-800 pt-3 text-[9.5px] text-slate-400 font-bold flex justify-between items-center bg-slate-900 select-none">
-            <span>GPS: {{ (market.province || market.city || 'BURUNDI').toUpperCase() }}_PLAN_LIVE</span>
+            <span>GPS: {{ (market.province || 'BURUNDI').toUpperCase() }}_PLAN_LIVE</span>
             <span class="text-primary flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               STABLE OMNI

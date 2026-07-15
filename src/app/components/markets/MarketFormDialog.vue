@@ -41,7 +41,7 @@ const PROVINCE_OPTIONS = getProvinceOptions();
 
 const createEmptyForm = (market = null) => ({
   name: market?.name || '',
-  province: market?.province || market?.city || PROVINCE_OPTIONS[0]?.value || '',
+  province: market?.province || PROVINCE_OPTIONS[0]?.value || '',
   commune: market?.commune || '',
   zone: market?.zone || '',
   colline: market?.colline || '',
@@ -136,7 +136,6 @@ const handleSubmit = () => {
   emit('submit', {
     ...(props.market || {}),
     name: form.value.name.trim(),
-    city: form.value.province,
     province: form.value.province,
     commune: form.value.commune,
     zone: form.value.zone,

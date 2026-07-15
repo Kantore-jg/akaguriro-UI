@@ -43,14 +43,13 @@ export function mapMarket(m) {
   const categories = m.product_categories?.length
     ? m.product_categories.map(mapProductCategory)
     : [];
-  const province = m.province || m.city || '';
+  const province = m.province || '';
   const administrativeLocation = [province, m.commune, m.zone, m.colline].filter(Boolean).join(' > ');
 
   return {
     id: m.id,
     name: m.name,
     slug: m.slug,
-    city: province,
     province,
     commune: m.commune || '',
     zone: m.zone || '',
@@ -300,10 +299,9 @@ export function userToApi(data) {
 }
 
 export function marketToApi(data) {
-  const province = data.province || data.city || '';
+  const province = data.province || '';
   return {
     name: data.name,
-    city: province,
     province,
     commune: data.commune || null,
     zone: data.zone || null,

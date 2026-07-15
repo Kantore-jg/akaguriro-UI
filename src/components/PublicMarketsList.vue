@@ -59,7 +59,7 @@ const filteredMarkets = computed(() =>
     const matchesSearch = m.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                           m.location.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                           getAdministrativeLocationLabel(m).toLowerCase().includes(searchQuery.value.toLowerCase());
-    const marketProvince = (m.province || m.city || '').toLowerCase();
+    const marketProvince = (m.province || '').toLowerCase();
     const marketCommune = (m.commune || '').toLowerCase();
     const marketZone = (m.zone || '').toLowerCase();
     const marketColline = (m.colline || '').toLowerCase();
@@ -171,9 +171,6 @@ function resetFilters() {
             :alt="m.name"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <!-- <span class="absolute top-2.5 left-2.5 bg-slate-900/80 text-white text-[9px] font-bold uppercase py-0.5 px-2 rounded-full backdrop-blur-sm shadow-sm">
-            {{ m.city }}
-          </span> -->
         </div>
 
         <!-- Right: Core parameters -->

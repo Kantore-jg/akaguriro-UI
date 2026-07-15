@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useApp } from '../../../composables/useApp.js';
 import { useAdminScope } from '../../../composables/useAdminScope.js';
 import PrintLayout from './PrintLayout.vue';
+import { getAdministrativeLocationLabel } from '../../../utils/burundiLocations.js';
 
 const route = useRoute();
 const { currentUser } = useApp();
@@ -75,7 +76,7 @@ onMounted(() => {
           <template v-if="market"> — {{ market.name }}</template>
         </h1>
         <div class="print-document__meta">
-          <span v-if="market"><strong>Marché :</strong> {{ market.name }} ({{ market.city }})</span>
+          <span v-if="market"><strong>Marché :</strong> {{ market.name }} ({{ getAdministrativeLocationLabel(market) }})</span>
           <!-- <span><strong>Édité par :</strong> {{ currentUser.name }}</span> -->
           <span><strong>Date :</strong> {{ printedAt }}</span>
         </div>

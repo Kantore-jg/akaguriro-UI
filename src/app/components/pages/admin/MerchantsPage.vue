@@ -4,6 +4,7 @@ import { Search, Users, ShieldCheck, Package, Printer } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
+import { getAdministrativeLocationLabel } from '../../../../utils/burundiLocations.js';
 import Button from '../../ui/Button.vue';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
@@ -64,7 +65,7 @@ const totalProducts = computed(() => scopedProducts.value.length);
 
 const getMarketLabel = (marketId) => {
   const m = findMarket(marketId);
-  return m ? `${m.city}` : '—';
+  return m ? getAdministrativeLocationLabel(m) : '—';
 };
 
 const openView = (merchant) => {
