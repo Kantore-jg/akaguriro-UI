@@ -59,10 +59,36 @@ const cart = ref([]);
 const checkoutOpen = ref(false);
 const saving = ref(false);
 const activeTab = ref(isMerchant.value ? 'pos' : 'history');
+const productSearchQuery = ref('');
 
 const availableProducts = computed(() =>
   scopedProducts.value.filter((p) => p.available !== false && p.stock > 0),
 );
+
+const normalizeText = (value) =>
+  String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const filteredProducts = computed(() => {
+  const q = normalizeText(productSearchQuery.value.trim());
+  if (!q) return [];
+
+  return availableProducts.value.filter((product) => {
+    const haystack = [
+      product.name,
+      product.category,
+      product.unit,
+      product.placeNumber,
+    ]
+      .filter(Boolean)
+      .map(normalizeText)
+      .join(' ');
+
+    return haystack.includes(q);
+  });
+});
 
 const cartTotal = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -155,6 +181,10 @@ const clearCart = () => {
   cart.value = [];
 };
 
+const clearProductSearch = () => {
+  productSearchQuery.value = '';
+};
+
 const openCheckout = () => {
   if (cart.value.length === 0) return;
   checkoutOpen.value = true;
@@ -234,16 +264,35 @@ const pageTitle = computed(() =>
     <!-- POS Interface for merchants -->
     <div v-if="isMerchant && activeTab === 'pos'" class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <div class="xl:col-span-2 space-y-4">
-        <h2 class="text-sm font-semibold text-foreground">Produits disponibles</h2>
+        <div class="space-y-3">
+          
+          <div class="relative">
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              v-model="productSearchQuery"
+              class="pl-9 bg-card"
+              placeholder="Nom du produit, catégorie, unité..."
+            />
+          </div>
+        </div>
         <div
           v-if="availableProducts.length === 0"
           class="bs-card p-12 text-center text-muted-foreground text-sm"
         >
           Aucun produit disponible en stock.
         </div>
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div
+          v-else-if="productSearchQuery.trim() && filteredProducts.length === 0"
+          class="bs-card p-12 text-center text-muted-foreground text-sm space-y-2"
+        >
+          <p>Aucun produit ne correspond à votre recherche.</p>
+          <Button variant="outline" size="sm" @click="clearProductSearch">
+            Réinitialiser la recherche
+          </Button>
+        </div>
+        <div v-else-if="filteredProducts.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <button
-            v-for="product in availableProducts"
+            v-for="product in filteredProducts"
             :key="product.id"
             type="button"
             class="bs-card-hover p-4 text-left transition-colors"
@@ -261,6 +310,9 @@ const pageTitle = computed(() =>
               <span class="text-xs text-muted-foreground">Stock: {{ product.stock }}</span>
             </div>
           </button>
+        </div>
+        <div v-else class="bs-card p-12 text-center text-muted-foreground text-sm space-y-2">
+          <p>rechercher un produit</p>
         </div>
       </div>
 
