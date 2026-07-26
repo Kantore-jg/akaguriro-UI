@@ -6,12 +6,6 @@ const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
 
 const routes = [
   {
-    path: '/led',
-    name: 'LED',
-    component: () => import('../components/LedPage.vue'),
-    meta: { public: true },
-  },
-  {
     path: '/login',
     name: 'Login',
     component: () => import('../components/LoginPage.vue'),

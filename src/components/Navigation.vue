@@ -41,9 +41,8 @@ const { goHome, goToTab } = usePublicNavigation();
 const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
 
 const isAdminRoute = computed(() => route.path.startsWith('/admin'));
-const isLedRoute = computed(() => route.path === '/led');
 const isProfileRoute = computed(() => route.path === '/profile');
-const isPublicRoute = computed(() => !isAdminRoute.value && !isLedRoute.value && !isProfileRoute.value);
+const isPublicRoute = computed(() => !isAdminRoute.value && !isProfileRoute.value);
 const isLoggedIn = computed(() => Boolean(currentUser.value?.id));
 const canAccessAdmin = computed(() => ADMIN_ROLES.includes(currentUser.value?.role));
 const userInitials = computed(() => {
@@ -108,10 +107,6 @@ function handlePublicNav(tab) {
 
 function goToAdmin() {
   router.push('/admin');
-}
-
-function goToLed() {
-  router.push('/led');
 }
 
 function goToProfile() {
@@ -188,15 +183,6 @@ async function handleLogout() {
         </nav>
 
         <div class="flex items-center gap-2">
-          <!-- <button
-            @click="isLedRoute ? router.push('/') : goToLed()"
-            class="hidden md:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
-            :class="isLedRoute ? 'bg-primary text-primary-foreground border-primary' : 'text-muted-foreground'"
-          >
-            <Tv class="w-3.5 h-3.5" />
-            LED
-          </button> -->
-
           <template v-if="!isLoggedIn">
             <button
               @click="handlePublicNav('auth')"

@@ -606,9 +606,9 @@ function getMerchantById(id) {
               <div class="flex gap-3.5 items-start p-3 bg-slate-50 rounded-2xl border border-slate-100">
                 <span class="w-2.5 h-2.5 mt-1.5 rounded-full bg-blue-500 shrink-0"></span>
                 <div class="space-y-0.5">
-                  <p class="text-xs font-bold text-slate-800">Encadrement LED intelligent déployé</p>
+                  <p class="text-xs font-bold text-slate-800">Canaux publics rationalisés</p>
                   <p class="text-[11px] text-slate-500">
-                    Les télévisions Smart d'affichage LED publicitaire affichent désormais les prix indicatifs régionaux toutes les 15 secondes pour le poisson Mukeke.
+                    L'interface publique conserve les pages de consultation standard.
                   </p>
                 </div>
               </div>
@@ -654,7 +654,7 @@ function getMerchantById(id) {
                 </td>
                 <td class="py-4 px-4">
                   <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 font-bold text-[9px]">
-                     CONNECTÉ (LED ACTIVE)
+                    CONNECTÉ
                   </span>
                 </td>
               </tr>
