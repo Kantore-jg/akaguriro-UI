@@ -213,7 +213,6 @@ const onCreateBlockFromPlace = (marketId) => {
   <div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-foreground">Emplacements & Blocs</h1>
         
       </div>
       <div class="flex flex-wrap gap-2">
@@ -234,12 +233,7 @@ const onCreateBlockFromPlace = (marketId) => {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <StatCard title="Blocs" :value="scopedBlocks.length" :icon="LayoutGrid" color="secondary" />
-      <StatCard title="Total étals" :value="scopedPlaces.length" :icon="MapPin" color="primary" />
-      <StatCard title="Occupés" :value="occupiedCount" :icon="MapPin" color="success" />
-      <StatCard title="Libres" :value="freeCount" :icon="MapPin" color="warning" />
-    </div>
+    
 
     <div class="flex gap-1 p-1 bg-muted rounded-lg w-fit">
       <button
