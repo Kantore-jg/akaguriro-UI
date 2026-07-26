@@ -164,9 +164,6 @@ const handleToggleActive = async (user, isActive) => {
   <div class="space-y-6">
     <PageHeader
       title="Gestion Des Utilisateurs"
-      :subtitle="isSuperAdmin
-        ? 'Création, modification et contrôle des accès au système.'
-        : 'Gestion des comptes liés à votre marché (commerçants et utilisateurs).'"
       action-label="Ajouter un utilisateur"
       :action-icon="Plus"
       @action="openCreate"
