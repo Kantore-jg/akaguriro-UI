@@ -8,6 +8,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
+import { sameId } from '../utils/ids.js';
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -70,7 +71,7 @@ const currentEditingProduct = ref(null);
 
 const pName = ref('');
 const pPrice = ref(0);
-const pCategory = ref('');
+const pCategoryId = ref('');
 const pUnit = ref('kg');
 const pDescription = ref('');
 const pStock = ref(50);
@@ -79,31 +80,32 @@ const pImage = ref('https://images.unsplash.com/photo-1542838132-92c53300491e?au
 
 const assignModalOpen = ref(false);
 const assignPlaceId = ref('');
-const assignMarketId = ref('m1');
+const assignMarketId = ref('');
 const assignMerchantId = ref('all_free');
 
 const receiptModalOpen = ref(false);
 const recMonth = ref('Juin 2026');
 const recAmount = ref(35000);
-const recImage = ref('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400');
+const recFile = ref(null);
+const recFileName = ref('Aucun fichier sélectionné');
 
 const isSuperAdmin = computed(() => currentUser.value.role === 'SUPER_ADMIN');
 const isMarketAdmin = computed(() => currentUser.value.role === 'ADMIN_MARCHE');
 const isMerchant = computed(() => currentUser.value.role === 'COMMERCANT');
 
 const assignedMarketId = computed(() =>
-  isMarketAdmin.value ? (currentUser.value.marketId || 'm1') : null
+  isMarketAdmin.value ? (currentUser.value.marketId || null) : null
 );
 const assignedMarketObj = computed(() =>
-  assignedMarketId.value ? markets.value.find((m) => m.id === assignedMarketId.value) : null
+  assignedMarketId.value ? markets.value.find((m) => sameId(m.id, assignedMarketId.value)) : null
 );
 
 const assignedMerchantIdValue = computed(() =>
-  isMerchant.value ? (currentUser.value.merchantId || 'mer1') : null
+  isMerchant.value ? (currentUser.value.merchantId || null) : null
 );
 const assignedMerchantObj = computed(() =>
   assignedMerchantIdValue.value
-    ? merchants.value.find((m) => m.id === assignedMerchantIdValue.value)
+    ? merchants.value.find((m) => sameId(m.id, assignedMerchantIdValue.value))
     : null
 );
 
@@ -159,7 +161,7 @@ function handleOpenProductModal(prod = null) {
     currentEditingProduct.value = prod;
     pName.value = prod.name;
     pPrice.value = prod.price;
-    pCategory.value = prod.category;
+    pCategoryId.value = prod.categoryId ?? productCategories.value.find((cat) => cat.name === prod.category)?.id ?? '';
     pUnit.value = prod.unit;
     pDescription.value = prod.description;
     pStock.value = prod.stock;
@@ -169,7 +171,7 @@ function handleOpenProductModal(prod = null) {
     currentEditingProduct.value = null;
     pName.value = '';
     pPrice.value = 10000;
-    pCategory.value = productCategories.value[0]?.name || '';
+    pCategoryId.value = productCategories.value[0]?.id || '';
     pUnit.value = 'kg';
     pDescription.value = '';
     pStock.value = 100;
@@ -182,24 +184,25 @@ function handleOpenProductModal(prod = null) {
 
 function handleProductSubmit(e) {
   e.preventDefault();
-  if (!pName.value || pPrice.value <= 0) {
+  if (!pName.value || pPrice.value <= 0 || !pCategoryId.value) {
     showToast('Coordonnées du produit invalides', 'error');
     return;
   }
 
-  let finalMarketId = 'm1';
-  let finalMerchantId = 'mer1';
-  let finalPlaceNo = 'A-01';
+  const marketContext = isMerchant.value
+    ? assignedMerchantObj.value?.activeMarketId || null
+    : assignedMarketId.value || markets.value[0]?.id || null;
 
-  if (isMerchant.value && assignedMerchantObj.value) {
-    finalMarketId = assignedMerchantObj.value.activeMarketId;
-    finalMerchantId = assignedMerchantObj.value.id;
-    finalPlaceNo = assignedMerchantObj.value.activePlaceId;
-  } else if (isMarketAdmin.value && assignedMarketId.value) {
-    finalMarketId = assignedMarketId.value;
-    const firstM = merchants.value.find((m) => m.activeMarketId === assignedMarketId.value);
-    finalMerchantId = firstM ? firstM.id : 'mer1';
-    finalPlaceNo = firstM ? firstM.activePlaceId : 'A-01';
+  const merchantContext = isMerchant.value
+    ? assignedMerchantObj.value
+    : merchants.value.find((m) => sameId(m.activeMarketId, marketContext))
+      || merchants.value.find((m) => sameId(m.id, currentEditingProduct.value?.merchantId))
+      || merchants.value[0]
+      || null;
+
+  if (!marketContext || !merchantContext) {
+    showToast('Impossible de déterminer un marché ou un commerçant réel pour ce produit', 'error');
+    return;
   }
 
   if (currentEditingProduct.value) {
@@ -207,26 +210,28 @@ function handleProductSubmit(e) {
       ...currentEditingProduct.value,
       name: pName.value,
       price: pPrice.value,
-      category: pCategory.value,
+      categoryId: pCategoryId.value,
       unit: pUnit.value,
       description: pDescription.value,
       stock: pStock.value,
       available: pAvailable.value,
       image: pImage.value,
+      marketId: currentEditingProduct.value.marketId || marketContext,
+      merchantId: currentEditingProduct.value.merchantId || merchantContext.id,
     });
   } else {
     addProduct({
       name: pName.value,
       price: pPrice.value,
-      category: pCategory.value,
+      categoryId: pCategoryId.value,
       unit: pUnit.value,
       description: pDescription.value,
       stock: pStock.value,
       available: pAvailable.value,
       image: pImage.value,
-      marketId: finalMarketId,
-      merchantId: finalMerchantId,
-      placeNumber: finalPlaceNo,
+      marketId: marketContext,
+      merchantId: merchantContext.id,
+      placeId: merchantContext.activePlaceId || null,
       isTrending: false,
     });
   }
@@ -234,22 +239,29 @@ function handleProductSubmit(e) {
   productModalOpen.value = false;
 }
 
-function handleReceiptSubmit(e) {
+async function handleReceiptSubmit(e) {
   e.preventDefault();
-  if (!isMerchant.value || !assignedMerchantObj.value) return;
+  if (!isMerchant.value || !assignedMerchantObj.value) {
+    showToast('Seul un commerçant affecté peut transmettre un reçu.', 'error');
+    return;
+  }
+  if (!recFile.value) {
+    showToast('Veuillez sélectionner un fichier de reçu.', 'error');
+    return;
+  }
 
-  const mObj = markets.value.find((m) => m.id === assignedMerchantObj.value.activeMarketId);
-
-  addPaymentReceipt({
-    merchantId: assignedMerchantObj.value.id,
-    merchantName: assignedMerchantObj.value.name,
-    marketName: mObj ? mObj.name : 'Marché Siyoni',
-    month: recMonth.value,
+  const created = await addPaymentReceipt({
+    file: recFile.value,
+    marketId: assignedMerchantObj.value.activeMarketId || null,
     amount: recAmount.value,
-    receiptImage: recImage.value,
+    reference: recMonth.value,
   });
 
-  receiptModalOpen.value = false;
+  if (created) {
+    recFile.value = null;
+    recFileName.value = 'Aucun fichier sélectionné';
+    receiptModalOpen.value = false;
+  }
 }
 
 function handleAssignSubmit(e) {
@@ -270,10 +282,16 @@ function openAssignModal(placeId, marketId, merchantId) {
 }
 
 function openDefaultAssignModal() {
-  assignPlaceId.value = filteredPlaces.value[0]?.id || 'A-01';
-  assignMarketId.value = assignedMarketId.value || 'm1';
+  assignPlaceId.value = filteredPlaces.value[0]?.id || '';
+  assignMarketId.value = assignedMarketId.value || markets.value[0]?.id || '';
   assignMerchantId.value = 'all_free';
   assignModalOpen.value = true;
+}
+
+function onReceiptFileChange(event) {
+  const file = event.target.files?.[0] || null;
+  recFile.value = file;
+  recFileName.value = file ? file.name : 'Aucun fichier sélectionné';
 }
 
 function setActiveTab(tab) {
@@ -1054,10 +1072,10 @@ function getMerchantById(id) {
             <div class="space-y-1">
               <label class="text-slate-500 block">Catégorie / Filière alimentaire</label>
               <select
-                v-model="pCategory"
+                v-model="pCategoryId"
                 class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-2.5 outline-none font-medium cursor-pointer"
               >
-                <option v-for="cat in productCategories" :key="cat.id" :value="cat.name">
+                <option v-for="cat in productCategories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
               </select>
@@ -1170,12 +1188,12 @@ function getMerchantById(id) {
         <form @submit.prevent="handleReceiptSubmit" class="space-y-4">
 
           <div class="space-y-1">
-            <label class="text-slate-500 block">Mois de règlement</label>
-            <input
-              v-model="recMonth"
-              type="text"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 outline-none"
-              required
+              <label class="text-slate-500 block">Référence du paiement</label>
+              <input
+                v-model="recMonth"
+                type="text"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 outline-none"
+                required
             />
           </div>
 
@@ -1191,13 +1209,17 @@ function getMerchantById(id) {
 
           <!-- Drag n drop simulated block -->
           <div class="space-y-1">
-            <label class="text-slate-500 block">Télécharger la pièce numérisée (PNG, JPG)</label>
-            <div class="border border-dashed border-slate-350 rounded-2xl p-6 bg-slate-50 text-center space-y-2 hover:bg-slate-100 transition-colors select-none cursor-pointer">
-              <Upload class="w-8 h-8 text-slate-400 mx-auto" />
-              <p class="text-[11px] text-slate-500 font-semibold">Faites glisser votre reçu mairies ici ou cliquez pour parcourir</p>
-              <p class="text-[9.5px] text-slate-400 font-medium">Formats autorisés : PDF, JPEG (Max. 5 Mo)</p>
+              <label class="text-slate-500 block">Télécharger la pièce numérisée (PNG, JPG, PDF)</label>
+              <label class="border border-dashed border-slate-350 rounded-2xl p-6 bg-slate-50 text-center space-y-2 hover:bg-slate-100 transition-colors select-none cursor-pointer block">
+                <Upload class="w-8 h-8 text-slate-400 mx-auto" />
+                <p class="text-[11px] text-slate-500 font-semibold">Cliquez pour parcourir ou déposez un fichier dans le champ ci-dessous</p>
+                <p class="text-[9.5px] text-slate-400 font-medium">Formats autorisés : PDF, JPEG, PNG (Max. 10 Mo)</p>
+                <input type="file" accept=".pdf,image/jpeg,image/png" class="hidden" @change="onReceiptFileChange" />
+              </label>
+              <p class="text-[10px] text-slate-500 font-medium">
+                Fichier sélectionné : <span class="font-semibold">{{ recFileName }}</span>
+              </p>
             </div>
-          </div>
 
           <button
             type="submit"

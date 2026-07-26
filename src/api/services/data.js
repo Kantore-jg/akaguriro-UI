@@ -21,7 +21,7 @@ import {
 } from '../mappers.js';
 import { getStoredUser } from './auth.js';
 
-const PER_PAGE = 100;
+const PER_PAGE = Number(import.meta.env.VITE_API_PAGE_SIZE || 100);
 
 function appendScalar(formData, key, value) {
   if (value === undefined || value === null || value === '') return;
@@ -80,8 +80,23 @@ function productToFormData(product) {
 }
 
 async function fetchScopedList(endpoint, params = {}) {
-  const { data } = await apiClient.get(endpoint, { params: { per_page: PER_PAGE, ...params } });
-  return extractList({ data });
+  const baseParams = { per_page: PER_PAGE, ...params };
+  const firstResponse = await apiClient.get(endpoint, { params: { ...baseParams, page: 1 } });
+  const firstPayload = firstResponse.data;
+  const firstPage = extractList(firstResponse);
+  const meta = firstPayload?.meta;
+
+  if (!meta?.last_page || meta.last_page <= 1) {
+    return firstPage;
+  }
+
+  const pages = [firstPage];
+  for (let page = 2; page <= meta.last_page; page += 1) {
+    const response = await apiClient.get(endpoint, { params: { ...baseParams, page } });
+    pages.push(extractList(response));
+  }
+
+  return pages.flat();
 }
 
 export async function fetchProductCategories() {

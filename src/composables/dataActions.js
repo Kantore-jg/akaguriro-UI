@@ -170,8 +170,10 @@ export function createDataActions(state) {
       const created = await createReceipt(formData);
       state.receipts.value = [created, ...state.receipts.value];
       state.showToast('Reçu téléversé avec succès pour validation', 'success');
+      return created;
     } catch (error) {
       state.showToast(getErrorMessage(error), 'error');
+      return null;
     }
   };
 
