@@ -114,12 +114,6 @@ const handleSubmit = () => {
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="sm:max-w-md">
-      <DialogHeader>
-        <DialogTitle>{{ isEditing ? 'Modifier l\'emplacement' : 'Nouvel emplacement' }}</DialogTitle>
-        <DialogDescription>
-          {{ isEditing ? 'Mettre à jour un étal existant dans le marché.' : 'Ajouter un étal dans un bloc du marché.' }}
-        </DialogDescription>
-      </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div class="space-y-2">

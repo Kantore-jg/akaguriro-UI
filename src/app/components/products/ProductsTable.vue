@@ -15,6 +15,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
@@ -108,6 +109,8 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem @click="emit('edit', product)">
                   <Pencil class="w-4 h-4 mr-2" />
                   Modifier

@@ -146,7 +146,7 @@ const handleSubmit = () => {
           <div class="space-y-2">
             <Label for="user-phone">Téléphone (optionnel)</Label>
             <Input id="user-phone" v-model="form.phone" placeholder="+25779123456" />
-            <p class="text-xs text-muted-foreground">Laissez vide si non disponible. Doit être unique.</p>
+            <p class="text-xs text-muted-foreground">Doit être unique.</p>
           </div>
         </div>
 
@@ -197,9 +197,7 @@ const handleSubmit = () => {
         <div class="flex items-center justify-between rounded-lg border border-border p-3">
           <div>
             <p class="text-sm font-medium">Compte actif</p>
-            <p class="text-xs text-muted-foreground">
-              Un compte désactivé ne peut plus se connecter.
-            </p>
+            
           </div>
           <Switch
             v-model:checked="form.isActive"

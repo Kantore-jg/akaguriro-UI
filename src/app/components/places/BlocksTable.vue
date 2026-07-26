@@ -1,5 +1,5 @@
 <script setup>
-import { Pencil, Trash2, MoreHorizontal, LayoutGrid } from 'lucide-vue-next';
+import { Pencil, Trash2, MoreHorizontal, LayoutGrid, Plus } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
@@ -75,8 +76,11 @@ const emit = defineEmits(['edit', 'delete', 'add-place']);
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem @click="emit('add-place', block)">
-                  Ajouter un étal
+                  <Plus class="w-4 h-4 mr-2" />
+                  Ajouter un emplacement
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="emit('edit', block)">
                   <Pencil class="w-4 h-4 mr-2" />

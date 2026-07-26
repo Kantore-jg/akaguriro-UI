@@ -5,7 +5,6 @@ import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import Button from '../../ui/Button.vue';
-import Badge from '../../ui/Badge.vue';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import ProductsTable from '../../products/ProductsTable.vue';
@@ -52,22 +51,14 @@ const saving = ref(false);
 
 const categories = computed(() => productCategories.value);
 
-const categoryCards = computed(() =>
-  productCategories.value
-
-    .map((cat) => ({
-      ...cat,
-      count: scopedProducts.value.filter(
-        (p) => p.categoryId === cat.id || p.category === cat.name,
-      ).length,
-    })),
-);
-
 const getMerchantName = (merchantId) =>
   scopedMerchants.value.find((m) => String(m.id) === String(merchantId))?.name || '—';
 
 const getMarketCity = (marketId) =>
-  scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.city || '—';
+  scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.administrativeLocation
+  || scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.location
+  || scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.name
+  || '—';
 
 const filteredProducts = computed(() =>
   scopedProducts.value.filter((p) => {
@@ -149,10 +140,6 @@ const clearFilters = () => {
   categoryFilter.value = 'all';
   merchantFilter.value = 'all';
 };
-
-const filterByCategory = (name) => {
-  categoryFilter.value = name;
-};
 </script>
 
 <template>
@@ -173,7 +160,7 @@ const filterByCategory = (name) => {
       </template>
     </PageHeader>
 
-    <FilterBar :show-clear="searchQuery || categoryFilter !== 'all'" @clear="clearFilters">
+    <FilterBar :show-clear="searchQuery || categoryFilter !== 'all' || merchantFilter !== 'all'" @clear="clearFilters">
       <div class="flex-1 space-y-1 w-full">
         <label class="text-xs font-medium text-muted-foreground">Recherche</label>
         <div class="relative">
