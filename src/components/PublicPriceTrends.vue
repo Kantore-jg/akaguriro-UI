@@ -228,7 +228,7 @@ const columns = [
           >
             <option value="all">Tous les marchés</option>
             <option v-for="m in markets" :key="m.id" :value="m.id">
-              {{ m.name }} ({{ getAdministrativeLocationLabel(m) }})
+              {{ m.name }} 
             </option>
           </select>
         </div>
