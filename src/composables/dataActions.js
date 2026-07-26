@@ -383,6 +383,29 @@ export function createDataActions(state) {
     }
   };
 
+  const updatePlace = async (place) => {
+    if (!place?.placeId) {
+      state.showToast('Emplacement introuvable', 'error');
+      return null;
+    }
+    try {
+      const updated = await updatePlaceApi(place.placeId, place);
+      state.places.value = state.places.value.map((p) =>
+        p.placeId === place.placeId || (p.id === place.id && p.marketId === place.marketId)
+          ? updated
+          : p,
+      );
+      if (refreshPublicData) {
+        await refreshPublicData();
+      }
+      state.showToast(`Emplacement ${place.id} mis à jour`, 'success');
+      return updated;
+    } catch (error) {
+      state.showToast(getErrorMessage(error), 'error');
+      return null;
+    }
+  };
+
   const deletePlace = async (place) => {
     if (!place?.placeId) {
       state.showToast('Emplacement introuvable', 'error');
@@ -510,6 +533,7 @@ export function createDataActions(state) {
     updateBlock,
     deleteBlock,
     addPlace,
+    updatePlace,
     deletePlace,
     addUser,
     updateUser,

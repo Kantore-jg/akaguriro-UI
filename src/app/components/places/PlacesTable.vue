@@ -1,5 +1,5 @@
 <script setup>
-import { MoreHorizontal, Settings2, Trash2 } from 'lucide-vue-next';
+import { MoreHorizontal, Pencil, Settings2, Trash2 } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import {
@@ -23,7 +23,7 @@ defineProps({
   getMarketName: { type: Function, required: true },
 });
 
-const emit = defineEmits(['assign', 'delete']);
+const emit = defineEmits(['assign', 'edit', 'delete']);
 
 const statusVariant = (status) => {
   if (status === 'occupée') return 'default';
@@ -90,6 +90,10 @@ const statusLabel = (status) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem @click="emit('edit', place)">
+                  <Pencil class="w-4 h-4 mr-2" />
+                  Modifier
+                </DropdownMenuItem>
                 <DropdownMenuItem @click="emit('assign', place)">
                   <Settings2 class="w-4 h-4 mr-2" />
                   Gérer l'affectation

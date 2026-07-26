@@ -23,6 +23,7 @@ import {
 
 const props = defineProps({
   open: { type: Boolean, default: false },
+  place: { type: Object, default: null },
   markets: { type: Array, default: () => [] },
   blocks: { type: Array, default: () => [] },
   defaultMarketId: { type: String, default: '' },
@@ -37,6 +38,8 @@ const form = ref({
   blockId: '',
   productCategoryIds: [],
 });
+
+const isEditing = computed(() => Boolean(props.place?.placeId));
 
 const blocksForMarket = computed(() =>
   props.blocks.filter((b) => String(b.marketId) === String(form.value.marketId)),
@@ -54,6 +57,15 @@ watch(
   () => props.open,
   (isOpen) => {
     if (!isOpen) return;
+    if (props.place) {
+      form.value = {
+        id: props.place.id || '',
+        marketId: props.place.marketId || props.defaultMarketId || props.markets[0]?.id || '',
+        blockId: props.place.blockId ? String(props.place.blockId) : props.defaultBlockId ? String(props.defaultBlockId) : '',
+        productCategoryIds: [...(props.place.categoryIds || [])],
+      };
+      return;
+    }
     form.value = {
       id: '',
       marketId: props.defaultMarketId || props.markets[0]?.id || '',
@@ -89,6 +101,7 @@ const handleSubmit = () => {
   if (!form.value.productCategoryIds.length) return;
 
   emit('submit', {
+    ...(props.place || {}),
     id: form.value.id.trim(),
     marketId: form.value.marketId,
     blockId: Number(form.value.blockId) || form.value.blockId,
@@ -102,14 +115,21 @@ const handleSubmit = () => {
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Nouvel emplacement</DialogTitle>
-        <DialogDescription>Ajouter un étal dans un bloc du marché.</DialogDescription>
+        <DialogTitle>{{ isEditing ? 'Modifier l\'emplacement' : 'Nouvel emplacement' }}</DialogTitle>
+        <DialogDescription>
+          {{ isEditing ? 'Mettre à jour un étal existant dans le marché.' : 'Ajouter un étal dans un bloc du marché.' }}
+        </DialogDescription>
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div class="space-y-2">
           <Label for="place-id">Code étal</Label>
-          <Input id="place-id" v-model="form.id" placeholder="ex. A-04" required />
+          <Input
+            id="place-id"
+            v-model="form.id"
+            placeholder="ex. A-04"
+            required
+        />
         </div>
 
         <div class="space-y-2">
@@ -176,7 +196,7 @@ const handleSubmit = () => {
             type="submit"
             :disabled="!form.blockId || !form.productCategoryIds.length || !availableCategories.length"
           >
-            Créer
+            {{ isEditing ? 'Mettre à jour' : 'Créer' }}
           </Button>
         </DialogFooter>
       </form>

@@ -36,6 +36,7 @@ const {
   loadBlocks,
   updatePlaceStatus,
   addPlace,
+  updatePlace,
   deletePlace,
   addBlock,
   updateBlock,
@@ -75,6 +76,7 @@ const blockFormOpen = ref(false);
 const deletePlaceOpen = ref(false);
 const deleteBlockOpen = ref(false);
 const selectedPlace = ref(null);
+const editingPlace = ref(null);
 const editingBlock = ref(null);
 const placeToDelete = ref(null);
 const blockToDelete = ref(null);
@@ -139,7 +141,14 @@ const openAssign = (place) => {
 };
 
 const openPlaceForm = (block = null) => {
+  editingPlace.value = null;
   defaultBlockId.value = block?.id ? String(block.id) : '';
+  placeFormOpen.value = true;
+};
+
+const openEditPlace = (place) => {
+  editingPlace.value = place;
+  defaultBlockId.value = place?.blockId ? String(place.blockId) : '';
   placeFormOpen.value = true;
 };
 
@@ -168,7 +177,11 @@ const handleAssign = ({ placeId, marketId, status, merchantId }) => {
   updatePlaceStatus(placeId, marketId, status, merchantId);
 };
 
-const handleAddPlace = (payload) => {
+const handleAddPlace = async (payload) => {
+  if (payload.placeId) {
+    await updatePlace(payload);
+    return;
+  }
   const exists = scopedPlaces.value.some(
     (p) => p.id === payload.id && p.marketId === payload.marketId,
   );
@@ -301,6 +314,7 @@ const onCreateBlockFromPlace = (marketId) => {
       :get-merchant="getMerchant"
       :get-market-name="getMarketName"
       @assign="openAssign"
+      @edit="openEditPlace"
       @delete="openDeletePlace"
     />
 
@@ -323,6 +337,7 @@ const onCreateBlockFromPlace = (marketId) => {
 
     <PlaceFormDialog
       v-model:open="placeFormOpen"
+      :place="editingPlace"
       :markets="scopedMarkets"
       :blocks="scopedBlocks"
       :default-market-id="assignedMarketId || ''"
