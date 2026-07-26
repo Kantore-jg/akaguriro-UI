@@ -19,6 +19,7 @@ export function usePrintReport() {
     });
 
   const openInvoicePrint = (saleId) => openPrint('invoice', { sale: saleId });
+  const openSaleReceiptPrint = (saleId) => openPrint('receipt', { sale: saleId });
 
   return {
     openPrint,
@@ -26,5 +27,6 @@ export function usePrintReport() {
     openPlacesPrint,
     openProductsPrint,
     openInvoicePrint,
+    openSaleReceiptPrint,
   };
 }

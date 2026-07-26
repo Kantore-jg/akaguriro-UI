@@ -41,21 +41,6 @@ const {
   findMarket,
 } = useAdminScope();
 
-const pageTitle = computed(() => {
-  if (isMerchant.value) return 'Mon tableau de bord';
-  if (isMarketAdmin.value) return 'Tableau de bord du marché';
-  return 'Tableau de bord national';
-});
-
-const pageSubtitle = computed(() => {
-  if (isMerchant.value) {
-    return '';
-  }
-  if (isMarketAdmin.value) {
-    return 'Statistiques et indicateurs de votre marché.';
-  }
-  return 'Vue d\'ensemble de l\'activité sur tous les marchés.';
-});
 
 const merchantPlaceLabel = computed(() => {
   if (!assignedMerchant.value?.activePlaceNumber) return 'Non assigné';

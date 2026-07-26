@@ -211,9 +211,7 @@ const handleSubmit = () => {
           <Package class="w-5 h-5 text-primary" />
           {{ isEditing ? 'Modifier le produit' : 'Ajouter un produit' }}
         </DialogTitle>
-        <DialogDescription>
-          Référencez un article dans le catalogue national des marchés.
-        </DialogDescription>
+       
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">

@@ -132,6 +132,12 @@ const routes = [
         component: () => import('../app/components/print/PrintInvoicePage.vue'),
         meta: { title: 'Facture de vente' },
       },
+      {
+        path: 'receipt',
+        name: 'PrintSaleReceipt',
+        component: () => import('../app/components/print/PrintSaleReceiptPage.vue'),
+        meta: { title: 'Reçu de vente' },
+      },
     ],
   },
   {

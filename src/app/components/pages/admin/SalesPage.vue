@@ -48,7 +48,7 @@ const {
   assignedMarketId,
 } = useAdminScope();
 
-const { openInvoicePrint } = usePrintReport();
+const { openInvoicePrint, openSaleReceiptPrint } = usePrintReport();
 
 const searchQuery = ref('');
 const merchantFilter = ref('all');
@@ -499,10 +499,16 @@ const pageTitle = computed(() =>
                   {{ formatPrice(sale.total) }} FBU
                 </TableCell>
                 <TableCell class="text-right">
-                  <Button variant="outline" size="sm" @click="openInvoicePrint(sale.id)">
-                    <Printer class="w-4 h-4" />
-                    Facture
-                  </Button>
+                  <div class="flex items-center justify-end gap-2">
+                    <Button variant="outline" size="sm" @click="openInvoicePrint(sale.id)">
+                      <Printer class="w-4 h-4" />
+                      Facture
+                    </Button>
+                    <Button variant="outline" size="sm" @click="openSaleReceiptPrint(sale.id)">
+                      <Receipt class="w-4 h-4" />
+                      Reçu
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             </TableBody>
