@@ -212,7 +212,7 @@ const reportSections = computed(() => [
       { key: 'commune', label: 'Commune' },
       { key: 'zone', label: 'Zone' },
       { key: 'colline', label: 'Colline' },
-      { key: 'location', label: 'Localisation' },
+      // { key: 'location', label: 'Localisation' },
       { key: 'categories', label: 'Catégories' },
       { key: 'totalPlaces', label: 'Places total' },
       { key: 'occupiedPlaces', label: 'Occupées' },

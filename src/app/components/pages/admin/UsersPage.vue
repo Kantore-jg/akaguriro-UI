@@ -163,32 +163,12 @@ const handleToggleActive = async (user, isActive) => {
 <template>
   <div class="space-y-6">
     <PageHeader
-      title="Gestion Des Utilisateurs"
       action-label="Ajouter un utilisateur"
       :action-icon="Plus"
       @action="openCreate"
     />
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <StatCard
-        title="Utilisateurs enregistrés"
-        :value="users.length"
-        :icon="UserCog"
-        color="primary"
-      />
-      <StatCard
-        title="Comptes actifs"
-        :value="activeCount"
-        :icon="UserCheck"
-        color="success"
-      />
-      <StatCard
-        title="Comptes désactivés"
-        :value="inactiveCount"
-        :icon="UserX"
-        color="warning"
-      />
-    </div>
+    
 
     <FilterBar
       :show-clear="searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || (isSuperAdmin && marketFilter !== 'all')"

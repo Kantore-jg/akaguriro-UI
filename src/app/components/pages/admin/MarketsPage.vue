@@ -123,36 +123,10 @@ const viewingStats = computed(() => {
 <template>
   <div class="space-y-6">
     <PageHeader
-      title="Gestion Des Marchés"
-      subtitle="Configuration et contrôle des infrastructures connectées."
       action-label="Ajouter un marché"
       :action-icon="Plus"
       @action="openCreate"
     />
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <StatCard
-        title="Marchés enregistrés"
-        :value="markets.length"
-        :icon="Store"
-        color="primary"
-      />
-      <StatCard
-        title="Capacité totale"
-        :value="totalPlaces"
-        :icon="Store"
-        :subtitle="`${totalOccupied} étals occupés`"
-        color="secondary"
-      />
-      <StatCard
-        title="Taux d'occupation moyen"
-        :value="avgOccupation + '%'"
-        :icon="Store"
-        :trend="{ value: '—', isPositive: avgOccupation < 85 }"
-        color="success"
-      />
-    </div>
-
     <FilterBar :show-clear="searchQuery || provinceFilter !== 'all'" @clear="searchQuery = ''; provinceFilter = 'all'">
       <div class="flex-1 space-y-1 w-full">
         <label class="text-xs font-medium text-muted-foreground">Recherche</label>

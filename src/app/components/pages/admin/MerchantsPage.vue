@@ -90,37 +90,9 @@ const viewingProductsCount = computed(() => {
 
 <template>
   <div class="space-y-6">
-    <PageHeader
-      title="Gestion Des Commerçants"
-    >
-      <template #actions>
-        <Button variant="outline" class="rounded-full" @click="handlePrint">
-          <Printer class="w-4 h-4" />
-          Imprimer la liste
-        </Button>
-      </template>
-    </PageHeader>
+    
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <StatCard
-        title="Commerçants actifs"
-        :value="scopedMerchants.length"
-        :icon="Users"
-        color="primary"
-      />
-      <StatCard
-        title="Habilités"
-        :value="verifiedCount"
-        :icon="ShieldCheck"
-        color="success"
-      />
-      <StatCard
-        title="Produits référencés"
-        :value="totalProducts"
-        :icon="Package"
-        color="warning"
-      />
-    </div>
+    
 
     <FilterBar
       :show-clear="searchQuery || marketFilter !== 'all' || categoryFilter !== 'all'"

@@ -115,26 +115,12 @@ const confirmDelete = async () => {
 <template>
   <div class="space-y-6">
     <PageHeader
-      title="Catégories de produits"
       action-label="Ajouter une catégorie"
       :action-icon="Plus"
       @action="openCreate"
     />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <StatCard
-        title="Total catégories"
-        :value="categories.length"
-        :icon="Tags"
-        color="primary"
-      />
-      <StatCard
-        title="Produits référencés"
-        :value="categories.reduce((sum, c) => sum + (c.productsCount || 0), 0)"
-        :icon="Tags"
-        color="secondary"
-      />
-    </div>
+    
 
     <FilterBar :show-clear="Boolean(searchQuery)" @clear="searchQuery = ''">
       <div class="flex-1 space-y-1 w-full">
