@@ -486,13 +486,15 @@ export function createDataActions(state) {
       return;
     }
     try {
-      const statusMap = {
-        libre: 'available',
-        occupée: 'occupied',
-        maintenance: 'maintenance',
-        réservée: 'reserved',
-      };
-      await updatePlaceApi(place.placeId, { status: statusMap[status] || status });
+      await updatePlaceApi(place.placeId, placeToApi({
+        ...place,
+        marketId: marketId || place.marketId,
+        blockId: place.blockId,
+        id: place.id,
+        number: place.number || place.id,
+        status,
+        productCategoryIds: place.categoryIds || [],
+      }));
       if (merchantId && status === 'occupée') {
         await assignPlaceChief(place.placeId, merchantId);
       }
