@@ -93,12 +93,16 @@ const routes = [
         meta: { title: 'Ventes' },
       },
       {
-        path: 'prints',
-        name: 'AdminPrints',
-        component: () => import('../app/components/print/PrintReportsPage.vue'),
-        meta: { title: 'Impressions', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'] },
+        path: 'reports',
+        name: 'AdminReports',
+        component: () => import('../app/components/pages/admin/ReportsPage.vue'),
+        meta: { title: 'Rapports', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'] },
       },
     ],
+  },
+  {
+    path: '/admin/prints',
+    redirect: '/admin/reports',
   },
   {
     path: '/admin/print',

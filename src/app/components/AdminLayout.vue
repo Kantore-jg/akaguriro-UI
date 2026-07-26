@@ -135,10 +135,10 @@ const navigation = computed(() => {
 
   if (isSuperAdmin.value || isMarketAdmin.value || isMerchant.value) {
     items.push({
-      id: 'prints',
-      name: 'Impressions',
+      id: 'reports',
+      name: 'Rapports',
       icon: Printer,
-      path: '/admin/prints',
+      path: '/admin/reports',
     });
   }
 

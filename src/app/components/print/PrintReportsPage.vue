@@ -67,7 +67,7 @@ const reports = computed(() => {
 <template>
   <div class="space-y-6">
     <PageHeader
-      title="Centre d'Impression"
+      title="Centre des rapports"
     />
     <!-- subtitle="Générez des rapports HTML prêts à imprimer pour votre marché." -->
 
