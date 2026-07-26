@@ -76,8 +76,8 @@ const printedAt = computed(() =>
           <span v-if="sale.placeNumber"><strong>Place :</strong> {{ sale.placeNumber }}</span>
         </div>
         <div>
-                <p class="font-semibold">client :{{ sale.merchantName }}</p>
-
+          <p class="font-semibold">Client : {{ sale.clientName }}</p>
+          <p v-if="sale.clientPhone" class="text-sm text-gray-600">{{ sale.clientPhone }}</p>
         </div>
       </header>
 
