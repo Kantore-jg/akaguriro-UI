@@ -21,7 +21,11 @@ import {
 } from '../mappers.js';
 import { getStoredUser } from './auth.js';
 
-const PER_PAGE = Number(import.meta.env.VITE_API_PAGE_SIZE || 100);
+const PER_PAGE = Number(import.meta.env.VITE_API_PAGE_SIZE);
+
+if (!Number.isFinite(PER_PAGE) || PER_PAGE <= 0) {
+  throw new Error('VITE_API_PAGE_SIZE must be a positive number');
+}
 
 function appendScalar(formData, key, value) {
   if (value === undefined || value === null || value === '') return;
