@@ -73,11 +73,15 @@ const printedAt = computed(() =>
         <div class="print-document__meta mt-4">
           <span><strong>Date :</strong> {{ saleDate }}</span>
           <span><strong>Marché :</strong> {{ sale.marketName }}</span>
-          <span v-if="sale.placeNumber"><strong>Emplacement :</strong> {{ sale.placeNumber }}</span>
+          <span v-if="sale.placeNumber"><strong>Place :</strong> {{ sale.placeNumber }}</span>
+        </div>
+        <div>
+                <p class="font-semibold">client :{{ sale.merchantName }}</p>
+
         </div>
       </header>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+      <!-- <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div class="rounded-lg border border-gray-200 p-4">
           <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Commerçant</p>
           <p class="font-semibold">{{ sale.merchantName }}</p>
@@ -90,7 +94,7 @@ const printedAt = computed(() =>
           <p v-if="sale.clientPhone" class="text-sm text-gray-600">{{ sale.clientPhone }}</p>
           <p v-if="sale.clientEmail" class="text-sm text-gray-600">{{ sale.clientEmail }}</p>
         </div>
-      </div>
+      </div> -->
 
       <table class="print-table w-full mb-6">
         <thead>
@@ -123,19 +127,10 @@ const printedAt = computed(() =>
           </tr>
         </tfoot>
       </table>
-<!-- 
-      <div class="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-8">
-        <p class="text-sm">
-          <strong>Mode de paiement :</strong> {{ paymentLabel }}
-        </p>
-        <p v-if="sale.notes" class="text-sm mt-2">
-          <strong>Notes :</strong> {{ sale.notes }}
-        </p>
-      </div> -->
+
 
       <footer class="text-center text-xs text-gray-500 border-t border-gray-200 pt-4">
         <p>Merci pour votre achat !</p>
-        <!-- <p class="mt-1">Document généré le {{ printedAt }}</p> -->
       </footer>
     </div>
   </PrintLayout>

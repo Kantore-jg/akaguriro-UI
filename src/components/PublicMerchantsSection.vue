@@ -32,9 +32,7 @@ const filteredMerchants = computed(() =>
       <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">
         Public des Commerçants
       </h1>
-      <p class="text-slate-500 text-sm max-w-xl font-medium">
-        Consultez les commerçants habilités et leur ancrage dans les marchés.
-      </p>
+
     </div>
 
     <div class="bg-white p-4 rounded-2xl border border-slate-150 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
