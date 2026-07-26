@@ -121,7 +121,7 @@ export function mapMerchant(m) {
     category: m.category || 'Commerce Général',
     activePlaceId: m.active_place_id || null,
     activePlaceNumber: m.active_place_number || '',
-    activeMarketId: m.active_market_id,
+    activeMarketId: m.active_market_id || m.managed_market_id || null,
     joinedDate: m.joined_date,
     verified: m.verified ?? false,
     bio: m.bio || '',
