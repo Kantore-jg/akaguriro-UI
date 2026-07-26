@@ -127,6 +127,16 @@ export async function deleteProductCategoryApi(id) {
   await apiClient.delete(`/product-categories/${id}`);
 }
 
+export async function fetchRolePermissions() {
+  const { data } = await apiClient.get('/permissions/roles');
+  return extractData({ data });
+}
+
+export async function updateRolePermissions(roleId, permissions) {
+  const { data } = await apiClient.put(`/permissions/roles/${roleId}`, { permissions });
+  return extractData({ data });
+}
+
 export async function fetchMarkets() {
   return (await fetchScopedList('/markets')).map(mapMarket);
 }

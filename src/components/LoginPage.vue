@@ -113,9 +113,7 @@ async function handleSubmit(e) {
         <h2 class="text-lg font-semibold text-foreground mb-1">
           {{ isLogin ? 'Connexion' : 'Créer un compte' }}
         </h2>
-        <p class="text-sm text-muted-foreground mb-6">
-          {{ isLogin ? 'Accédez à votre espace marché' : 'Rejoignez la plateforme digitale' }}
-        </p>
+       
 
         <form @submit="handleSubmit" class="space-y-4">
           <div v-if="!isLogin" class="space-y-1.5">

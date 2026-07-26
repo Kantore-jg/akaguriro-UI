@@ -24,6 +24,7 @@ import {
   Circle,
   Printer,
   ShoppingCart,
+  Settings,
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
@@ -139,6 +140,15 @@ const navigation = computed(() => {
       name: 'Rapports',
       icon: Printer,
       path: '/admin/reports',
+    });
+  }
+
+  if (isSuperAdmin.value) {
+    items.push({
+      id: 'settings',
+      name: 'Paramètres',
+      icon: Settings,
+      path: '/admin/settings',
     });
   }
 

@@ -98,6 +98,12 @@ const routes = [
         component: () => import('../app/components/pages/admin/ReportsPage.vue'),
         meta: { title: 'Rapports', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'] },
       },
+      {
+        path: 'settings',
+        name: 'AdminSettings',
+        component: () => import('../app/components/pages/admin/SettingsPage.vue'),
+        meta: { title: 'Paramètres', roles: ['SUPER_ADMIN'] },
+      },
     ],
   },
   {
