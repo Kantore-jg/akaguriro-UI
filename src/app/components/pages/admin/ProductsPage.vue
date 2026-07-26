@@ -1,13 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Plus, Search, LayoutGrid, Printer } from 'lucide-vue-next';
+import { Plus, Search, Printer } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import Button from '../../ui/Button.vue';
+import Badge from '../../ui/Badge.vue';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
-import ProductCard from '../../products/ProductCard.vue';
+import ProductsTable from '../../products/ProductsTable.vue';
 import ProductFormDialog from '../../products/ProductFormDialog.vue';
 import Input from '../../ui/Input.vue';
 import {
@@ -61,6 +62,12 @@ const categoryCards = computed(() =>
       ).length,
     })),
 );
+
+const getMerchantName = (merchantId) =>
+  scopedMerchants.value.find((m) => String(m.id) === String(merchantId))?.name || '—';
+
+const getMarketCity = (marketId) =>
+  scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.city || '—';
 
 const filteredProducts = computed(() =>
   scopedProducts.value.filter((p) => {
@@ -140,6 +147,7 @@ const confirmDelete = async () => {
 const clearFilters = () => {
   searchQuery.value = '';
   categoryFilter.value = 'all';
+  merchantFilter.value = 'all';
 };
 
 const filterByCategory = (name) => {
@@ -164,28 +172,6 @@ const filterByCategory = (name) => {
         </Button>
       </template>
     </PageHeader>
-
-    <section v-if="categoryCards.length" class="space-y-3">
-      <h2 class="text-sm font-semibold text-foreground">Catégories</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        <button
-          v-for="cat in categoryCards"
-          :key="cat.id"
-          type="button"
-          class="bs-card-hover p-4 text-left transition-colors"
-          :class="categoryFilter === cat.name ? 'ring-2 ring-primary/30 border-primary/30' : ''"
-          @click="filterByCategory(cat.name)"
-        >
-          <div class="flex items-start justify-between gap-2">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <LayoutGrid class="w-4 h-4" />
-            </div>
-          </div>
-          <h3 class="font-semibold text-sm mt-3">{{ cat.name }}</h3>
-          <p class="text-xs text-muted-foreground mt-0.5">{{ cat.count }} produit(s)</p>
-        </button>
-      </div>
-    </section>
 
     <FilterBar :show-clear="searchQuery || categoryFilter !== 'all'" @clear="clearFilters">
       <div class="flex-1 space-y-1 w-full">
@@ -229,11 +215,11 @@ const filterByCategory = (name) => {
       Aucun produit dans le catalogue.
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-      <ProductCard
-        v-for="product in filteredProducts"
-        :key="product.id"
-        :product="product"
+    <div v-else class="space-y-3">
+      <ProductsTable
+        :products="filteredProducts"
+        :get-merchant-name="getMerchantName"
+        :get-market-city="getMarketCity"
         @edit="openEdit"
         @delete="openDelete"
         @toggle-availability="handleToggleAvailability"

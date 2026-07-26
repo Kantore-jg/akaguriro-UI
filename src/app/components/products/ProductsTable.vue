@@ -2,6 +2,7 @@
 import { Pencil, Trash2, MoreHorizontal } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
+import Switch from '../ui/Switch.vue';
 import {
   Table,
   TableBody,
@@ -24,7 +25,7 @@ defineProps({
   getMarketCity: { type: Function, required: true },
 });
 
-const emit = defineEmits(['edit', 'delete']);
+const emit = defineEmits(['edit', 'delete', 'toggle-availability']);
 
 const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
 </script>
@@ -38,13 +39,14 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
           <TableHead>Catégorie</TableHead>
           <TableHead>Prix</TableHead>
           <TableHead>Stock</TableHead>
+          <TableHead>Statut</TableHead>
           <TableHead>Vendeur</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-if="!products.length">
-          <TableCell colspan="6" class="text-center py-8 text-muted-foreground">
+          <TableCell colspan="7" class="text-center py-8 text-muted-foreground">
             Aucun produit dans le catalogue.
           </TableCell>
         </TableRow>
@@ -80,6 +82,17 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
             <span :class="product.stock <= 5 ? 'text-destructive font-medium' : ''">
               {{ product.stock }}
             </span>
+          </TableCell>
+          <TableCell>
+            <div class="flex items-center gap-2">
+              <Switch
+                :checked="product.available !== false"
+                @update:checked="emit('toggle-availability', product)"
+              />
+              <Badge :variant="product.available === false ? 'secondary' : 'default'">
+                {{ product.available === false ? 'Indisponible' : 'Disponible' }}
+              </Badge>
+            </div>
           </TableCell>
           <TableCell class="text-sm">
             <p>{{ getMerchantName(product.merchantId) }}</p>
