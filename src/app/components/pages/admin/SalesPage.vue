@@ -94,6 +94,10 @@ const salesTotal = computed(() =>
   filteredSales.value.reduce((sum, s) => sum + s.total, 0),
 );
 
+const creditTotal = computed(() =>
+  filteredSales.value.reduce((sum, s) => sum + (s.remainingAmount || 0), 0),
+);
+
 const cashTotal = computed(() =>
   filteredSales.value
     .filter((s) => s.paymentType === 'cash')
@@ -109,7 +113,7 @@ const electronicTotal = computed(() =>
 const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
 
 const paymentLabel = (type) =>
-  type === 'cash' ? 'Espèces' : type === 'electronic' ? 'Électronique' : type;
+  type === 'cash' ? 'Espèces' : type === 'electronic' ? 'Électronique' : type === 'credit' ? 'Crédit' : type;
 
 const getCartQty = (productId) =>
   cart.value.find((item) => item.id === productId)?.quantity || 0;
@@ -323,7 +327,7 @@ const pageTitle = computed(() =>
 
     <!-- Sales history -->
     <div v-if="!isMerchant || activeTab === 'history'" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <StatCard title="Ventes" :value="filteredSales.length" :icon="Receipt" color="primary" />
         <StatCard
           title="Chiffre d'affaires"
@@ -340,6 +344,12 @@ const pageTitle = computed(() =>
         <StatCard
           title="Électronique"
           :value="`${formatPrice(electronicTotal)} FBU`"
+          :icon="CreditCard"
+          color="secondary"
+        />
+        <StatCard
+          title="Crédit dû"
+          :value="`${formatPrice(creditTotal)} FBU`"
           :icon="CreditCard"
           color="secondary"
         />
@@ -380,6 +390,7 @@ const pageTitle = computed(() =>
               <SelectItem value="all">Tous modes</SelectItem>
               <SelectItem value="cash">Espèces</SelectItem>
               <SelectItem value="electronic">Électronique</SelectItem>
+              <SelectItem value="credit">Crédit</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -425,6 +436,12 @@ const pageTitle = computed(() =>
                 <TableCell>{{ sale.createdAt }}</TableCell>
                 <TableCell>
                   <Badge variant="secondary">{{ paymentLabel(sale.paymentType) }}</Badge>
+                  <p v-if="sale.paymentType === 'credit'" class="mt-1 text-xs text-muted-foreground">
+                    Payé: {{ formatPrice(sale.paidAmount) }} FBU
+                    <span v-if="sale.remainingAmount > 0">
+                      · Reste: {{ formatPrice(sale.remainingAmount) }} FBU
+                    </span>
+                  </p>
                 </TableCell>
                 <TableCell class="text-right font-medium">
                   {{ formatPrice(sale.total) }} FBU

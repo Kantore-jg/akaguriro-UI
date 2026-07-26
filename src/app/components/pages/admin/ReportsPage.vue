@@ -180,8 +180,17 @@ const salesRows = computed(() =>
     market: sale.marketName || findMarket(sale.marketId)?.name || '—',
     merchant: sale.merchantName || '—',
     client: sale.clientName || '—',
-    payment: sale.paymentType === 'cash' ? 'Espèces' : 'Électronique',
+    payment:
+      sale.paymentType === 'cash'
+        ? 'Espèces'
+        : sale.paymentType === 'electronic'
+          ? 'Électronique'
+          : sale.paymentType === 'credit'
+            ? 'Crédit'
+            : sale.paymentType || '—',
     subtotal: formatNumber(sale.subtotal),
+    paidAmount: formatNumber(sale.paidAmount || 0),
+    remainingAmount: formatNumber(sale.remainingAmount || 0),
     total: formatNumber(sale.total),
     itemsCount: sale.items?.length || 0,
     place: sale.placeNumber || '—',
@@ -302,6 +311,8 @@ const reportSections = computed(() => [
       { key: 'client', label: 'Client' },
       { key: 'payment', label: 'Paiement' },
       { key: 'subtotal', label: 'Sous-total' },
+      { key: 'paidAmount', label: 'Payé' },
+      { key: 'remainingAmount', label: 'Reste' },
       { key: 'total', label: 'Total' },
       { key: 'itemsCount', label: 'Articles' },
       { key: 'place', label: 'Étal' },

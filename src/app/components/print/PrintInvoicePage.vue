@@ -23,8 +23,17 @@ const formatPrice = (n) => Number(n || 0).toLocaleString('fr-FR');
 
 const paymentLabel = computed(() => {
   if (!sale.value) return '';
-  return sale.value.paymentType === 'cash' ? 'Espèces (Cash)' : 'Électronique';
+  if (sale.value.paymentType === 'cash') return 'Espèces (Cash)';
+  if (sale.value.paymentType === 'electronic') return 'Électronique';
+  if (sale.value.paymentType === 'credit') return 'Crédit';
+  return sale.value.paymentType;
 });
+
+const paidAmount = computed(() => Number(sale.value?.paidAmount ?? sale.value?.total ?? 0));
+
+const remainingAmount = computed(() =>
+  Number(sale.value?.remainingAmount ?? Math.max(Number(sale.value?.total ?? 0) - paidAmount.value, 0)),
+);
 
 const saleDate = computed(() => {
   if (!sale.value?.createdAtFull) return '';
@@ -74,6 +83,9 @@ const printedAt = computed(() =>
           <span><strong>Date :</strong> {{ saleDate }}</span>
           <span><strong>Marché :</strong> {{ sale.marketName }}</span>
           <span v-if="sale.placeNumber"><strong>Place :</strong> {{ sale.placeNumber }}</span>
+          <span><strong>Paiement :</strong> {{ paymentLabel }}</span>
+          <span><strong>Payé :</strong> {{ formatPrice(paidAmount) }} FBU</span>
+          <span v-if="remainingAmount > 0"><strong>Reste :</strong> {{ formatPrice(remainingAmount) }} FBU</span>
         </div>
         <div>
           <p class="font-semibold">Client : {{ sale.clientName }}</p>

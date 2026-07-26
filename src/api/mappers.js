@@ -189,6 +189,10 @@ export function mapSaleItem(item) {
 }
 
 export function mapSale(s) {
+  const paidAmount = Number(s.paid_amount ?? s.total ?? 0);
+  const total = Number(s.total ?? 0);
+  const remainingAmount = Number(s.remaining_amount ?? Math.max(total - paidAmount, 0));
+
   return {
     id: s.id,
     invoiceNumber: s.invoice_number,
@@ -205,7 +209,9 @@ export function mapSale(s) {
     clientEmail: s.client_email || '',
     paymentType: s.payment_type,
     subtotal: Number(s.subtotal),
-    total: Number(s.total),
+    total,
+    paidAmount,
+    remainingAmount,
     notes: s.notes || '',
     items: (s.items || []).map(mapSaleItem),
     createdAt: s.created_at?.split('T')[0] || '',
@@ -221,6 +227,7 @@ export function saleToApi(data) {
     client_phone: data.clientPhone || null,
     client_email: data.clientEmail || null,
     payment_type: data.paymentType,
+    paid_amount: data.paidAmount ?? data.paid_amount ?? 0,
     notes: data.notes || null,
     items: (data.items || []).map((item) => ({
       product_id: item.productId,
