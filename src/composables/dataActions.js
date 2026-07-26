@@ -1,4 +1,5 @@
 import { getErrorMessage } from '../api/client.js';
+import { placeToApi } from '../api/mappers.js';
 import {
   fetchProductCategories,
   fetchAllProductCategories,
@@ -389,7 +390,7 @@ export function createDataActions(state) {
       return null;
     }
     try {
-      const updated = await updatePlaceApi(place.placeId, place);
+      const updated = await updatePlaceApi(place.placeId, placeToApi(place));
       state.places.value = state.places.value.map((p) =>
         p.placeId === place.placeId || (p.id === place.id && p.marketId === place.marketId)
           ? updated
