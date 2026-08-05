@@ -5,6 +5,7 @@ import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import StatCard from '../../StatCard.vue';
+import AdminExcelActions from '../../admin/AdminExcelActions.vue';
 import PlacesTable from '../../places/PlacesTable.vue';
 import BlocksTable from '../../places/BlocksTable.vue';
 import PlaceAssignDialog from '../../places/PlaceAssignDialog.vue';
@@ -227,9 +228,11 @@ const onCreateBlockFromPlace = (marketId) => {
   <div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        
+        <h1 class="bs-page-title">Gestion des emplacements</h1>
+        <p class="bs-page-subtitle">Suivi des étals, blocs, statuts et affectations</p>
       </div>
       <div class="flex flex-wrap gap-2">
+        <AdminExcelActions />
         <Button variant="outline" class="rounded-full" @click="handlePrint">
           <Printer class="w-4 h-4 mr-2" />
           Imprimer le plan

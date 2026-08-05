@@ -18,6 +18,7 @@ import PaymentDonutChart from '../../dashboard/PaymentDonutChart.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import Badge from '../../ui/Badge.vue';
 import Button from '../../ui/Button.vue';
+import ExcelTransferCard from '../../../../components/ExcelTransferCard.vue';
 
 const router = useRouter();
 const {
@@ -200,6 +201,8 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         </CardContent>
       </Card>
     </div>
+
+    <ExcelTransferCard v-if="isSuperAdmin || isMarketAdmin" />
 
     <Card v-if="isSuperAdmin || isMarketAdmin" class="bs-card border shadow-sm">
       <CardHeader>

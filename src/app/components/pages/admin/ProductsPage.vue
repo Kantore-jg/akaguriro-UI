@@ -6,6 +6,7 @@ import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import Button from '../../ui/Button.vue';
 import PageHeader from '../../layout/PageHeader.vue';
+import AdminExcelActions from '../../admin/AdminExcelActions.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import ProductsTable from '../../products/ProductsTable.vue';
 import ProductFormDialog from '../../products/ProductFormDialog.vue';
@@ -150,9 +151,8 @@ const clearFilters = () => {
       :action-icon="Plus"
       @action="openCreate"
     >
-    <!-- subtitle="Configuration et contrôle des éléments de votre marché." -->
-
       <template #actions>
+        <AdminExcelActions />
         <Button variant="outline" class="rounded-full" @click="handlePrint">
           <Printer class="w-4 h-4" />
           {{ isMerchant ? 'Imprimer mon catalogue' : 'Imprimer le catalogue' }}

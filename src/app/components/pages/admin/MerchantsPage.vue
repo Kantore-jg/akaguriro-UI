@@ -7,6 +7,7 @@ import { usePrintReport } from '../../../../composables/usePrintReport.js';
 import { getAdministrativeLocationLabel } from '../../../../utils/burundiLocations.js';
 import Button from '../../ui/Button.vue';
 import PageHeader from '../../layout/PageHeader.vue';
+import AdminExcelActions from '../../admin/AdminExcelActions.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import MerchantsTable from '../../merchants/MerchantsTable.vue';
@@ -90,9 +91,19 @@ const viewingProductsCount = computed(() => {
 
 <template>
   <div class="space-y-6">
-    
-
-    
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="bs-page-title">Gestion des commerçants</h1>
+        <p class="bs-page-subtitle">Suivi des profils, affectations et activité</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <AdminExcelActions />
+        <Button variant="outline" class="rounded-full" @click="handlePrint">
+          <Printer class="w-4 h-4 mr-2" />
+          Imprimer les commerçants
+        </Button>
+      </div>
+    </div>
 
     <FilterBar
       :show-clear="searchQuery || marketFilter !== 'all' || categoryFilter !== 'all'"

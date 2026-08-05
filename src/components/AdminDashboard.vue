@@ -10,6 +10,7 @@ import { useApp } from '../composables/useApp.js';
 import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import { sameId } from '../utils/ids.js';
 import { PLACE_STATUS, placeStatusLabel } from '../utils/placeStatus.js';
+import ExcelTransferCard from './ExcelTransferCard.vue';
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -590,6 +591,8 @@ function getMerchantById(id) {
           </div>
 
         </div>
+
+        <ExcelTransferCard v-if="isSuperAdmin || isMarketAdmin" />
 
         <!-- DYNAMIC CONTENT WIDGETS COLUMN -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">

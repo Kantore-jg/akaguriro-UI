@@ -10,6 +10,7 @@ import {
 } from '../../../../api/services/data.js';
 import { getErrorMessage } from '../../../../api/client.js';
 import PageHeader from '../../layout/PageHeader.vue';
+import AdminExcelActions from '../../admin/AdminExcelActions.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
 import CategoriesTable from '../../categories/CategoriesTable.vue';
@@ -118,9 +119,11 @@ const confirmDelete = async () => {
       action-label="Ajouter une catégorie"
       :action-icon="Plus"
       @action="openCreate"
-    />
-
-    
+    >
+      <template #actions>
+        <AdminExcelActions />
+      </template>
+    </PageHeader>
 
     <FilterBar :show-clear="Boolean(searchQuery)" @clear="searchQuery = ''">
       <div class="flex-1 space-y-1 w-full">
