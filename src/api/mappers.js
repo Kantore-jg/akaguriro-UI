@@ -2,16 +2,22 @@ import { resolveStorageUrl } from './client.js';
 
 const PLACE_STATUS_TO_UI = {
   available: 'libre',
+  libre: 'libre',
   occupied: 'occupée',
+  occupée: 'occupée',
   maintenance: 'maintenance',
   reserved: 'réservée',
+  réservée: 'réservée',
 };
 
 const PLACE_STATUS_TO_API = {
   libre: 'available',
+  available: 'available',
   occupée: 'occupied',
+  occupied: 'occupied',
   maintenance: 'maintenance',
   réservée: 'reserved',
+  reserved: 'reserved',
 };
 
 const REQUEST_STATUS_TO_UI = {
