@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { placeStatusBadgeVariant, placeStatusLabel } from '../../../utils/placeStatus.js';
 
 defineProps({
   places: { type: Array, required: true },
@@ -25,16 +26,8 @@ defineProps({
 
 const emit = defineEmits(['assign', 'edit', 'delete']);
 
-const statusVariant = (status) => {
-  if (status === 'occupée') return 'default';
-  if (status === 'libre') return 'secondary';
-  return 'outline';
-};
-
-const statusLabel = (status) => {
-  const map = { occupée: 'Occupée', libre: 'Libre', maintenance: 'Maintenance' };
-  return map[status] || status;
-};
+const statusVariant = placeStatusBadgeVariant;
+const statusLabel = placeStatusLabel;
 </script>
 
 <template>

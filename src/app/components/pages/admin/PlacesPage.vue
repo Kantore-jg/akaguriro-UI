@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../../ui/alert-dialog';
+import { PLACE_STATUS } from '../../../../utils/placeStatus.js';
 
 const {
   blocks,
@@ -123,13 +124,13 @@ const filteredBlocks = computed(() =>
 );
 
 const occupiedCount = computed(() =>
-  scopedPlaces.value.filter((p) => p.status === 'occupée').length,
+  scopedPlaces.value.filter((p) => p.status === PLACE_STATUS.OCCUPIED).length,
 );
 const freeCount = computed(() =>
-  scopedPlaces.value.filter((p) => p.status === 'libre').length,
+  scopedPlaces.value.filter((p) => p.status === PLACE_STATUS.AVAILABLE).length,
 );
 const maintenanceCount = computed(() =>
-  scopedPlaces.value.filter((p) => p.status === 'maintenance').length,
+  scopedPlaces.value.filter((p) => p.status === PLACE_STATUS.MAINTENANCE).length,
 );
 
 const getMarketName = (id) => findMarket(id)?.name || '—';
@@ -299,9 +300,9 @@ const onCreateBlockFromPlace = (marketId) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous statuts</SelectItem>
-              <SelectItem value="libre">Libre</SelectItem>
-              <SelectItem value="occupée">Occupée</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
+              <SelectItem :value="PLACE_STATUS.AVAILABLE">Libre</SelectItem>
+              <SelectItem :value="PLACE_STATUS.OCCUPIED">Occupée</SelectItem>
+              <SelectItem :value="PLACE_STATUS.MAINTENANCE">Maintenance</SelectItem>
             </SelectContent>
           </Select>
         </div>

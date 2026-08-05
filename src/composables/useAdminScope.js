@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { useApp } from './useApp.js';
+import { PLACE_STATUS } from '../utils/placeStatus.js';
 
 export function useAdminScope() {
   const {
@@ -120,7 +121,7 @@ export function useAdminScope() {
   const scopedTotalPlaces = computed(() => scopedPlaces.value.length);
 
   const scopedOccupiedPlaces = computed(() =>
-    scopedPlaces.value.filter((p) => p.status === 'occupée').length,
+    scopedPlaces.value.filter((p) => p.status === PLACE_STATUS.OCCUPIED).length,
   );
 
   const scopedFreePlaces = computed(
@@ -135,7 +136,7 @@ export function useAdminScope() {
   const scopedMarketOccupation = computed(() =>
     scopedMarkets.value.map((market) => {
       const marketPlaces = scopedPlaces.value.filter((p) => p.marketId == market.id);
-      const occupied = marketPlaces.filter((p) => p.status === 'occupée').length;
+      const occupied = marketPlaces.filter((p) => p.status === PLACE_STATUS.OCCUPIED).length;
       const total = marketPlaces.length || market.totalPlaces || 0;
       return {
         id: market.id,

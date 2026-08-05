@@ -5,6 +5,12 @@ import { useApp } from '../../../composables/useApp.js';
 import { useAdminScope } from '../../../composables/useAdminScope.js';
 import PrintLayout from './PrintLayout.vue';
 import { getAdministrativeLocationLabel } from '../../../utils/burundiLocations.js';
+import {
+  PLACE_STATUS,
+  isPlaceAvailable,
+  isPlaceOccupied,
+  placeStatusLabel,
+} from '../../../utils/placeStatus.js';
 
 const route = useRoute();
 const { currentUser } = useApp();
@@ -33,10 +39,10 @@ const places = computed(() => {
 });
 
 const occupiedCount = computed(() =>
-  places.value.filter((p) => p.status === 'occupée').length,
+  places.value.filter((p) => p.status === PLACE_STATUS.OCCUPIED).length,
 );
 const freeCount = computed(() =>
-  places.value.filter((p) => p.status === 'libre').length,
+  places.value.filter((p) => p.status === PLACE_STATUS.AVAILABLE).length,
 );
 
 const printedAt = computed(() =>
@@ -50,14 +56,13 @@ const printedAt = computed(() =>
 );
 
 const statusBadgeClass = (status) => {
-  if (status === 'occupée') return 'badge-print badge-print--success';
-  if (status === 'libre') return 'badge-print badge-print--muted';
+  if (isPlaceOccupied(status)) return 'badge-print badge-print--success';
+  if (isPlaceAvailable(status)) return 'badge-print badge-print--muted';
   return 'badge-print badge-print--warning';
 };
 
 const statusLabel = (status) => {
-  const map = { occupée: 'Occupée', libre: 'Libre', maintenance: 'Maintenance' };
-  return map[status] || status;
+  return placeStatusLabel(status);
 };
 
 onMounted(() => {

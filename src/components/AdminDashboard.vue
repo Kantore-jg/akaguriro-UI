@@ -9,6 +9,7 @@ import { useRouter } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import { sameId } from '../utils/ids.js';
+import { PLACE_STATUS, placeStatusLabel } from '../utils/placeStatus.js';
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -150,7 +151,7 @@ const approvedReceiptsTotal = computed(() =>
     .reduce((sum, r) => sum + r.amount, 0)
 );
 const vacantPlacesCount = computed(() =>
-  filteredPlaces.value.filter((p) => p.status === 'libre').length
+  filteredPlaces.value.filter((p) => p.status === PLACE_STATUS.AVAILABLE).length
 );
 const marketAdminPlacesCount = computed(() =>
   places.value.filter((p) => p.marketId === assignedMarketId.value).length
@@ -267,9 +268,14 @@ async function handleReceiptSubmit(e) {
 function handleAssignSubmit(e) {
   e.preventDefault();
   if (assignMerchantId.value === 'all_free') {
-    updatePlaceStatus(assignPlaceId.value, assignMarketId.value, 'libre');
+    updatePlaceStatus(assignPlaceId.value, assignMarketId.value, PLACE_STATUS.AVAILABLE);
   } else {
-    updatePlaceStatus(assignPlaceId.value, assignMarketId.value, 'occupée', assignMerchantId.value);
+    updatePlaceStatus(
+      assignPlaceId.value,
+      assignMarketId.value,
+      PLACE_STATUS.OCCUPIED,
+      assignMerchantId.value,
+    );
   }
   assignModalOpen.value = false;
 }
@@ -713,12 +719,12 @@ function getMerchantById(id) {
                   <span
                     :class="[
                       'px-2.5 py-0.5 rounded-full text-[9px] font-bold',
-                      p.status === 'occupée' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                      p.status === 'libre' ? 'bg-slate-100 text-slate-600 border border-slate-200' :
+                      p.status === PLACE_STATUS.OCCUPIED ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                      p.status === PLACE_STATUS.AVAILABLE ? 'bg-slate-100 text-slate-600 border border-slate-200' :
                       'bg-amber-50 text-amber-700 border border-amber-100',
                     ]"
                   >
-                    {{ p.status.toUpperCase() }}
+                    {{ placeStatusLabel(p.status) }}
                   </span>
                 </td>
                 <td class="py-3.5 px-4">

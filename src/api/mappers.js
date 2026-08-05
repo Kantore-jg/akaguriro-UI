@@ -1,24 +1,5 @@
 import { resolveStorageUrl } from './client.js';
-
-const PLACE_STATUS_TO_UI = {
-  available: 'libre',
-  libre: 'libre',
-  occupied: 'occupée',
-  occupée: 'occupée',
-  maintenance: 'maintenance',
-  reserved: 'réservée',
-  réservée: 'réservée',
-};
-
-const PLACE_STATUS_TO_API = {
-  libre: 'available',
-  available: 'available',
-  occupée: 'occupied',
-  occupied: 'occupied',
-  maintenance: 'maintenance',
-  réservée: 'reserved',
-  reserved: 'reserved',
-};
+import { normalizePlaceStatus, placeStatusToApi } from '../utils/placeStatus.js';
 
 const REQUEST_STATUS_TO_UI = {
   pending: 'pending',
@@ -93,7 +74,7 @@ export function mapBlock(b) {
 }
 
 export function mapPlace(p) {
-  const status = PLACE_STATUS_TO_UI[p.status] || p.status;
+  const status = normalizePlaceStatus(p.status);
   const categoryNames = p.category
     ? p.category.split(',').map((name) => name.trim()).filter(Boolean)
     : [];
@@ -340,7 +321,7 @@ export function placeToApi(data) {
     market_id: data.marketId,
     market_block_id: data.blockId || null,
     number: data.id || data.number,
-    status: PLACE_STATUS_TO_API[data.status] || data.status || 'available',
+    status: placeStatusToApi(data.status),
     product_category_ids: data.productCategoryIds || [],
   };
 }

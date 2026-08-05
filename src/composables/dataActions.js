@@ -1,5 +1,6 @@
 import { getErrorMessage } from '../api/client.js';
 import { placeToApi } from '../api/mappers.js';
+import { PLACE_STATUS } from '../utils/placeStatus.js';
 import {
   fetchProductCategories,
   fetchAllProductCategories,
@@ -495,7 +496,7 @@ export function createDataActions(state) {
         status,
         productCategoryIds: place.categoryIds || [],
       }));
-      if (merchantId && status === 'occupée') {
+      if (merchantId && status === PLACE_STATUS.OCCUPIED) {
         await assignPlaceChief(place.placeId, merchantId);
       }
       if (refreshPublicData) {

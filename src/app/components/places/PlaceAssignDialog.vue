@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { MapPin } from 'lucide-vue-next';
 import Button from '../ui/Button.vue';
 import Label from '../ui/Label.vue';
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { PLACE_STATUS, normalizePlaceStatus } from '../../../utils/placeStatus.js';
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -30,14 +31,14 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'submit']);
 
 const merchantId = ref('all_free');
-const status = ref('libre');
+const status = ref(PLACE_STATUS.AVAILABLE);
 
 watch(
   () => props.open,
   (isOpen) => {
     if (!isOpen || !props.place) return;
     merchantId.value = props.place.merchantId || 'all_free';
-    status.value = props.place.status || 'libre';
+    status.value = normalizePlaceStatus(props.place.status);
   },
 );
 
@@ -50,10 +51,12 @@ const handleSubmit = () => {
   let finalMerchantId = merchantId.value;
 
   if (merchantId.value === 'all_free') {
-    finalStatus = 'libre';
+    finalStatus = PLACE_STATUS.AVAILABLE;
     finalMerchantId = undefined;
   } else if (merchantId.value !== 'all_free') {
-    finalStatus = status.value === 'maintenance' ? 'maintenance' : 'occupée';
+    finalStatus = status.value === PLACE_STATUS.MAINTENANCE
+      ? PLACE_STATUS.MAINTENANCE
+      : PLACE_STATUS.OCCUPIED;
   }
 
   emit('submit', {
@@ -107,9 +110,9 @@ const handleSubmit = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="libre">Libre</SelectItem>
-              <SelectItem value="occupée">Occupée</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
+              <SelectItem :value="PLACE_STATUS.AVAILABLE">Libre</SelectItem>
+              <SelectItem :value="PLACE_STATUS.OCCUPIED">Occupée</SelectItem>
+              <SelectItem :value="PLACE_STATUS.MAINTENANCE">Maintenance</SelectItem>
             </SelectContent>
           </Select>
         </div>

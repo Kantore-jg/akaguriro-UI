@@ -11,6 +11,12 @@ import { categoriesForMarket, placeHasCategory } from '../utils/categories.js';
 import { getAdministrativeLocationLabel } from '../utils/burundiLocations.js';
 import { sameId } from '../utils/ids.js';
 import {
+  PLACE_STATUS,
+  isPlaceAvailable,
+  isPlaceOccupied,
+  placeStatusLabel,
+} from '../utils/placeStatus.js';
+import {
   MapPin,
   Store,
   ShieldCheck,
@@ -88,16 +94,14 @@ function handlePlaceClick(place) {
 }
 
 function currentStallAvailabilityColor(status) {
-  switch (status) {
-    case 'occupée': return 'bg-primary border-emerald-700 text-white';
-    case 'libre': return 'bg-white border-dashed border-slate-300 text-slate-400 hover:bg-primary/5 hover:border-primary/30';
-    case 'maintenance': return 'bg-amber-100 border-amber-300 text-amber-700';
-    default: return 'bg-slate-100 border-slate-200';
-  }
+  if (isPlaceOccupied(status)) return 'bg-primary border-emerald-700 text-white';
+  if (isPlaceAvailable(status)) return 'bg-white border-dashed border-slate-300 text-slate-400 hover:bg-primary/5 hover:border-primary/30';
+  if (status === PLACE_STATUS.MAINTENANCE) return 'bg-amber-100 border-amber-300 text-amber-700';
+  return 'bg-slate-100 border-slate-200';
 }
 
 function getStallOccupantName(p) {
-  if (p.status !== 'occupée') return p.status.toUpperCase();
+  if (!isPlaceOccupied(p.status)) return placeStatusLabel(p.status).toUpperCase();
   const vendor = merchants.value.find((m) => sameId(m.id, p.merchantId));
   return vendor ? vendor.name : 'Occupé';
 }
@@ -241,7 +245,7 @@ function getVendor(merchantId) {
                 {{ block }}
               </h4>
               <span class="text-[10px] font-bold text-slate-400">
-                {{ getBlockPlaces(block).filter(p => p.status === 'libre').length }} places vacantes
+                {{ getBlockPlaces(block).filter(p => p.status === PLACE_STATUS.AVAILABLE).length }} places vacantes
               </span>
             </div>
 
@@ -253,7 +257,7 @@ function getVendor(merchantId) {
                 class="cursor-pointer rounded-xl border p-2.5 transition-all flex flex-col justify-between h-20 shadow-sm relative group select-none"
                 :class="[
                   currentStallAvailabilityColor(pl.status),
-                  (mapCategoryHighlight !== 'all' && placeHasCategory(pl, mapCategoryHighlight) && pl.status === 'occupée')
+                  (mapCategoryHighlight !== 'all' && placeHasCategory(pl, mapCategoryHighlight) && pl.status === PLACE_STATUS.OCCUPIED)
                     ? 'ring-2 ring-emerald-500 ring-offset-2 scale-102 border-emerald-500 bg-emerald-50/25 animate-pulseGlow'
                     : ''
                 ]"
@@ -262,7 +266,7 @@ function getVendor(merchantId) {
                   <span class="text-xs font-extrabold tracking-tight">
                     {{ pl.id }}
                   </span>
-                  <span v-if="pl.status === 'occupée'" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping"></span>
+                  <span v-if="pl.status === PLACE_STATUS.OCCUPIED" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping"></span>
                 </div>
 
                 <div class="mt-1">
@@ -270,7 +274,7 @@ function getVendor(merchantId) {
                     {{ getStallOccupantName(pl).split(' ')[0] }}
                   </p>
                   <p class="text-[9px] text-slate-400 dark:text-slate-300 font-semibold truncate leading-none mt-1">
-                    {{ pl.categories?.length ? pl.categories.join(', ') : (pl.status === 'libre' ? 'Vacant' : '—') }}
+                    {{ pl.categories?.length ? pl.categories.join(', ') : (pl.status === PLACE_STATUS.AVAILABLE ? 'Vacant' : '—') }}
                   </p>
                 </div>
               </div>
@@ -298,7 +302,7 @@ function getVendor(merchantId) {
                 </button>
               </div>
 
-              <div v-if="selectedPlace.status === 'libre'" class="space-y-4 py-3">
+              <div v-if="selectedPlace.status === PLACE_STATUS.AVAILABLE" class="space-y-4 py-3">
                 <div class="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-bold text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20">
                    Emplacement Libre
                 </div>
@@ -317,7 +321,7 @@ function getVendor(merchantId) {
                 </button>
               </div>
 
-              <div v-else-if="selectedPlace.status === 'maintenance'" class="space-y-4 py-3">
+              <div v-else-if="selectedPlace.status === PLACE_STATUS.MAINTENANCE" class="space-y-4 py-3">
                 <div class="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 font-bold text-[10px] px-2 py-0.5 rounded-full border border-amber-500/20">
                    En travaux / Réservée
                 </div>
