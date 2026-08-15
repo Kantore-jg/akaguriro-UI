@@ -3,12 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { Plus, Search, UserCog, UserCheck, UserX } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
-import {
-  fetchUsers,
-  createUser,
-  updateUserApi,
-  deleteUserApi,
-} from '../../../../api/services/data.js';
+import { createUser, updateUserApi, deleteUserApi } from '../../../../api/services/data.js';
 import { getErrorMessage } from '../../../../api/client.js';
 import { sameId } from '../../../../utils/ids.js';
 import PageHeader from '../../layout/PageHeader.vue';
@@ -66,8 +61,7 @@ const ROLES = computed(() =>
 async function refreshUsers() {
   loading.value = true;
   try {
-    users.value = await fetchUsers();
-    await loadUsers();
+    users.value = await loadUsers();
   } catch (error) {
     showToast(getErrorMessage(error, 'Erreur de chargement des utilisateurs'), 'error');
   } finally {
@@ -167,8 +161,6 @@ const handleToggleActive = async (user, isActive) => {
       :action-icon="Plus"
       @action="openCreate"
     />
-
-    
 
     <FilterBar
       :show-clear="searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || (isSuperAdmin && marketFilter !== 'all')"

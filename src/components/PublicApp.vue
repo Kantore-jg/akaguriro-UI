@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useApp } from '../composables/useApp.js';
 import { usePublicNavigation } from '../composables/usePublicNavigation.js';
@@ -29,11 +29,19 @@ const {
   productCategories,
   toast,
   initialized,
+  ensurePublicSupplementalData,
 } = useApp();
 
 const { goToProduct, goToTab, goHome } = usePublicNavigation();
 
 const tabFromRoute = computed(() => route.meta.tab || 'home');
+const tabsNeedingSupplementalData = new Set([
+  'home',
+  'markets',
+  'products',
+  'merchants',
+  'request',
+]);
 
 watch(
   () => [route.path, route.params.marketId, route.params.productId, tabFromRoute.value],
@@ -59,6 +67,22 @@ watch(
   },
   { immediate: true },
 );
+
+watch(
+  () => publicTab.value,
+  (tab) => {
+    if (tabsNeedingSupplementalData.has(tab)) {
+      void ensurePublicSupplementalData();
+    }
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  if (tabsNeedingSupplementalData.has(publicTab.value)) {
+    void ensurePublicSupplementalData();
+  }
+});
 </script>
 
 <template>

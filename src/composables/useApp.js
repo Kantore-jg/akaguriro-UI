@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ref, computed, watch, provide, inject, onMounted } from 'vue';
+import { ref, watch, provide, inject, onMounted, onUnmounted } from 'vue';
 import { getStoredUser, saveUser, fetchProfile } from '../api/services/auth.js';
 import { getErrorMessage } from '../api/client.js';
 import { createSessionActions, GUEST_USER } from './sessionActions.js';
@@ -26,6 +26,7 @@ export function createAppState() {
   const loading = ref(false);
   const usersLoading = ref(false);
   const initialized = ref(false);
+  const publicSupplementalLoaded = ref(false);
 
   const viewState = ref('PUBLIC');
   const selectedMarketId = ref(null);
@@ -40,6 +41,21 @@ export function createAppState() {
 
   const clearToast = () => {
     toast.value = null;
+  };
+
+  const resetSessionState = () => {
+    currentUser.value = GUEST_USER;
+    requests.value = [];
+    receipts.value = [];
+    sales.value = [];
+    users.value = [];
+    usersLoading.value = false;
+    selectedMarketId.value = null;
+    selectedProductId.value = null;
+    publicTab.value = 'home';
+    adminActiveTab.value = 'dashboard';
+    publicSupplementalLoaded.value = false;
+    saveUser(null);
   };
 
   watch(toast, (newToast) => {
@@ -71,10 +87,6 @@ export function createAppState() {
       try {
         await dataActions.loadPublicCoreData();
         initialized.value = true;
-
-        void dataActions.loadPublicSupplementalData().catch((error) => {
-          showToast(getErrorMessage(error, 'Erreur de chargement des données complémentaires'), 'error');
-        });
         if (currentUser.value?.id) {
           void dataActions.loadAuthenticatedData().catch((error) => {
             showToast(getErrorMessage(error, 'Erreur de chargement des données utilisateur'), 'error');
@@ -93,6 +105,29 @@ export function createAppState() {
     })();
 
     return refreshPromise;
+  };
+
+  let supplementalPromise = null;
+  const ensurePublicSupplementalData = async () => {
+    if (publicSupplementalLoaded.value) {
+      publicSupplementalLoaded.value = true;
+      return;
+    }
+
+    if (supplementalPromise) return supplementalPromise;
+
+    supplementalPromise = (async () => {
+      try {
+        await dataActions.loadPublicSupplementalData();
+        publicSupplementalLoaded.value = true;
+      } catch (error) {
+        showToast(getErrorMessage(error, 'Erreur de chargement des données complémentaires'), 'error');
+      } finally {
+        supplementalPromise = null;
+      }
+    })();
+
+    return supplementalPromise;
   };
 
   const refreshInBackground = () => {
@@ -115,6 +150,10 @@ export function createAppState() {
     showToast,
   });
 
+  const handleUnauthorized = () => {
+    resetSessionState();
+  };
+
   dataActions.bindRefreshers({
     refreshPublicData: dataActions.loadPublicData,
     refreshAllData: refreshAll,
@@ -135,6 +174,7 @@ export function createAppState() {
     showToast,
     refreshInBackground,
     saveUser,
+    resetSession: resetSessionState,
   });
 
   const {
@@ -172,15 +212,20 @@ export function createAppState() {
 
   onMounted(() => {
     refreshInBackground();
+    window.addEventListener('akaguriro:unauthorized', handleUnauthorized);
     if (getStoredUser()) {
       fetchProfile()
         .then((profile) => {
           currentUser.value = profile;
         })
         .catch(() => {
-          currentUser.value = GUEST_USER;
+          resetSessionState();
         });
     }
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('akaguriro:unauthorized', handleUnauthorized);
   });
 
   return {
@@ -203,6 +248,7 @@ export function createAppState() {
     selectedProductId,
     publicTab,
     adminActiveTab,
+    publicSupplementalLoaded,
     toast,
     login,
     register,
@@ -210,6 +256,7 @@ export function createAppState() {
     updateProfile,
     updatePassword,
     refreshAll,
+    ensurePublicSupplementalData,
     loadUsers,
     loadBlocks,
     setCurrentUser,

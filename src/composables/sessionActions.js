@@ -29,7 +29,19 @@ export function createSessionActions({
   showToast,
   refreshInBackground,
   saveUser,
+  resetSession,
 }) {
+  const resetState = () => {
+    if (typeof resetSession === 'function') {
+      resetSession();
+      return;
+    }
+
+    currentUser.value = GUEST_USER;
+    clearAuthCollections([requests, receipts, sales]);
+    saveUser(null);
+  };
+
   const setCurrentUser = (user) => {
     currentUser.value = user || GUEST_USER;
     saveUser(user?.id ? user : null);
@@ -60,9 +72,7 @@ export function createSessionActions({
     } catch {
       // session may already be invalid
     }
-    currentUser.value = GUEST_USER;
-    clearAuthCollections([requests, receipts, sales]);
-    saveUser(null);
+    resetState();
     showToast('Session déconnectée', 'info');
   };
 

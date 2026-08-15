@@ -86,6 +86,11 @@ export function createDataActions(state) {
     state.places.value = places;
     state.products.value = products;
     state.merchants.value = merchants;
+    return {
+      places,
+      products,
+      merchants,
+    };
   };
 
   const loadPublicData = async () => {
@@ -107,13 +112,15 @@ export function createDataActions(state) {
   const loadUsers = async () => {
     if (!['SUPER_ADMIN', 'ADMIN_MARCHE'].includes(state.currentUser.value?.role)) {
       state.users.value = [];
-      return;
+      return state.users.value;
     }
     state.usersLoading.value = true;
     try {
       state.users.value = await fetchUsers();
+      return state.users.value;
     } catch (error) {
       state.showToast(getErrorMessage(error, 'Erreur de chargement des utilisateurs'), 'error');
+      return state.users.value;
     } finally {
       state.usersLoading.value = false;
     }

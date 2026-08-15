@@ -30,10 +30,8 @@ const route = useRoute();
 const router = useRouter();
 const {
   currentUser,
-  login,
   logout,
   publicTab,
-  showToast,
 } = useApp();
 
 const { goHome, goToTab } = usePublicNavigation();
@@ -55,14 +53,6 @@ const roleLabel = computed(() =>
 );
 
 const mobileMenuOpen = ref(false);
-const roleSwitcherOpen = ref(false);
-
-const DEMO_EMAILS = {
-  SUPER_ADMIN: 'admin@akaguriro.bi',
-  ADMIN_MARCHE: 'admin.bujumbura@akaguriro.bi',
-  COMMERCANT: 'commercant@akaguriro.bi',
-};
-
 const navItems = [
   { id: 'home', label: 'Accueil', path: '/' },
   { id: 'markets', label: 'Marchés', path: '/markets' },
@@ -70,27 +60,6 @@ const navItems = [
   { id: 'price-trends', label: 'Tendances prix', path: '/price-trends' },
   { id: 'merchants', label: 'Commerçants', path: '/merchants' },
 ];
-
-async function handleRoleChange(role) {
-  roleSwitcherOpen.value = false;
-
-  if (role === 'VISITOR') {
-    await logout();
-    router.push('/');
-    goToTab('home');
-    return;
-  }
-
-  const email = DEMO_EMAILS[role];
-  if (!email) return;
-
-  try {
-    await login(email, 'password');
-    router.push('/admin');
-  } catch {
-    showToast('Connexion API impossible — vérifiez que le backend est démarré', 'error');
-  }
-}
 
 function handleLogoClick() {
   goHome();
@@ -124,34 +93,6 @@ async function handleLogout() {
 
 <template>
   <header class="sticky top-0 z-50 w-full bg-card text-foreground shadow-sm border-b border-border">
-    <div
-      v-if="roleSwitcherOpen"
-      class="absolute top-14 right-4 bg-card border border-border rounded-xl shadow-xl p-4 z-50 w-72"
-    >
-      <div class="flex items-center justify-between pb-2 mb-2 border-b border-border">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Simulation de Rôles</h4>
-        <button @click="roleSwitcherOpen = false" class="text-muted-foreground hover:text-foreground">
-          <X class="w-4 h-4" />
-        </button>
-      </div>
-      <div class="space-y-1.5 text-xs">
-        <button
-          v-for="(role, label) in [
-            ['VISITOR', '👤 Visiteur Public'],
-            ['COMMERCANT', '🏪 Commerçant'],
-            ['ADMIN_MARCHE', '🏢 Admin Marché'],
-            ['SUPER_ADMIN', '🔑 Super Admin'],
-          ]"
-          :key="role[0]"
-          @click="handleRoleChange(role[0])"
-          class="w-full py-2 px-3 rounded-lg text-left transition-colors"
-          :class="currentUser.role === role[0] ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'"
-        >
-          {{ role[1] }}
-        </button>
-      </div>
-    </div>
-
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-14">
         <div @click="handleLogoClick" class="flex items-center gap-2.5 cursor-pointer group shrink-0">
@@ -198,7 +139,7 @@ async function handleLogout() {
                   class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 hover:bg-accent transition-colors"
                   :title="currentUser.name"
                 >
-                <span class="hidden sm:inline text-sm font-medium text-foreground max-w-[140px] truncate">
+                  <span class="hidden sm:inline text-sm font-medium text-foreground max-w-[140px] truncate">
                     {{ currentUser.name }}
                   </span>
                   <Avatar class="w-8 h-8">
@@ -211,7 +152,6 @@ async function handleLogout() {
                       {{ userInitials }}
                     </AvatarFallback>
                   </Avatar>
-                  
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-56">

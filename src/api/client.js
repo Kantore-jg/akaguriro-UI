@@ -39,6 +39,9 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem('akaguriro_user');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('akaguriro:unauthorized'));
+      }
     }
     return Promise.reject(error);
   },
