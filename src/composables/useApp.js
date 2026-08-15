@@ -31,6 +31,7 @@ export function createAppState() {
   const viewState = ref('PUBLIC');
   const selectedMarketId = ref(null);
   const selectedProductId = ref(null);
+  const selectedMerchantId = ref(null);
   const publicTab = ref('home');
   const adminActiveTab = ref('dashboard');
   const toast = ref(null);
@@ -52,6 +53,7 @@ export function createAppState() {
     usersLoading.value = false;
     selectedMarketId.value = null;
     selectedProductId.value = null;
+    selectedMerchantId.value = null;
     publicTab.value = 'home';
     adminActiveTab.value = 'dashboard';
     publicSupplementalLoaded.value = false;
@@ -246,6 +248,7 @@ export function createAppState() {
     viewState,
     selectedMarketId,
     selectedProductId,
+    selectedMerchantId,
     publicTab,
     adminActiveTab,
     publicSupplementalLoaded,
@@ -263,6 +266,7 @@ export function createAppState() {
     setViewState,
     setSelectedMarketId: (id) => { selectedMarketId.value = id; },
     setSelectedProductId: (id) => { selectedProductId.value = id; },
+    setSelectedMerchantId: (id) => { selectedMerchantId.value = id; },
     setPublicTab: (tab) => { publicTab.value = tab; },
     setAdminActiveTab: (tab) => { adminActiveTab.value = tab; },
     addPlaceRequest,

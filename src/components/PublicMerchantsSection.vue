@@ -9,6 +9,7 @@ const props = defineProps({
   merchants: { type: Array, default: () => [] },
   markets: { type: Array, default: () => [] },
   productCategories: { type: Array, default: () => [] },
+  onSelectMerchant: { type: Function, required: true },
 });
 
 const merchantQuery = ref('');
@@ -63,6 +64,7 @@ const filteredMerchants = computed(() =>
         :merchant="m"
         :market-name="getMarketById(m.activeMarketId)?.name || ''"
         :market-location="getAdministrativeLocationLabel(getMarketById(m.activeMarketId)) || ''"
+        :on-select-merchant="onSelectMerchant"
       />
     </div>
   </div>

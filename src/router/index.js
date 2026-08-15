@@ -145,6 +145,7 @@ const routes = [
       { path: 'products', name: 'Products', meta: { tab: 'products' } },
       { path: 'products/:productId', name: 'ProductDetail', meta: { tab: 'products' } },
       { path: 'merchants', name: 'Merchants', meta: { tab: 'merchants' } },
+      { path: 'merchants/:merchantId', name: 'MerchantDetail', meta: { tab: 'merchants' } },
       { path: 'price-trends', name: 'PriceTrends', meta: { tab: 'price-trends' } },
       { path: 'request', name: 'Request', meta: { tab: 'request' } },
       {

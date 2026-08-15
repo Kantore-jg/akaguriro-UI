@@ -4,11 +4,17 @@ import { toIdString } from '../utils/ids.js';
 
 export function usePublicNavigation() {
   const router = useRouter();
-  const { setPublicTab, setSelectedMarketId, setSelectedProductId } = useApp();
+  const {
+    setPublicTab,
+    setSelectedMarketId,
+    setSelectedProductId,
+    setSelectedMerchantId,
+  } = useApp();
 
   const goHome = () => {
     setSelectedMarketId(null);
     setSelectedProductId(null);
+    setSelectedMerchantId(null);
     setPublicTab('home');
     router.push('/');
   };
@@ -25,12 +31,14 @@ export function usePublicNavigation() {
     };
     setSelectedMarketId(null);
     setSelectedProductId(null);
+    setSelectedMerchantId(null);
     setPublicTab(tab);
     router.push(paths[tab] || '/');
   };
 
   const goToMarketsList = () => {
     setSelectedMarketId(null);
+    setSelectedMerchantId(null);
     setPublicTab('markets');
     router.push('/markets');
   };
@@ -44,6 +52,7 @@ export function usePublicNavigation() {
 
   const goToProductsList = () => {
     setSelectedProductId(null);
+    setSelectedMerchantId(null);
     setPublicTab('products');
     router.push('/products');
   };
@@ -55,6 +64,21 @@ export function usePublicNavigation() {
     router.push(`/products/${toIdString(productId)}`);
   };
 
+  const goToMerchantsList = () => {
+    setSelectedMerchantId(null);
+    setSelectedProductId(null);
+    setSelectedMarketId(null);
+    setPublicTab('merchants');
+    router.push('/merchants');
+  };
+
+  const goToMerchant = (merchantId) => {
+    if (merchantId == null) return goToMerchantsList();
+    setSelectedMerchantId(merchantId);
+    setPublicTab('merchants');
+    router.push(`/merchants/${toIdString(merchantId)}`);
+  };
+
   return {
     goHome,
     goToTab,
@@ -62,5 +86,7 @@ export function usePublicNavigation() {
     goToMarket,
     goToProductsList,
     goToProduct,
+    goToMerchantsList,
+    goToMerchant,
   };
 }

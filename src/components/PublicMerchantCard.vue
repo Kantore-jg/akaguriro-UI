@@ -3,12 +3,18 @@ defineProps({
   merchant: { type: Object, required: true },
   marketName: { type: String, default: '' },
   marketLocation: { type: String, default: '' },
+  onSelectMerchant: { type: Function, required: true },
 });
 </script>
 
 <template>
   <div
-    class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex gap-4 items-center relative group"
+    role="button"
+    tabindex="0"
+    @click="onSelectMerchant(merchant.id)"
+    @keydown.enter.prevent="onSelectMerchant(merchant.id)"
+    @keydown.space.prevent="onSelectMerchant(merchant.id)"
+    class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex gap-4 items-center relative group cursor-pointer"
   >
     <img :src="merchant.image" :alt="merchant.name" class="w-16 h-16 rounded-2xl object-cover bg-background shrink-0" />
     <div class="min-w-0 flex-1 space-y-1 text-xs">
@@ -24,6 +30,7 @@ defineProps({
     <div class="absolute bottom-4 right-4 flex gap-1">
       <a
         :href="`https://wa.me/${(merchant.phone || '').replace(/\s+/g, '')}`"
+        @click.stop
         target="_blank"
         rel="noreferrer"
         class="p-1.5 bg-emerald-50 text-primary rounded-lg border border-emerald-110 shadow-sm hover:bg-primary hover:text-white transition-colors"
