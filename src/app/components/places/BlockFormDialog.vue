@@ -83,9 +83,7 @@ const handleSubmit = () => {
           <LayoutGrid class="w-5 h-5 text-primary" />
           {{ isEditing ? 'Modifier le bloc' : 'Nouveau bloc' }}
         </DialogTitle>
-        <DialogDescription>
-          Organisez le marché en zones (blocs) avant d'y ajouter des étals.
-        </DialogDescription>
+        
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
