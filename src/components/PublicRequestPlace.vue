@@ -207,59 +207,6 @@ function findMarket(marketId) {
         </form>
       </div>
 
-      <div class="lg:col-span-5 space-y-6">
-        <div class="bg-slate-900 text-white p-6 sm:p-7 rounded-3xl border border-slate-800 space-y-5 shadow-sm">
-          <div class="space-y-1">
-            <h3 class="text-xs font-black uppercase text-primary tracking-wider">Tableau des Candidatures Actives</h3>
-          </div>
-
-          <div v-if="requests.length === 0" class="text-center py-8 text-slate-500 text-xs">
-            Aucun dossier soumis dans votre historique.
-          </div>
-          <div v-else class="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
-            <div
-              v-for="item in requests"
-              :key="item.id"
-              class="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3.5"
-            >
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="text-xs font-black text-white">{{ item.merchantName }}</h4>
-                  <p class="text-[10px] text-slate-400 tracking-tight mt-0.5">{{ item.merchantPhone }}</p>
-                </div>
-                <span
-                  v-if="item.status === 'pending'"
-                  class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
-                >
-                  <Clock class="w-3 h-3" /> En attente d'évaluation
-                </span>
-                <span
-                  v-else-if="item.status === 'approved'"
-                  class="inline-flex items-center gap-1 bg-emerald-50 text-primary border border-primary/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
-                >
-                  <CheckCircle2 class="w-3 h-3" /> Demande Approuvée
-                </span>
-                <span
-                  v-else-if="item.status === 'rejected'"
-                  class="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-[10px] px-2.5 py-0.5 rounded-full font-bold"
-                >
-                  <AlertTriangle class="w-3 h-3" /> Dossier Rejeté
-                </span>
-              </div>
-
-              <div class="space-y-1.5 text-[11px] border-t border-slate-900 pt-2.5 text-slate-300">
-                <p><strong class="text-white">Activité :</strong> {{ item.activityType }}</p>
-                <p><strong class="text-white">Catégories :</strong> {{ item.category }}</p>
-                <p><strong class="text-white">Marché :</strong> {{ findMarket(item.requestedMarketId)?.name || 'Inconnu' }}</p>
-              </div>
-
-              <div class="flex justify-end text-[9.5px] font-bold text-slate-500">
-                Soumis le {{ item.submittedDate }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
