@@ -155,6 +155,7 @@ export function mapPlaceRequest(r) {
     categories: categoryNames,
     requestedMarketId: r.market_id,
     marketName: r.market?.name,
+    assignedPlaceNumber: r.place?.number || '',
     description: r.description || '',
     submittedDate: r.created_at?.split('T')[0] || '',
     status: REQUEST_STATUS_TO_UI[r.status] || r.status,

@@ -1,15 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { FileText, Search, CheckCircle, XCircle } from 'lucide-vue-next';
+import { FileText, Search } from 'lucide-vue-next';
 import { useApp } from '../../../../composables/useApp.js';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import FilterBar from '../../layout/FilterBar.vue';
 import StatCard from '../../StatCard.vue';
-import Badge from '../../ui/Badge.vue';
-import Button from '../../ui/Button.vue';
 import Input from '../../ui/Input.vue';
-import { Card, CardContent } from '../../ui/card';
 import {
   Select,
   SelectContent,
@@ -17,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../ui/select';
+import RequestsTable from '../../requests/RequestsTable.vue';
 
 const { updateRequestStatus } = useApp();
-const { scopedRequests, scopedMarkets, findMarket } = useAdminScope();
+const { scopedRequests, scopedMarkets } = useAdminScope();
 
 const searchQuery = ref('');
 const statusFilter = ref('all');
@@ -39,15 +37,6 @@ const filteredRequests = computed(() =>
 const pendingCount = computed(() =>
   scopedRequests.value.filter((r) => r.status === 'pending').length,
 );
-
-const statusBadge = (status) => {
-  const map = {
-    pending: { label: 'En attente', variant: 'secondary' },
-    approved: { label: 'Approuvé', variant: 'default' },
-    rejected: { label: 'Rejeté', variant: 'destructive' },
-  };
-  return map[status] || { label: status, variant: 'secondary' };
-};
 </script>
 
 <template>
@@ -89,48 +78,12 @@ const statusBadge = (status) => {
       </div>
     </FilterBar>
 
-    <div v-if="!filteredRequests.length" class="text-center py-16 rounded-lg border border-border bg-card text-muted-foreground text-sm">
-      Aucun dossier trouvé.
-    </div>
-
-    <div v-else class="space-y-4">
-      <Card v-for="item in filteredRequests" :key="item.id">
-        <CardContent class="p-5 space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-            <div>
-              <h3 class="font-semibold text-foreground">{{ item.merchantName }}</h3>
-              <p class="text-sm text-muted-foreground">{{ item.merchantPhone }}</p>
-              <p class="text-xs text-muted-foreground mt-1">
-                {{ findMarket(item.requestedMarketId)?.name }} — {{ item.submittedDate }}
-              </p>
-            </div>
-            <Badge :variant="statusBadge(item.status).variant">
-              {{ statusBadge(item.status).label }}
-            </Badge>
-          </div>
-
-          <div class="text-sm bg-muted/40 rounded-lg p-4 space-y-1 border border-border">
-            <p><span class="font-medium">Activité :</span> {{ item.activityType }}</p>
-            <p><span class="font-medium">Catégories :</span> {{ item.category }}</p>
-            <p class="text-muted-foreground">{{ item.description }}</p>
-          </div>
-
-          <div v-if="item.status === 'pending'" class="flex gap-2 justify-end">
-            <Button
-              variant="outline"
-              class="text-destructive border-destructive/30 hover:bg-destructive/10"
-              @click="updateRequestStatus(item.id, 'rejected')"
-            >
-              <XCircle class="w-4 h-4 mr-2" />
-              Rejeter
-            </Button>
-            <Button @click="updateRequestStatus(item.id, 'approved')">
-              <CheckCircle class="w-4 h-4 mr-2" />
-              Approuver & assigner
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <RequestsTable
+      :requests="filteredRequests"
+      :markets="scopedMarkets"
+      :loading="false"
+      @approve="updateRequestStatus($event.id, 'approved')"
+      @reject="updateRequestStatus($event.id, 'rejected')"
+    />
   </div>
 </template>
