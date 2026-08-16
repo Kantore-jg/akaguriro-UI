@@ -161,15 +161,13 @@ export async function fetchProducts(params = {}) {
   return (await fetchScopedList('/products', params)).map(mapProduct);
 }
 
-export async function fetchPlaceRequests() {
-  const user = getStoredUser();
+export async function fetchPlaceRequests(user = getStoredUser()) {
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/place-requests' : '/my/place-requests';
   return (await fetchScopedList(endpoint)).map(mapPlaceRequest);
 }
 
-export async function fetchSales(params = {}) {
-  const user = getStoredUser();
+export async function fetchSales(params = {}, user = getStoredUser()) {
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/sales' : '/my/sales';
   return (await fetchScopedList(endpoint, params)).map(mapSale);
@@ -185,8 +183,7 @@ export async function createSale(sale) {
   return mapSale(extractData({ data }));
 }
 
-export async function fetchReceipts() {
-  const user = getStoredUser();
+export async function fetchReceipts(user = getStoredUser()) {
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_MARCHE';
   const endpoint = isAdmin ? '/receipts' : '/my/receipts';
   return (await fetchScopedList(endpoint)).map(mapReceipt);

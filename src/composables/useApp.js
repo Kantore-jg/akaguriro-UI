@@ -88,6 +88,7 @@ export function createAppState() {
     refreshPromise = (async () => {
       try {
         await dataActions.loadPublicCoreData();
+        await ensurePublicSupplementalData();
         initialized.value = true;
         if (currentUser.value?.id) {
           void dataActions.loadAuthenticatedData().catch((error) => {
@@ -213,17 +214,20 @@ export function createAppState() {
   } = dataActions;
 
   onMounted(() => {
-    refreshInBackground();
     window.addEventListener('akaguriro:unauthorized', handleUnauthorized);
-    if (getStoredUser()) {
-      fetchProfile()
-        .then((profile) => {
-          currentUser.value = profile;
-        })
-        .catch(() => {
+    void (async () => {
+      if (getStoredUser()) {
+        try {
+          currentUser.value = await fetchProfile();
+        } catch {
           resetSessionState();
-        });
-    }
+          await refreshAll();
+          return;
+        }
+      }
+
+      await refreshAll();
+    })();
   });
 
   onUnmounted(() => {

@@ -99,10 +99,11 @@ export function createDataActions(state) {
   };
 
   const loadAuthenticatedData = async () => {
+    const user = state.currentUser.value;
     const [requests, receipts, sales] = await Promise.all([
-      fetchPlaceRequests(),
-      fetchReceipts(),
-      fetchSales(),
+      fetchPlaceRequests(user),
+      fetchReceipts(user),
+      fetchSales({}, user),
     ]);
     state.requests.value = requests;
     state.receipts.value = receipts;
@@ -138,7 +139,7 @@ export function createDataActions(state) {
 
   const loadSales = async (params = {}) => {
     try {
-      state.sales.value = await fetchSales(params);
+      state.sales.value = await fetchSales(params, state.currentUser.value);
     } catch (error) {
       state.showToast(getErrorMessage(error, 'Erreur de chargement des ventes'), 'error');
     }
