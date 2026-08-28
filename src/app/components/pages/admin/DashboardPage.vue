@@ -29,7 +29,7 @@ const {
   scopedProducts,
   scopedPendingRequests,
   scopedPendingReceipts,
-  scopedApprovedReceiptsTotal,
+  scopedSalesTotal,
   scopedOccupiedPlaces,
   scopedTotalPlaces,
   scopedFreePlaces,
@@ -72,7 +72,7 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <StatCard
         :title="isMerchant ? 'Mes revenus validés' : 'CA validé'"
-        :value="`${formatAmount(scopedApprovedReceiptsTotal)} BIF`"
+        :value="`${formatAmount(scopedSalesTotal)} BIF`"
         :icon="DollarSign"
         color="pink"
       />

@@ -118,6 +118,10 @@ export function useAdminScope() {
     scopedApprovedReceipts.value.reduce((sum, r) => sum + r.amount, 0),
   );
 
+  const scopedSalesTotal = computed(() =>
+    scopedSales.value.reduce((sum, sale) => sum + Number(sale.total || 0), 0),
+  );
+
   const scopedTotalPlaces = computed(() => scopedPlaces.value.length);
 
   const scopedOccupiedPlaces = computed(() =>
@@ -213,6 +217,7 @@ export function useAdminScope() {
     scopedPendingReceipts,
     scopedApprovedReceipts,
     scopedApprovedReceiptsTotal,
+    scopedSalesTotal,
     scopedTotalPlaces,
     scopedOccupiedPlaces,
     scopedFreePlaces,

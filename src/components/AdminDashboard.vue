@@ -43,6 +43,7 @@ const {
   places,
   requests,
   receipts,
+  sales,
   addProduct,
   updateProduct,
   deleteProduct,
@@ -138,6 +139,13 @@ const filteredReceipts = computed(() =>
     return true;
   })
 );
+const filteredSales = computed(() =>
+  sales.value.filter((sale) => {
+    if (isMerchant.value) return sale.merchantId === assignedMerchantIdValue.value;
+    if (isMarketAdmin.value) return sale.marketId === assignedMarketId.value;
+    return true;
+  })
+);
 
 const pendingRequestsCount = computed(() =>
   filteredRequests.value.filter((r) => r.status === 'pending').length
@@ -145,10 +153,8 @@ const pendingRequestsCount = computed(() =>
 const pendingReceiptsCount = computed(() =>
   filteredReceipts.value.filter((r) => r.status === 'pending').length
 );
-const approvedReceiptsTotal = computed(() =>
-  filteredReceipts.value
-    .filter((r) => r.status === 'approved')
-    .reduce((sum, r) => sum + r.amount, 0)
+const salesTotal = computed(() =>
+  filteredSales.value.reduce((sum, sale) => sum + Number(sale.total || 0), 0)
 );
 const vacantPlacesCount = computed(() =>
   filteredPlaces.value.filter((p) => p.status === PLACE_STATUS.AVAILABLE).length
@@ -582,11 +588,13 @@ function getMerchantById(id) {
           </div>
 
           <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-1">
-            <span class="text-[10px] text-slate-400 block font-bold uppercase">Rentrées Redevances (Est.)</span>
+            <span class="text-[10px] text-slate-400 block font-bold uppercase">Chiffre d'affaires des ventes</span>
             <strong class="text-xl sm:text-2xl font-black text-emerald-600">
-              {{ isMerchant ? '35 000' : approvedReceiptsTotal.toLocaleString('fr-FR') }} BIF
+              {{ salesTotal.toLocaleString('fr-FR') }} BIF
             </strong>
-            <span class="text-[9px] text-emerald-500 block font-semibold">Mai 2026 acquitté</span>
+            <span class="text-[9px] text-emerald-500 block font-semibold">
+              {{ filteredSales.length }} vente(s) enregistrée(s)
+            </span>
           </div>
 
         </div>
