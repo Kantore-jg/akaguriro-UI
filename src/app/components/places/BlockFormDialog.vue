@@ -33,6 +33,7 @@ const form = ref({
   name: '',
   code: '',
   description: '',
+  rentAmount: '',
   marketId: '',
 });
 
@@ -47,6 +48,7 @@ watch(
         name: props.block.name || '',
         code: props.block.code || '',
         description: props.block.description || '',
+        rentAmount: props.block.rentAmount ?? '',
         marketId: props.block.marketId || '',
       };
     } else {
@@ -54,6 +56,7 @@ watch(
         name: '',
         code: '',
         description: '',
+        rentAmount: '',
         marketId: props.defaultMarketId || props.markets[0]?.id || '',
       };
     }
@@ -69,6 +72,7 @@ const handleSubmit = () => {
     name: form.value.name.trim(),
     code: form.value.code.trim() || undefined,
     description: form.value.description.trim() || undefined,
+    rentAmount: form.value.rentAmount === '' ? 0 : Number(form.value.rentAmount),
     marketId: form.value.marketId,
   });
   close();
@@ -110,6 +114,18 @@ const handleSubmit = () => {
             <Label for="block-code">Code (optionnel)</Label>
             <Input id="block-code" v-model="form.code" placeholder="A" />
           </div>
+        </div>
+
+        <div class="space-y-2">
+          <Label for="block-rent">Loyer par place (BIF)</Label>
+          <Input
+            id="block-rent"
+            v-model="form.rentAmount"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="12000"
+          />
         </div>
 
         <div class="space-y-2">

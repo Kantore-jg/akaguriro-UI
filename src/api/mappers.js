@@ -67,6 +67,7 @@ export function mapBlock(b) {
     name: b.name,
     code: b.code || '',
     description: b.description || '',
+    rentAmount: Number(b.rent_amount ?? 0),
     totalPlaces: b.total_places ?? b.places_count ?? 0,
     placesCount: b.places_count ?? b.total_places ?? 0,
     isActive: b.is_active ?? true,
@@ -85,6 +86,7 @@ export function mapPlace(p) {
     number: p.number,
     blockId: p.market_block_id || p.block?.id || null,
     blockName: p.block?.name || '—',
+    block: p.block ? mapBlock(p.block) : null,
     rowName: p.number || '',
     status,
     merchantId: p.chief?.id || null,
@@ -313,6 +315,7 @@ export function blockToApi(data) {
     name: data.name,
     code: data.code || null,
     description: data.description || null,
+    rent_amount: data.rentAmount ?? data.rent_amount ?? 0,
     is_active: data.isActive ?? true,
   };
 }

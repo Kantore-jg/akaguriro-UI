@@ -53,7 +53,23 @@ const marketPlaces = computed(() => {
   return places.value.filter((p) => sameId(p.marketId, market.value.id));
 });
 
-const blocks = computed(() => Array.from(new Set(marketPlaces.value.map(p => p.blockName))));
+const blocks = computed(() => {
+  const seen = new Set();
+  return marketPlaces.value
+    .filter((place) => place.block?.id || place.blockName)
+    .map((place) => place.block || {
+      id: place.blockId || place.blockName,
+      name: place.blockName,
+      code: '',
+      rentAmount: 0,
+    })
+    .filter((block) => {
+      const key = String(block.id ?? block.name);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+});
 
 const marketProducts = computed(() => {
   if (!market.value) return [];
@@ -107,7 +123,15 @@ function getStallOccupantName(p) {
 }
 
 function getBlockPlaces(block) {
-  return marketPlaces.value.filter(p => p.blockName === block);
+  return marketPlaces.value.filter((p) => {
+    const blockId = p.block?.id ?? p.blockId ?? p.blockName;
+    const candidateId = block?.id ?? block?.name;
+    return String(blockId) === String(candidateId);
+  });
+}
+
+function formatRent(amount) {
+  return `${Number(amount || 0).toLocaleString('fr-FR')} BIF`;
 }
 
 function getVendor(merchantId) {
@@ -238,14 +262,25 @@ function getVendor(merchantId) {
             Entrée Principale (Nord)
           </div>
 
-          <div v-for="block in blocks" :key="block" class="space-y-3.5 bg-white p-4 rounded-xl border border-slate-200/40 shadow-sm">
+          <div
+            v-for="block in blocks"
+            :key="block.id"
+            class="space-y-3.5 bg-white p-4 rounded-xl border border-slate-200/40 shadow-sm"
+          >
             <div class="flex justify-between items-center bg-background px-2.5 py-1.5 rounded-lg border border-slate-100">
               <h4 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
                 <Store class="w-4 h-4 text-primary" />
-                {{ block }}
+                {{ block.name }}
               </h4>
-              <span class="text-[10px] font-bold text-slate-400">
+              <span class="text-[10px] font-bold text-slate-400 text-right">
                 {{ getBlockPlaces(block).filter(p => p.status === PLACE_STATUS.AVAILABLE).length }} places vacantes
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Loyer du bloc</span>
+              <span class="text-xs font-black text-emerald-700">
+                {{ formatRent(block.rentAmount) }} / place
               </span>
             </div>
 
@@ -288,12 +323,12 @@ function getVendor(merchantId) {
 
         <div class="lg:col-span-4 bg-slate-900 text-white rounded-2xl border border-slate-800 p-5 space-y-5 shadow-lg relative min-h-[300px] flex flex-col justify-between">
           <template v-if="selectedPlace">
-            <div class="space-y-5">
-              <div class="flex justify-between items-start border-b border-slate-800 pb-3">
-                <div>
-                  <h4 class="text-base font-extrabold text-white">Étalage local {{ selectedPlace.id }}</h4>
+              <div class="space-y-5">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                  <div>
+                    <h4 class="text-base font-extrabold text-white">Étalage local {{ selectedPlace.id }}</h4>
                   <p class="text-[10px] text-primary font-bold uppercase tracking-wider">{{ selectedPlace.blockName }} • {{ selectedPlace.rowName }}</p>
-                </div>
+                  </div>
                 <button
                   @click="selectedPlace = null"
                   class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
@@ -310,8 +345,10 @@ function getVendor(merchantId) {
                   Cette place est actuellement vacante de commerçant. Elle peut accueillir des activités de type <strong class="text-white">Commerce Général, Primeurs, Poissonnerie ou textiles</strong>.
                 </p>
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
-                  <span class="block text-[10px] text-slate-400 font-bold">REDEVANCE COMMUNALE EST :</span>
-                  <strong class="text-xs text-primary font-black">1 200 BIF / jour d'occupation</strong>
+                  <span class="block text-[10px] text-slate-400 font-bold">LOYER DU BLOC :</span>
+                  <strong class="text-xs text-primary font-black">
+                    {{ formatRent(selectedPlace.block?.rentAmount) }} / place
+                  </strong>
                 </div>
                 <button
                   @click="goToTab('request')"
