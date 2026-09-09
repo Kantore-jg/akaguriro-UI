@@ -54,11 +54,11 @@ const categories = computed(() => productCategories.value);
 const getMerchantName = (merchantId) =>
   scopedMerchants.value.find((m) => String(m.id) === String(merchantId))?.name || '—';
 
-const getMarketCity = (marketId) =>
-  scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.administrativeLocation
-  || scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.location
-  || scopedMarkets.value.find((m) => String(m.id) === String(marketId))?.name
-  || '—';
+const getMarketCity = (marketId) => {
+  const market = scopedMarkets.value.find((m) => String(m.id) === String(marketId));
+  return market?.colline || market?.zone || '—';
+};
+
 
 const filteredProducts = computed(() =>
   scopedProducts.value.filter((p) => {

@@ -68,9 +68,7 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
               </div>
               <div>
                 <p class="font-medium text-sm">{{ product.name }}</p>
-                <Badge v-if="product.isTrending" variant="secondary" class="text-[10px] mt-0.5">
-                  Tendance
-                </Badge>
+               
               </div>
             </div>
           </TableCell>
@@ -98,7 +96,7 @@ const formatPrice = (n) => Number(n).toLocaleString('fr-FR');
           <TableCell class="text-sm">
             <p>{{ getMerchantName(product.merchantId) }}</p>
             <p class="text-xs text-muted-foreground">
-              {{ getMarketCity(product.marketId) }} · {{ product.placeNumber }}
+              {{ getMarketCity(product.marketId) }}
             </p>
           </TableCell>
           <TableCell class="text-right">
