@@ -47,7 +47,7 @@ const {
   findMerchant,
 } = useAdminScope();
 
-const activeTab = ref('markets');
+const activeTab = ref(isMerchant.value ? 'products' : 'markets');
 const marketFilter = ref('all');
 const previewLimit = 8;
 
@@ -211,80 +211,8 @@ const buildSection = ({ key, label, icon, description, filename, columns, rows }
 });
 
 const reportSections = computed(() => {
-  const sections = [
-  buildSection({
-    key: 'markets',
-    label: 'Marchés',
-    icon: Store,
-    filename: 'rapport-marches',
-    columns: [
-      { key: 'name', label: 'Marché' },
-      { key: 'province', label: 'Province' },
-      { key: 'commune', label: 'Commune' },
-      { key: 'zone', label: 'Zone' },
-      { key: 'colline', label: 'Colline' },
-      // { key: 'location', label: 'Localisation' },
-      { key: 'categories', label: 'Catégories' },
-      { key: 'totalPlaces', label: 'Places total' },
-      { key: 'occupiedPlaces', label: 'Occupées' },
-      { key: 'freePlaces', label: 'Libres' },
-      { key: 'status', label: 'Statut' },
-    ],
-    rows: marketsRows.value,
-  }),
-  buildSection({
-    key: 'places',
-    label: 'Emplacements',
-    icon: MapPin,
-    filename: 'rapport-emplacements',
-    columns: [
-      { key: 'market', label: 'Marché' },
-      { key: 'block', label: 'Bloc' },
-      { key: 'row', label: 'Emplacement' },
-      { key: 'categories', label: 'Filière' },
-      { key: 'merchant', label: 'Commerçant' },
-      { key: 'phone', label: 'Téléphone' },
-      { key: 'status', label: 'Statut' },
-    ],
-    rows: placesRows.value,
-  }),
-  buildSection({
-    key: 'blocks',
-    label: 'Blocs',
-    icon: Layers3,
-    filename: 'rapport-blocs',
-    columns: [
-      { key: 'name', label: 'Bloc' },
-      { key: 'code', label: 'Code' },
-      { key: 'market', label: 'Marché' },
-      { key: 'description', label: 'Description' },
-      { key: 'totalPlaces', label: 'Places total' },
-      { key: 'placesCount', label: 'Places référencées' },
-      { key: 'status', label: 'Statut' },
-    ],
-    rows: blocksRows.value,
-  }),
-  buildSection({
-    key: 'merchants',
-    label: 'Commerçants',
-    icon: Users,
-    filename: 'rapport-commercants',
-    columns: [
-      { key: 'name', label: 'Commerçant' },
-      { key: 'phone', label: 'Téléphone' },
-      { key: 'email', label: 'Email' },
-      { key: 'market', label: 'Marché' },
-      { key: 'place', label: 'Étal' },
-      { key: 'category', label: 'Filière' },
-      { key: 'productsCount', label: 'Produits' },
-      { key: 'verified', label: 'Habilitation' },
-    ],
-    rows: merchantsRows.value,
-  }),
-  ];
-
   if (isMerchant.value) {
-    sections.push(
+    return [
       buildSection({
         key: 'products',
         label: 'Produits',
@@ -325,10 +253,79 @@ const reportSections = computed(() => {
         ],
         rows: salesRows.value,
       }),
-    );
+    ];
   }
 
-  return sections;
+  return [
+    buildSection({
+      key: 'markets',
+      label: 'Marchés',
+      icon: Store,
+      filename: 'rapport-marches',
+      columns: [
+        { key: 'name', label: 'Marché' },
+        { key: 'province', label: 'Province' },
+        { key: 'commune', label: 'Commune' },
+        { key: 'zone', label: 'Zone' },
+        { key: 'colline', label: 'Colline' },
+        { key: 'categories', label: 'Catégories' },
+        { key: 'totalPlaces', label: 'Places total' },
+        { key: 'occupiedPlaces', label: 'Occupées' },
+        { key: 'freePlaces', label: 'Libres' },
+        { key: 'status', label: 'Statut' },
+      ],
+      rows: marketsRows.value,
+    }),
+    buildSection({
+      key: 'places',
+      label: 'Emplacements',
+      icon: MapPin,
+      filename: 'rapport-emplacements',
+      columns: [
+        { key: 'market', label: 'Marché' },
+        { key: 'block', label: 'Bloc' },
+        { key: 'row', label: 'Emplacement' },
+        { key: 'categories', label: 'Filière' },
+        { key: 'merchant', label: 'Commerçant' },
+        { key: 'phone', label: 'Téléphone' },
+        { key: 'status', label: 'Statut' },
+      ],
+      rows: placesRows.value,
+    }),
+    buildSection({
+      key: 'blocks',
+      label: 'Blocs',
+      icon: Layers3,
+      filename: 'rapport-blocs',
+      columns: [
+        { key: 'name', label: 'Bloc' },
+        { key: 'code', label: 'Code' },
+        { key: 'market', label: 'Marché' },
+        { key: 'description', label: 'Description' },
+        { key: 'totalPlaces', label: 'Places total' },
+        { key: 'placesCount', label: 'Places référencées' },
+        { key: 'status', label: 'Statut' },
+      ],
+      rows: blocksRows.value,
+    }),
+    buildSection({
+      key: 'merchants',
+      label: 'Commerçants',
+      icon: Users,
+      filename: 'rapport-commercants',
+      columns: [
+        { key: 'name', label: 'Commerçant' },
+        { key: 'phone', label: 'Téléphone' },
+        { key: 'email', label: 'Email' },
+        { key: 'market', label: 'Marché' },
+        { key: 'place', label: 'Étal' },
+        { key: 'category', label: 'Filière' },
+        { key: 'productsCount', label: 'Produits' },
+        { key: 'verified', label: 'Habilitation' },
+      ],
+      rows: merchantsRows.value,
+    }),
+  ];
 });
 
 const selectedMarketCount = computed(() => {
