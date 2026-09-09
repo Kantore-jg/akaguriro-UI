@@ -85,6 +85,27 @@ const merchantMarketName = computed(() => {
   if (!assignedMerchant.value) return 'Marché';
   return findMarket(assignedMerchant.value.activeMarketId)?.name || 'Marché';
 });
+
+const formatRegistrationDate = (value) => {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    // ISO date-only string YYYY-MM-DD
+    const parts = String(value).split('-');
+    if (parts.length === 3) {
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).toLocaleDateString(
+        'fr-FR',
+        { day: '2-digit', month: 'short', year: 'numeric' },
+      );
+    }
+    return value;
+  }
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 </script>
 
 <template>
@@ -136,6 +157,7 @@ const merchantMarketName = computed(() => {
           <TableRow>
             <TableHead>Commerçant</TableHead>
             <TableHead>Mois</TableHead>
+            <TableHead>Date d'enregistrement</TableHead>
             <TableHead>Montant</TableHead>
             <TableHead>Justificatif</TableHead>
             <TableHead>Statut</TableHead>
@@ -144,13 +166,14 @@ const merchantMarketName = computed(() => {
         </TableHeader>
         <TableBody>
           <TableRow v-if="!filteredReceipts.length">
-            <TableCell :colspan="canValidateReceipts ? 6 : 5" class="text-center py-8 text-muted-foreground">
+            <TableCell :colspan="canValidateReceipts ? 7 : 6" class="text-center py-8 text-muted-foreground">
               Aucun reçu enregistré.
             </TableCell>
           </TableRow>
           <TableRow v-for="r in filteredReceipts" :key="r.id">
             <TableCell class="font-medium">{{ r.merchantName }}</TableCell>
             <TableCell>{{ r.month }}</TableCell>
+            <TableCell>{{ formatRegistrationDate(r.submittedDate) }}</TableCell>
             <TableCell>{{ r.amount.toLocaleString('fr-FR') }} BIF</TableCell>
             <TableCell>
               <a
