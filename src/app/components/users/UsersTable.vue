@@ -34,6 +34,7 @@ const emit = defineEmits(['edit', 'delete', 'toggle-active']);
 const roleVariant = (role) => {
   if (role === 'SUPER_ADMIN') return 'default';
   if (role === 'ADMIN_MARCHE') return 'secondary';
+  if (role === 'PROPRIETAIRE_MARCHE') return 'secondary';
   if (role === 'COMMERCANT') return 'outline';
   return 'outline';
 };

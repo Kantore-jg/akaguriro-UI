@@ -314,6 +314,7 @@ const onCreateBlockFromPlace = (marketId) => {
       :places="filteredPlaces"
       :get-merchant="getMerchant"
       :get-market-name="getMarketName"
+      :readonly="!canManage"
       @assign="openAssign"
       @edit="openEditPlace"
       @delete="openDeletePlace"
@@ -323,6 +324,7 @@ const onCreateBlockFromPlace = (marketId) => {
       v-else
       :blocks="filteredBlocks"
       :get-market-name="getMarketName"
+      :readonly="!canManage"
       @edit="openEditBlock"
       @delete="openDeleteBlock"
       @add-place="openPlaceForm"

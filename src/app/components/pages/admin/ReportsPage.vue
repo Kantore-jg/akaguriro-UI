@@ -33,6 +33,7 @@ const { markets } = useApp();
 const {
   isSuperAdmin,
   isMarketAdmin,
+  isMarketOwner,
   isMerchant,
   assignedMarketId,
   assignedMerchant,
@@ -57,7 +58,7 @@ const selectedMarketId = computed(() => {
   if (isMerchant.value) {
     return assignedMerchant.value?.activeMarketId || null;
   }
-  if (isMarketAdmin.value) {
+  if (isMarketAdmin.value || isMarketOwner.value) {
     return assignedMarketId.value || null;
   }
   return null;

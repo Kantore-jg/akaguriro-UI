@@ -18,10 +18,11 @@ export function useAdminScope() {
 
   const isSuperAdmin = computed(() => currentUser.value.role === 'SUPER_ADMIN');
   const isMarketAdmin = computed(() => currentUser.value.role === 'ADMIN_MARCHE');
+  const isMarketOwner = computed(() => currentUser.value.role === 'PROPRIETAIRE_MARCHE');
   const isMerchant = computed(() => currentUser.value.role === 'COMMERCANT');
 
   const assignedMarketId = computed(() =>
-    isMarketAdmin.value ? currentUser.value.marketId : null,
+    isMarketAdmin.value || isMarketOwner.value ? currentUser.value.marketId : null,
   );
 
   const assignedMerchantId = computed(() =>
@@ -200,6 +201,7 @@ export function useAdminScope() {
     users,
     isSuperAdmin,
     isMarketAdmin,
+    isMarketOwner,
     isMerchant,
     assignedMarketId,
     assignedMerchantId,

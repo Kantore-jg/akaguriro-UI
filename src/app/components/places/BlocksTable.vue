@@ -22,6 +22,7 @@ import {
 defineProps({
   blocks: { type: Array, required: true },
   getMarketName: { type: Function, required: true },
+  readonly: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['edit', 'delete', 'add-place']);
@@ -38,12 +39,12 @@ const emit = defineEmits(['edit', 'delete', 'add-place']);
           <TableHead>Loyer</TableHead>
           <TableHead>Étals</TableHead>
           <TableHead>Statut</TableHead>
-          <TableHead class="text-right">Actions</TableHead>
+          <TableHead v-if="!readonly" class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-if="!blocks.length">
-          <TableCell colspan="7" class="text-center py-8 text-muted-foreground">
+          <TableCell :colspan="readonly ? 6 : 7" class="text-center py-8 text-muted-foreground">
             Aucun bloc configuré. Créez un bloc pour organiser les emplacements.
           </TableCell>
         </TableRow>
@@ -72,7 +73,7 @@ const emit = defineEmits(['edit', 'delete', 'add-place']);
               {{ block.isActive ? 'Actif' : 'Inactif' }}
             </Badge>
           </TableCell>
-          <TableCell class="text-right">
+          <TableCell v-if="!readonly" class="text-right">
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <Button variant="ghost" size="icon">

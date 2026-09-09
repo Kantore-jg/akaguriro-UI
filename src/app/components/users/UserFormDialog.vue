@@ -36,6 +36,7 @@ const { isSuperAdmin, scopedMarkets } = useAdminScope();
 const ALL_ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Administrateur' },
   { value: 'ADMIN_MARCHE', label: 'Admin Marché' },
+  { value: 'PROPRIETAIRE_MARCHE', label: 'Propriétaire Marché' },
   { value: 'COMMERCANT', label: 'Commerçant' },
   { value: 'USER', label: 'Utilisateur' },
 ];
@@ -62,7 +63,9 @@ const form = ref({
 
 const isEditing = computed(() => Boolean(props.user?.id));
 const isSelf = computed(() => props.user?.id === currentUser.value?.id);
-const showMarketSelect = computed(() => form.value.role === 'ADMIN_MARCHE');
+const showMarketSelect = computed(() =>
+  ['ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'].includes(form.value.role),
+);
 
 watch(
   () => props.open,
@@ -95,7 +98,7 @@ watch(
 watch(
   () => form.value.role,
   (role) => {
-    if (role !== 'ADMIN_MARCHE') {
+    if (!['ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'].includes(role)) {
       form.value.marketId = null;
     }
   },
@@ -106,7 +109,7 @@ const close = () => emit('update:open', false);
 const handleSubmit = () => {
   if (!form.value.name.trim() || !form.value.email.trim()) return;
   if (!isEditing.value && !form.value.password.trim()) return;
-  if (form.value.role === 'ADMIN_MARCHE' && !form.value.marketId) return;
+  if (['ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'].includes(form.value.role) && !form.value.marketId) return;
 
   emit('submit', {
     ...(props.user || {}),

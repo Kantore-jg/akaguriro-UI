@@ -16,6 +16,7 @@ const props = defineProps({
   requests: { type: Array, required: true },
   markets: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['approve', 'reject']);
@@ -53,19 +54,19 @@ function getCategories(item) {
           <TableHead>Catégories</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Statut</TableHead>
-          <TableHead class="text-right">Actions</TableHead>
+          <TableHead v-if="!readonly" class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
         <TableRow v-if="loading">
-          <TableCell colspan="7" class="text-center py-10 text-muted-foreground">
+          <TableCell :colspan="readonly ? 6 : 7" class="text-center py-10 text-muted-foreground">
             Chargement...
           </TableCell>
         </TableRow>
 
         <TableRow v-else-if="!requests.length">
-          <TableCell colspan="7" class="text-center py-10 text-muted-foreground">
+          <TableCell :colspan="readonly ? 6 : 7" class="text-center py-10 text-muted-foreground">
             Aucun dossier trouvé.
           </TableCell>
         </TableRow>
@@ -122,7 +123,7 @@ function getCategories(item) {
             </Badge>
           </TableCell>
 
-          <TableCell class="text-right whitespace-normal align-top">
+          <TableCell v-if="!readonly" class="text-right whitespace-normal align-top">
             <div v-if="item.status === 'pending'" class="flex justify-end gap-2">
               <Button
                 variant="outline"

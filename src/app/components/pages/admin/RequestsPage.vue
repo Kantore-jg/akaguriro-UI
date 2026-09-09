@@ -17,7 +17,7 @@ import {
 import RequestsTable from '../../requests/RequestsTable.vue';
 
 const { updateRequestStatus } = useApp();
-const { scopedRequests, scopedMarkets } = useAdminScope();
+const { scopedRequests, scopedMarkets, isMarketOwner } = useAdminScope();
 
 const searchQuery = ref('');
 const statusFilter = ref('all');
@@ -82,6 +82,7 @@ const pendingCount = computed(() =>
       :requests="filteredRequests"
       :markets="scopedMarkets"
       :loading="false"
+      :readonly="isMarketOwner"
       @approve="updateRequestStatus($event.id, 'approved')"
       @reject="updateRequestStatus($event.id, 'rejected')"
     />

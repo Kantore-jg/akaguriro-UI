@@ -48,6 +48,7 @@ const deleting = ref(false);
 const ALL_ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Administrateur' },
   { value: 'ADMIN_MARCHE', label: 'Admin Marché' },
+  { value: 'PROPRIETAIRE_MARCHE', label: 'Propriétaire Marché' },
   { value: 'COMMERCANT', label: 'Commerçant' },
   { value: 'USER', label: 'Utilisateur' },
 ];

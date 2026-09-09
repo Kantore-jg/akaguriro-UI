@@ -24,6 +24,7 @@ const router = useRouter();
 const {
   isSuperAdmin,
   isMarketAdmin,
+  isMarketOwner,
   isMerchant,
   assignedMerchant,
   scopedMerchants,
@@ -190,7 +191,7 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
             <span class="text-xs">Produits</span>
           </Button>
           <Button
-            v-if="isMarketAdmin"
+            v-if="isMarketAdmin || isMarketOwner"
             variant="outline"
             class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/requests')"
@@ -212,7 +213,7 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
       </Card>
     </div>
 
-    <Card v-if="isSuperAdmin || isMarketAdmin" class="bs-card border shadow-sm">
+    <Card v-if="isSuperAdmin || isMarketAdmin || isMarketOwner" class="bs-card border shadow-sm">
       <CardHeader>
         <CardTitle class="text-base">Demandes récentes</CardTitle>
         <!-- <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p> -->

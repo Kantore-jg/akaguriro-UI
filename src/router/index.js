@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { getStoredUser } from '../api/services/auth.js';
 import { getToken } from '../api/client.js';
 
-const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE', 'COMMERCANT'];
+const OWNER_CONSULT_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'];
 
 const routes = [
   {
@@ -48,13 +49,13 @@ const routes = [
         path: 'places',
         name: 'AdminPlaces',
         component: () => import('../app/components/pages/admin/PlacesPage.vue'),
-        meta: { title: 'Emplacements', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+        meta: { title: 'Emplacements', roles: OWNER_CONSULT_ROLES },
       },
       {
         path: 'merchants',
         name: 'AdminMerchants',
         component: () => import('../app/components/pages/admin/MerchantsPage.vue'),
-        meta: { title: 'Commerçants', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+        meta: { title: 'Commerçants', roles: OWNER_CONSULT_ROLES },
       },
       {
         path: 'categories',
@@ -72,7 +73,7 @@ const routes = [
         path: 'requests',
         name: 'AdminRequests',
         component: () => import('../app/components/pages/admin/RequestsPage.vue'),
-        meta: { title: 'Demandes', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+        meta: { title: 'Demandes', roles: OWNER_CONSULT_ROLES },
       },
       {
         path: 'receipts',
@@ -90,7 +91,7 @@ const routes = [
         path: 'reports',
         name: 'AdminReports',
         component: () => import('../app/components/pages/admin/ReportsPage.vue'),
-        meta: { title: 'Rapports', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'] },
+        meta: { title: 'Rapports', roles: [...OWNER_CONSULT_ROLES, 'COMMERCANT'] },
       },
     ],
   },
@@ -106,13 +107,13 @@ const routes = [
         path: 'merchants',
         name: 'PrintMerchants',
         component: () => import('../app/components/print/PrintMerchantsPage.vue'),
-        meta: { title: 'Impression commerçants', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+        meta: { title: 'Impression commerçants', roles: OWNER_CONSULT_ROLES },
       },
       {
         path: 'places',
         name: 'PrintPlaces',
         component: () => import('../app/components/print/PrintPlacesPage.vue'),
-        meta: { title: 'Impression emplacements', roles: ['SUPER_ADMIN', 'ADMIN_MARCHE'] },
+        meta: { title: 'Impression emplacements', roles: OWNER_CONSULT_ROLES },
       },
       {
         path: 'products',

@@ -36,7 +36,7 @@ const {
 
 const { goHome, goToTab } = usePublicNavigation();
 
-const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'COMMERCANT'];
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE', 'COMMERCANT'];
 
 const isAdminRoute = computed(() => route.path.startsWith('/admin'));
 const isProfileRoute = computed(() => route.path === '/profile');

@@ -44,6 +44,7 @@ const { currentUser, loading } = useApp();
 const {
   isSuperAdmin,
   isMarketAdmin,
+  isMarketOwner,
   isMerchant,
   scopedPendingRequests,
   scopedPendingReceipts,
@@ -110,6 +111,20 @@ const navigation = computed(() => {
     );
   }
 
+  if (isMarketOwner.value) {
+    items.push(
+      { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
+      { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
+      {
+        id: 'requests',
+        name: 'Demandes',
+        icon: FileText,
+        path: '/admin/requests',
+        badge: pendingRequestsCount.value,
+      },
+    );
+  }
+
   if (isSuperAdmin.value || isMarketAdmin.value) {
     items.push({
       id: 'categories',
@@ -136,7 +151,7 @@ const navigation = computed(() => {
     );
   }
 
-  if (isSuperAdmin.value || isMarketAdmin.value || isMerchant.value) {
+  if (isSuperAdmin.value || isMarketAdmin.value || isMarketOwner.value || isMerchant.value) {
     items.push({
       id: 'reports',
       name: 'Rapports',

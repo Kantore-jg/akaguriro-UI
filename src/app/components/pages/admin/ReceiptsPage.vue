@@ -30,6 +30,7 @@ import {
 const { addPaymentReceipt, updateReceiptStatus } = useApp();
 const {
   isMerchant,
+  isMarketOwner,
   scopedReceipts,
   assignedMerchant,
   findMarket,
@@ -38,6 +39,7 @@ const {
 const searchQuery = ref('');
 const statusFilter = ref('all');
 const formOpen = ref(false);
+const canValidateReceipts = computed(() => !isMerchant.value && !isMarketOwner.value);
 
 const filteredReceipts = computed(() =>
   scopedReceipts.value.filter((r) => {
@@ -136,12 +138,12 @@ const merchantMarketName = computed(() => {
             <TableHead>Montant</TableHead>
             <TableHead>Justificatif</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead v-if="!isMerchant" class="text-right">Actions</TableHead>
+            <TableHead v-if="canValidateReceipts" class="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <TableRow v-if="!filteredReceipts.length">
-            <TableCell :colspan="isMerchant ? 5 : 6" class="text-center py-8 text-muted-foreground">
+            <TableCell :colspan="canValidateReceipts ? 6 : 5" class="text-center py-8 text-muted-foreground">
               Aucun reçu enregistré.
             </TableCell>
           </TableRow>
@@ -165,7 +167,7 @@ const merchantMarketName = computed(() => {
                 {{ statusBadge(r.status).label }}
               </Badge>
             </TableCell>
-            <TableCell v-if="!isMerchant" class="text-right">
+            <TableCell v-if="canValidateReceipts" class="text-right">
               <div v-if="r.status === 'pending'" class="flex gap-2 justify-end">
                 <Button size="sm" variant="outline" @click="updateReceiptStatus(r.id, 'rejected')">
                   Rejeter

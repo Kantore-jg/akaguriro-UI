@@ -245,6 +245,7 @@ export function mapReceipt(r) {
 const ROLE_LABELS = {
   SUPER_ADMIN: 'Super Administrateur',
   ADMIN_MARCHE: 'Admin Marché',
+  PROPRIETAIRE_MARCHE: 'Propriétaire Marché',
   COMMERCANT: 'Commerçant',
   USER: 'Utilisateur',
 };
@@ -280,7 +281,9 @@ export function userToApi(data) {
     email: data.email,
     role: data.role,
     is_active: data.isActive ?? true,
-    managed_market_id: data.role === 'ADMIN_MARCHE' ? (data.marketId || null) : null,
+    managed_market_id: ['ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'].includes(data.role)
+      ? (data.marketId || null)
+      : null,
   };
 
   const phone = normalizePhone(data.phone);

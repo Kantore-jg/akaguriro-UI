@@ -18,6 +18,7 @@ const {
   scopedPlaces,
   scopedMarkets,
   isMarketAdmin,
+  isMarketOwner,
   assignedMarketId,
   findMarket,
   findMerchant,
@@ -25,7 +26,7 @@ const {
 
 const selectedMarketId = computed(() => {
   if (route.query.market) return route.query.market;
-  if (isMarketAdmin.value) return assignedMarketId.value;
+  if (isMarketAdmin.value || isMarketOwner.value) return assignedMarketId.value;
   return null;
 });
 

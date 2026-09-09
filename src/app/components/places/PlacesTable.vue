@@ -22,6 +22,7 @@ defineProps({
   places: { type: Array, required: true },
   getMerchant: { type: Function, required: true },
   getMarketName: { type: Function, required: true },
+  readonly: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['assign', 'edit', 'delete']);
@@ -41,12 +42,12 @@ const statusLabel = placeStatusLabel;
           <TableHead>Catégories</TableHead>
           <TableHead>Occupant</TableHead>
           <TableHead>Statut</TableHead>
-          <TableHead class="text-right">Actions</TableHead>
+          <TableHead v-if="!readonly" class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-if="!places.length">
-          <TableCell colspan="7" class="text-center py-8 text-muted-foreground">
+          <TableCell :colspan="readonly ? 6 : 7" class="text-center py-8 text-muted-foreground">
             Aucun emplacement trouvé.
           </TableCell>
         </TableRow>
@@ -75,7 +76,7 @@ const statusLabel = placeStatusLabel;
               {{ statusLabel(place.status) }}
             </Badge>
           </TableCell>
-          <TableCell class="text-right">
+          <TableCell v-if="!readonly" class="text-right">
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <Button variant="ghost" size="icon">
