@@ -119,19 +119,22 @@ const navigation = computed(() => {
     });
   }
 
-  items.push({
-    id: 'products',
-    name: 'Produits',
-    icon: Package,
-    path: '/admin/products',
-  });
-
-  items.push({
-    id: 'sales',
-    name: isMerchant.value ? 'Ventes' : 'Ventes',
-    icon: ShoppingCart,
-    path: '/admin/sales',
-  });
+  if (isMerchant.value) {
+    items.push(
+      {
+        id: 'products',
+        name: 'Produits',
+        icon: Package,
+        path: '/admin/products',
+      },
+      {
+        id: 'sales',
+        name: 'Ventes',
+        icon: ShoppingCart,
+        path: '/admin/sales',
+      },
+    );
+  }
 
   if (isSuperAdmin.value || isMarketAdmin.value || isMerchant.value) {
     items.push({

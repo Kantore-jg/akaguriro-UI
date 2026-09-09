@@ -9,6 +9,7 @@ import {
   TrendingUp,
   DollarSign,
   CheckCircle,
+  Users,
 } from 'lucide-vue-next';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
 import PageHeader from '../../layout/PageHeader.vue';
@@ -99,12 +100,19 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
       <!-- :subtitle="assignedMerchant?.activeMarketId ? findMarket(assignedMerchant.activeMarketId)?.name : 'Marché non défini'" -->
 
       <StatCard
-        :title="isMerchant ? 'Mes produits' : 'Produits catalogue'"
+        v-if="isMerchant"
+        title="Mes produits"
         :value="scopedProducts.length"
         :icon="CheckCircle"
         color="success"
       />
-        <!-- :subtitle="isMerchant ? 'Produits actifs dans mon catalogue' : `${scopedMerchants.length} commerçant(s) actif(s)`" -->
+      <StatCard
+        v-else
+        title="Commerçants"
+        :value="scopedMerchants.length"
+        :icon="Users"
+        color="success"
+      />
 
     </div>
 
@@ -173,6 +181,7 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
             <span class="text-xs">Emplacements</span>
           </Button>
           <Button
+            v-if="isMerchant"
             variant="outline"
             class="h-auto py-4 flex flex-col gap-2 rounded-xl"
             @click="router.push('/admin/products')"

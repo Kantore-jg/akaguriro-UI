@@ -209,7 +209,8 @@ const buildSection = ({ key, label, icon, description, filename, columns, rows }
   count: rows.length,
 });
 
-const reportSections = computed(() => [
+const reportSections = computed(() => {
+  const sections = [
   buildSection({
     key: 'markets',
     label: 'Marchés',
@@ -279,47 +280,55 @@ const reportSections = computed(() => [
     ],
     rows: merchantsRows.value,
   }),
-  buildSection({
-    key: 'products',
-    label: 'Produits',
-    icon: Package,
-    filename: 'rapport-produits',
-    columns: [
-      { key: 'name', label: 'Produit' },
-      { key: 'category', label: 'Catégorie' },
-      { key: 'market', label: 'Marché' },
-      { key: 'merchant', label: 'Commerçant' },
-      { key: 'place', label: 'Étal' },
-      { key: 'unit', label: 'Unité' },
-      { key: 'price', label: 'Prix' },
-      { key: 'stock', label: 'Stock' },
-      { key: 'availability', label: 'Statut' },
-      { key: 'trending', label: 'Tendance' },
-    ],
-    rows: productsRows.value,
-  }),
-  buildSection({
-    key: 'sales',
-    label: 'Ventes',
-    icon: ShoppingCart,
-    filename: 'rapport-ventes',
-    columns: [
-      { key: 'invoice', label: 'Facture' },
-      { key: 'date', label: 'Date' },
-      { key: 'market', label: 'Marché' },
-      { key: 'merchant', label: 'Commerçant' },
-      { key: 'client', label: 'Client' },
-      { key: 'payment', label: 'Paiement' },
-      { key: 'subtotal', label: 'Sous-total' },
-      { key: 'paidAmount', label: 'Payé' },
-      { key: 'remainingAmount', label: 'Reste' },
-      { key: 'total', label: 'Total' },
-      { key: 'itemsCount', label: 'Articles' },
-      { key: 'place', label: 'Étal' },
-    ],
-    rows: salesRows.value,
-  }),
-]);
+  ];
+
+  if (isMerchant.value) {
+    sections.push(
+      buildSection({
+        key: 'products',
+        label: 'Produits',
+        icon: Package,
+        filename: 'rapport-produits',
+        columns: [
+          { key: 'name', label: 'Produit' },
+          { key: 'category', label: 'Catégorie' },
+          { key: 'market', label: 'Marché' },
+          { key: 'merchant', label: 'Commerçant' },
+          { key: 'place', label: 'Étal' },
+          { key: 'unit', label: 'Unité' },
+          { key: 'price', label: 'Prix' },
+          { key: 'stock', label: 'Stock' },
+          { key: 'availability', label: 'Statut' },
+          { key: 'trending', label: 'Tendance' },
+        ],
+        rows: productsRows.value,
+      }),
+      buildSection({
+        key: 'sales',
+        label: 'Ventes',
+        icon: ShoppingCart,
+        filename: 'rapport-ventes',
+        columns: [
+          { key: 'invoice', label: 'Facture' },
+          { key: 'date', label: 'Date' },
+          { key: 'market', label: 'Marché' },
+          { key: 'merchant', label: 'Commerçant' },
+          { key: 'client', label: 'Client' },
+          { key: 'payment', label: 'Paiement' },
+          { key: 'subtotal', label: 'Sous-total' },
+          { key: 'paidAmount', label: 'Payé' },
+          { key: 'remainingAmount', label: 'Reste' },
+          { key: 'total', label: 'Total' },
+          { key: 'itemsCount', label: 'Articles' },
+          { key: 'place', label: 'Étal' },
+        ],
+        rows: salesRows.value,
+      }),
+    );
+  }
+
+  return sections;
+});
 
 const selectedMarketCount = computed(() => {
   if (selectedMarketId.value) return 1;
