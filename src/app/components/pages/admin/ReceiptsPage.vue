@@ -32,6 +32,7 @@ const {
   isMerchant,
   isMarketOwner,
   scopedReceipts,
+  scopedPlaces,
   assignedMerchant,
   findMarket,
 } = useAdminScope();
@@ -189,6 +190,7 @@ const merchantMarketName = computed(() => {
       :merchant="assignedMerchant"
       :market-name="merchantMarketName"
       :market-id="assignedMerchant?.activeMarketId"
+      :places="scopedPlaces"
       @submit="handleReceiptSubmit"
     />
   </div>

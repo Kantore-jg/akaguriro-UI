@@ -227,18 +227,56 @@ export function saleToApi(data) {
 }
 
 export function mapReceipt(r) {
+  const periodLabel = r.period_year && r.period_month
+    ? new Date(r.period_year, r.period_month - 1, 1).toLocaleDateString('fr-FR', {
+        month: 'long',
+        year: 'numeric',
+      })
+    : (r.created_at
+      ? new Date(r.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      : '');
+
   return {
     id: r.id,
     merchantId: r.user_id,
     merchantName: r.user?.name || '',
     marketId: r.market_id,
     marketName: r.market?.name || '',
-    month: r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : '',
+    placeId: r.place_id,
+    periodYear: r.period_year || null,
+    periodMonth: r.period_month || null,
+    paymentMethodId: r.payment_method_id || r.payment_method?.id || null,
+    paymentMethodName: r.payment_method?.name || '',
+    month: periodLabel,
     amount: Number(r.amount || 0),
     receiptImage: r.file_url,
     submittedDate: r.created_at?.split('T')[0] || '',
     status: r.status,
     reference: r.reference,
+  };
+}
+
+export function mapPaymentMethod(m) {
+  return {
+    id: m.id,
+    marketId: m.market_id,
+    marketName: m.market?.name || '',
+    name: m.name,
+    type: m.type || 'bank',
+    accountNumber: m.account_number || '',
+    accountName: m.account_name || '',
+    isActive: m.is_active ?? true,
+  };
+}
+
+export function paymentMethodToApi(data) {
+  return {
+    market_id: data.marketId || null,
+    name: data.name,
+    type: data.type || 'bank',
+    account_number: data.accountNumber || null,
+    account_name: data.accountName || null,
+    is_active: data.isActive ?? true,
   };
 }
 

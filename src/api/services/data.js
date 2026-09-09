@@ -9,6 +9,8 @@ import {
   mapProduct,
   mapPlaceRequest,
   mapReceipt,
+  mapPaymentMethod,
+  paymentMethodToApi,
   mapSale,
   mapUser,
   saleToApi,
@@ -309,4 +311,43 @@ export async function approveReceipt(id) {
 export async function rejectReceipt(id, reason) {
   const { data } = await apiClient.post(`/receipts/${id}/reject`, { reason });
   return mapReceipt(extractData({ data }));
+}
+
+export async function fetchPaymentMethods(params = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+      query.set(key, String(value));
+    }
+  });
+  const suffix = query.toString() ? `?${query}` : '';
+  const { data } = await apiClient.get(`/payment-methods${suffix}`);
+  return extractList({ data }).map(mapPaymentMethod);
+}
+
+export async function createPaymentMethod(payload) {
+  const { data } = await apiClient.post('/payment-methods', paymentMethodToApi(payload));
+  return mapPaymentMethod(extractData({ data }));
+}
+
+export async function updatePaymentMethod(id, payload) {
+  const { data } = await apiClient.put(`/payment-methods/${id}`, paymentMethodToApi(payload));
+  return mapPaymentMethod(extractData({ data }));
+}
+
+export async function deletePaymentMethod(id) {
+  const { data } = await apiClient.delete(`/payment-methods/${id}`);
+  return mapPaymentMethod(extractData({ data }));
+}
+
+export async function fetchRentSummary(params = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+      query.set(key, String(value));
+    }
+  });
+  const suffix = query.toString() ? `?${query}` : '';
+  const { data } = await apiClient.get(`/rent-summary${suffix}`);
+  return extractData({ data });
 }

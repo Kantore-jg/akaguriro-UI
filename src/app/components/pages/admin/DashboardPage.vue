@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   Package,
@@ -10,8 +10,10 @@ import {
   DollarSign,
   CheckCircle,
   Users,
+  CalendarDays,
 } from 'lucide-vue-next';
 import { useAdminScope } from '../../../../composables/useAdminScope.js';
+import { fetchRentSummary } from '../../../../api/services/data.js';
 import PageHeader from '../../layout/PageHeader.vue';
 import StatCard from '../../StatCard.vue';
 import WeeklyBarChart from '../../dashboard/WeeklyBarChart.vue';
@@ -31,8 +33,6 @@ const {
   scopedProducts,
   scopedPendingRequests,
   scopedPendingReceipts,
-  scopedApprovedReceipts,
-  scopedApprovedReceiptsTotal,
   scopedSalesTotal,
   scopedOccupiedPlaces,
   scopedTotalPlaces,
@@ -45,6 +45,44 @@ const {
   findMarket,
 } = useAdminScope();
 
+const rentSummary = ref(null);
+const bankColors = ['#2e7d32', '#1565c0', '#f9a825', '#6a1b9a', '#00838f', '#e53935'];
+
+const now = new Date();
+const periodLabel = computed(() =>
+  now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+);
+
+const rentTotals = computed(() => rentSummary.value?.totals || {
+  expected_amount: 0,
+  paid_amount: 0,
+  unpaid_count: 0,
+  late_count: 0,
+  paid_count: 0,
+});
+
+const bankSegments = computed(() => {
+  const rows = rentSummary.value?.by_payment_method || [];
+  return rows
+    .filter((row) => Number(row.paid_amount) > 0)
+    .map((row, index) => ({
+      label: row.name || 'Non renseigné',
+      value: Number(row.paid_amount || 0),
+      color: bankColors[index % bankColors.length],
+    }));
+});
+
+onMounted(async () => {
+  if (isMerchant.value) return;
+  try {
+    rentSummary.value = await fetchRentSummary({
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+    });
+  } catch {
+    rentSummary.value = null;
+  }
+});
 
 const merchantPlaceLabel = computed(() => {
   if (!assignedMerchant.value?.activePlaceNumber) return 'Non assigné';
@@ -66,18 +104,34 @@ const statusBadge = (status) => {
   return map[status] || { label: status, variant: 'secondary' };
 };
 
-const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
+const formatAmount = (n) => Number(n || 0).toLocaleString('fr-FR');
 </script>
 
 <template>
   <div class="space-y-6">
-    <PageHeader :title="pageTitle" :subtitle="pageSubtitle" />
+    <PageHeader title="Tableau de bord" :subtitle="!isMerchant ? periodLabel : ''" />
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <template v-if="!isMerchant">
+        <StatCard
+          title="Loyers attendus"
+          :value="`${formatAmount(rentTotals.expected_amount)} BIF`"
+          :subtitle="periodLabel"
+          :icon="CalendarDays"
+          color="primary"
+        />
+        <StatCard
+          title="Loyers perçus"
+          :value="`${formatAmount(rentTotals.paid_amount)} BIF`"
+          :subtitle="`${rentTotals.paid_count} payé(s) · ${rentTotals.late_count + rentTotals.unpaid_count} impayé(s)/retard`"
+          :icon="DollarSign"
+          color="pink"
+        />
+      </template>
       <StatCard
-        :title="isMerchant ? 'Mes revenus validés' : 'Loyers perçus'"
-        :value="`${formatAmount(isMerchant ? scopedSalesTotal : scopedApprovedReceiptsTotal)} BIF`"
-        :subtitle="!isMerchant ? `${scopedApprovedReceipts.length} reçu(s) validé(s)` : ''"
+        v-else
+        title="Mes revenus validés"
+        :value="`${formatAmount(scopedSalesTotal)} BIF`"
         :icon="DollarSign"
         color="pink"
       />
@@ -98,7 +152,6 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         :icon="MapPin"
         color="success"
       />
-      <!-- :subtitle="assignedMerchant?.activeMarketId ? findMarket(assignedMerchant.activeMarketId)?.name : 'Marché non défini'" -->
 
       <StatCard
         v-if="isMerchant"
@@ -114,7 +167,6 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         :icon="Users"
         color="success"
       />
-
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -122,14 +174,18 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
         title="Activité des 7 derniers jours"
         :data="scopedWeeklyReceiptActivity"
       />
-      <!-- subtitle="Nombre de reçus soumis par jour" -->
 
       <PaymentDonutChart
+        v-if="!isMerchant"
+        title="Paiements par banque"
+        :subtitle="periodLabel"
+        :segments="bankSegments"
+      />
+      <PaymentDonutChart
+        v-else
         title="Répartition des reçus"
         :segments="scopedReceiptStatusBreakdown"
       />
-      <!-- subtitle="Montants par statut dans votre périmètre" -->
-
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -182,6 +238,15 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
             <span class="text-xs">Emplacements</span>
           </Button>
           <Button
+            v-if="!isMerchant"
+            variant="outline"
+            class="h-auto py-4 flex flex-col gap-2 rounded-xl"
+            @click="router.push('/admin/rents')"
+          >
+            <Coins class="w-5 h-5" />
+            <span class="text-xs">Loyers</span>
+          </Button>
+          <Button
             v-if="isMerchant"
             variant="outline"
             class="h-auto py-4 flex flex-col gap-2 rounded-xl"
@@ -216,7 +281,6 @@ const formatAmount = (n) => Number(n).toLocaleString('fr-FR');
     <Card v-if="isSuperAdmin || isMarketAdmin || isMarketOwner" class="bs-card border shadow-sm">
       <CardHeader>
         <CardTitle class="text-base">Demandes récentes</CardTitle>
-        <!-- <p class="text-sm text-muted-foreground">Dernières demandes d'octroi d'emplacement</p> -->
       </CardHeader>
       <CardContent>
         <div v-if="recentRequests.length" class="space-y-2">

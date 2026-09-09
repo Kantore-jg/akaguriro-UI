@@ -93,6 +93,18 @@ const routes = [
         component: () => import('../app/components/pages/admin/ReportsPage.vue'),
         meta: { title: 'Rapports', roles: [...OWNER_CONSULT_ROLES, 'COMMERCANT'] },
       },
+      {
+        path: 'rents',
+        name: 'AdminRents',
+        component: () => import('../app/components/pages/admin/RentsPage.vue'),
+        meta: { title: 'Loyers', roles: OWNER_CONSULT_ROLES },
+      },
+      {
+        path: 'payment-methods',
+        name: 'AdminPaymentMethods',
+        component: () => import('../app/components/pages/admin/PaymentMethodsPage.vue'),
+        meta: { title: 'Moyens de paiement', roles: OWNER_CONSULT_ROLES },
+      },
     ],
   },
   {

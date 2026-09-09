@@ -24,6 +24,8 @@ import {
   Circle,
   Printer,
   ShoppingCart,
+  CalendarDays,
+  Landmark,
 } from 'lucide-vue-next';
 import Button from './ui/Button.vue';
 import Badge from './ui/Badge.vue';
@@ -147,6 +149,23 @@ const navigation = computed(() => {
         name: 'Ventes',
         icon: ShoppingCart,
         path: '/admin/sales',
+      },
+    );
+  }
+
+  if (isSuperAdmin.value || isMarketAdmin.value || isMarketOwner.value) {
+    items.push(
+      {
+        id: 'rents',
+        name: 'Loyers',
+        icon: CalendarDays,
+        path: '/admin/rents',
+      },
+      {
+        id: 'payment-methods',
+        name: 'Moyens de paiement',
+        icon: Landmark,
+        path: '/admin/payment-methods',
       },
     );
   }

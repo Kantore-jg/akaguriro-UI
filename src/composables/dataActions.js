@@ -173,9 +173,10 @@ export function createDataActions(state) {
       if (rec.file) {
         formData.append('file', rec.file);
       }
-      if (rec.marketId) formData.append('market_id', rec.marketId);
-      formData.append('amount', rec.amount || 35000);
-      if (rec.reference) formData.append('reference', rec.reference);
+      formData.append('place_id', rec.placeId);
+      formData.append('period_year', rec.periodYear);
+      formData.append('period_month', rec.periodMonth);
+      formData.append('payment_method_id', rec.paymentMethodId);
 
       const created = await createReceipt(formData);
       state.receipts.value = [created, ...state.receipts.value];

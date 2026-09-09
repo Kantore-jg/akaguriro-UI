@@ -67,12 +67,14 @@ const close = () => emit('update:open', false);
 
 const handleSubmit = () => {
   if (!form.value.name.trim() || !form.value.marketId) return;
+  const rent = Number(form.value.rentAmount);
+  if (!rent || rent < 1) return;
   emit('submit', {
     ...(props.block || {}),
     name: form.value.name.trim(),
     code: form.value.code.trim() || undefined,
     description: form.value.description.trim() || undefined,
-    rentAmount: form.value.rentAmount === '' ? 0 : Number(form.value.rentAmount),
+    rentAmount: rent,
     marketId: form.value.marketId,
   });
   close();
@@ -122,9 +124,10 @@ const handleSubmit = () => {
             id="block-rent"
             v-model="form.rentAmount"
             type="number"
-            min="0"
+            min="1"
             step="1"
             placeholder="12000"
+            required
           />
         </div>
 
