@@ -1,7 +1,14 @@
 import { apiClient, extractData, setToken } from '../client.js';
 import { mapUser } from '../mappers.js';
+import { setCommerceId } from './commerce.js';
 
 const USER_KEY = 'akaguriro_user';
+
+function persistCommerceContext(user) {
+  if (user?.role === 'COMMERCE_USER' && user.commerceId) {
+    setCommerceId(user.commerceId);
+  }
+}
 
 export function getStoredUser() {
   try {
@@ -26,6 +33,7 @@ export async function login(email, password) {
   const user = mapUser(payload.user);
   setToken(payload.token);
   saveUser(user);
+  persistCommerceContext(user);
   return user;
 }
 
@@ -56,6 +64,7 @@ export async function register({ name, email, phone, password, password_confirma
   const user = mapUser(payload.user);
   setToken(payload.token);
   saveUser(user);
+  persistCommerceContext(user);
   return user;
 }
 
@@ -65,6 +74,7 @@ export async function logout() {
   } finally {
     setToken(null);
     saveUser(null);
+    setCommerceId(null);
   }
 }
 
@@ -72,6 +82,7 @@ export async function fetchProfile() {
   const { data } = await apiClient.get('/profile');
   const user = mapUser(extractData({ data }));
   saveUser(user);
+  persistCommerceContext(user);
   return user;
 }
 
@@ -106,4 +117,5 @@ export async function updatePassword({ current_password, password, password_conf
 export function clearSession() {
   setToken(null);
   saveUser(null);
+  setCommerceId(null);
 }

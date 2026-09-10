@@ -4,6 +4,7 @@ import { getToken } from '../api/client.js';
 
 const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE', 'COMMERCANT'];
 const OWNER_CONSULT_ROLES = ['SUPER_ADMIN', 'ADMIN_MARCHE', 'PROPRIETAIRE_MARCHE'];
+const COMMERCE_USER_ROLE = 'COMMERCE_USER';
 
 const routes = [
   {
@@ -105,6 +106,115 @@ const routes = [
         component: () => import('../app/components/pages/admin/PaymentMethodsPage.vue'),
         meta: { title: 'Moyens de paiement', roles: OWNER_CONSULT_ROLES },
       },
+      {
+        path: 'commerces',
+        name: 'AdminCommerces',
+        component: () => import('../app/components/pages/admin/CommercesPage.vue'),
+        meta: { title: 'Commerces indépendants', roles: ['SUPER_ADMIN'] },
+      },
+    ],
+  },
+  {
+    path: '/commerce',
+    component: () => import('../app/components/CommerceLayout.vue'),
+    meta: { requiresCommerceAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'CommerceDashboard',
+        component: () => import('../app/components/pages/commerce/DashboardPage.vue'),
+        meta: { title: 'Tableau de bord' },
+      },
+      {
+        path: 'pos',
+        name: 'CommercePos',
+        component: () => import('../app/components/pages/commerce/PosPage.vue'),
+        meta: { title: 'Nouvelle vente' },
+      },
+      {
+        path: 'sales',
+        name: 'CommerceSales',
+        component: () => import('../app/components/pages/commerce/SalesPage.vue'),
+        meta: { title: 'Ventes' },
+      },
+      {
+        path: 'stocks',
+        name: 'CommerceStocks',
+        component: () => import('../app/components/pages/commerce/StocksPage.vue'),
+        meta: { title: 'Mes stocks' },
+      },
+      {
+        path: 'products',
+        name: 'CommerceProducts',
+        component: () => import('../app/components/pages/commerce/ProductsPage.vue'),
+        meta: { title: 'Produits' },
+      },
+      {
+        path: 'purchases',
+        name: 'CommercePurchases',
+        component: () => import('../app/components/pages/commerce/PurchasesPage.vue'),
+        meta: { title: 'Entrées stock' },
+      },
+      {
+        path: 'stock-exits',
+        name: 'CommerceStockExits',
+        component: () => import('../app/components/pages/commerce/StockExitsPage.vue'),
+        meta: { title: 'Sorties stock' },
+      },
+      {
+        path: 'transfers',
+        name: 'CommerceTransfers',
+        component: () => import('../app/components/pages/commerce/TransfersPage.vue'),
+        meta: { title: 'Transferts' },
+      },
+      {
+        path: 'movements',
+        name: 'CommerceMovements',
+        component: () => import('../app/components/pages/commerce/MovementsPage.vue'),
+        meta: { title: 'Mouvements' },
+      },
+      {
+        path: 'cash/current',
+        name: 'CommerceCashCurrent',
+        component: () => import('../app/components/pages/commerce/CashCurrentPage.vue'),
+        meta: { title: 'Caisse actuelle' },
+      },
+      {
+        path: 'cash/open-close',
+        name: 'CommerceCashOpenClose',
+        component: () => import('../app/components/pages/commerce/CashOpenClosePage.vue'),
+        meta: { title: 'Ouverture / fermeture' },
+      },
+      {
+        path: 'cash/movements',
+        name: 'CommerceCashMovements',
+        component: () => import('../app/components/pages/commerce/CashMovementsPage.vue'),
+        meta: { title: 'Mouvements caisse' },
+      },
+      {
+        path: 'cash/history',
+        name: 'CommerceCashHistory',
+        component: () => import('../app/components/pages/commerce/CashHistoryPage.vue'),
+        meta: { title: 'Historique caisse' },
+      },
+      {
+        path: 'reports',
+        name: 'CommerceReports',
+        component: () => import('../app/components/pages/commerce/ReportsPage.vue'),
+        meta: { title: 'Rapports' },
+      },
+      {
+        path: 'users',
+        name: 'CommerceUsers',
+        component: () => import('../app/components/pages/commerce/UsersPage.vue'),
+        meta: { title: 'Utilisateurs' },
+      },
+      {
+        path: 'settings',
+        name: 'CommerceSettings',
+        component: () => import('../app/components/pages/commerce/SettingsPage.vue'),
+        meta: { title: 'Paramètres' },
+      },
     ],
   },
   {
@@ -182,12 +292,25 @@ router.beforeEach((to, from, next) => {
   const hasToken = Boolean(getToken());
 
   if ((to.name === 'Login' || to.name === 'Register') && hasToken && user?.id) {
-    next({ path: '/' });
+    if (role === COMMERCE_USER_ROLE) {
+      next({ path: '/commerce' });
+    } else if (ADMIN_ROLES.includes(role)) {
+      next({ path: '/admin' });
+    } else {
+      next({ path: '/' });
+    }
     return;
   }
 
   if (to.matched.some((r) => r.meta.requiresToken)) {
     if (!hasToken || !user?.id) {
+      next({ path: '/login', query: { redirect: to.fullPath } });
+      return;
+    }
+  }
+
+  if (to.matched.some((r) => r.meta.requiresCommerceAuth)) {
+    if (!hasToken || role !== COMMERCE_USER_ROLE) {
       next({ path: '/login', query: { redirect: to.fullPath } });
       return;
     }
@@ -206,8 +329,18 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  if (to.path.startsWith('/admin') && role === COMMERCE_USER_ROLE) {
+    next({ path: '/commerce' });
+    return;
+  }
+
   if (to.path.startsWith('/admin') && role && !ADMIN_ROLES.includes(role)) {
     next(user?.id ? { name: 'Profile' } : { path: '/login' });
+    return;
+  }
+
+  if (to.path.startsWith('/commerce') && role && role !== COMMERCE_USER_ROLE) {
+    next(ADMIN_ROLES.includes(role) ? { path: '/admin' } : { path: '/login' });
     return;
   }
 

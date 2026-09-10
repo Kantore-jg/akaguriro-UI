@@ -285,11 +285,159 @@ const ROLE_LABELS = {
   ADMIN_MARCHE: 'Admin Marché',
   PROPRIETAIRE_MARCHE: 'Propriétaire Marché',
   COMMERCANT: 'Commerçant',
+  COMMERCE_USER: 'Commerce indépendant',
   USER: 'Utilisateur',
 };
 
+export const COMMERCE_ROLE_LABELS = {
+  owner: 'Propriétaire',
+  admin: 'Administrateur',
+  cashier: 'Caissier',
+  stock_manager: 'Gestionnaire de stock',
+  seller: 'Vendeur',
+};
+
+export function mapCommerce(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    type: c.type || '',
+    rccm: c.rccm || '',
+    nif: c.nif || '',
+    phone: c.phone || '',
+    email: c.email || '',
+    address: c.address || '',
+    province: c.province || '',
+    commune: c.commune || '',
+    zone: c.zone || '',
+    colline: c.colline || '',
+    description: c.description || '',
+    logoUrl: resolveStorageUrl(c.logo_url),
+    status: c.status || 'active',
+    usersCount: c.commerce_users_count ?? 0,
+    createdAt: c.created_at?.split('T')[0] || '',
+  };
+}
+
+export function commerceToApi(data) {
+  return {
+    name: data.name,
+    type: data.type || null,
+    rccm: data.rccm || null,
+    nif: data.nif || null,
+    phone: data.phone || null,
+    email: data.email || null,
+    address: data.address || null,
+    province: data.province || null,
+    commune: data.commune || null,
+    zone: data.zone || null,
+    colline: data.colline || null,
+    description: data.description || null,
+    status: data.status || 'active',
+  };
+}
+
+export function mapCommerceCategory(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    description: c.description || '',
+  };
+}
+
+export function mapCommerceProduct(p) {
+  return {
+    id: p.id,
+    commerceId: p.commerce_id,
+    categoryId: p.category_id,
+    categoryName: p.category?.name || '',
+    name: p.name,
+    sku: p.sku || '',
+    barcode: p.barcode || '',
+    unit: p.unit || 'unit',
+    purchasePrice: Number(p.purchase_price ?? 0),
+    salePrice: Number(p.sale_price ?? 0),
+    minStock: Number(p.min_stock ?? 0),
+    maxStock: p.max_stock != null ? Number(p.max_stock) : null,
+    vatRate: p.vat_rate != null ? Number(p.vat_rate) : null,
+    status: p.status || 'active',
+    createdAt: p.created_at?.split('T')[0] || '',
+  };
+}
+
+export function mapCommerceStock(s) {
+  return {
+    id: s.id,
+    commerceId: s.commerce_id,
+    name: s.name,
+    location: s.location || '',
+    managerUserId: s.manager_user_id,
+    managerName: s.manager?.name || '',
+    status: s.status || 'active',
+    items: (s.items || []).map((item) => ({
+      id: item.id,
+      productId: item.product_id,
+      productName: item.product?.name || '',
+      sku: item.product?.sku || '',
+      quantity: Number(item.quantity ?? 0),
+      avgPurchasePrice: Number(item.avg_purchase_price ?? 0),
+    })),
+    createdAt: s.created_at?.split('T')[0] || '',
+  };
+}
+
+export function mapCommerceSaleItem(item) {
+  return {
+    id: item.id,
+    productId: item.product_id,
+    productName: item.product?.name || '',
+    quantity: Number(item.quantity),
+    unitPrice: Number(item.unit_price),
+    unitCost: Number(item.unit_cost ?? 0),
+    lineTotal: Number(item.line_total),
+  };
+}
+
+export function mapCommerceSale(s) {
+  return {
+    id: s.id,
+    commerceId: s.commerce_id,
+    stockId: s.stock_id,
+    stockName: s.stock?.name || '',
+    cashSessionId: s.cash_session_id,
+    paymentMethod: s.payment_method || 'cash',
+    totalAmount: Number(s.total_amount ?? 0),
+    totalCost: Number(s.total_cost ?? 0),
+    userId: s.user_id,
+    userName: s.user?.name || '',
+    soldAt: s.sold_at?.split('T')[0] || s.sold_at || '',
+    notes: s.notes || '',
+    items: (s.items || []).map(mapCommerceSaleItem),
+    createdAt: s.created_at?.split('T')[0] || '',
+  };
+}
+
+export function mapCommerceUser(u) {
+  return {
+    id: u.id,
+    commerceId: u.commerce_id,
+    userId: u.user_id,
+    role: u.role?.value || u.role,
+    roleLabel: COMMERCE_ROLE_LABELS[u.role?.value || u.role] || u.role,
+    isActive: u.is_active ?? true,
+    name: u.user?.name || '',
+    email: u.user?.email || '',
+    phone: u.user?.phone || '',
+    createdAt: u.created_at?.split('T')[0] || '',
+  };
+}
+
 export function mapUser(u) {
   const role = u.roles?.[0] || 'USER';
+  const memberships = u.commerce_memberships || [];
+  const firstMembership = memberships[0] || null;
+
   return {
     id: u.id,
     name: u.name,
@@ -302,6 +450,15 @@ export function mapUser(u) {
     marketId: u.managed_market_id || u.active_market_id || null,
     marketName: u.managed_market?.name || u.active_market?.name || '',
     merchantId: role === 'COMMERCANT' ? u.id : null,
+    commerceId: firstMembership?.commerce_id || null,
+    commerceRole: firstMembership?.role || null,
+    commerceMemberships: memberships.map((m) => ({
+      id: m.id,
+      commerceId: m.commerce_id,
+      role: m.role,
+      isActive: m.is_active ?? true,
+      commerceName: m.commerce_name || '',
+    })),
     permissions: u.permissions || [],
     createdAt: u.created_at?.split('T')[0] || '',
   };

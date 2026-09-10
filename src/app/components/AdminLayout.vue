@@ -93,6 +93,7 @@ const navigation = computed(() => {
     items.push(
       { id: 'users', name: 'Utilisateurs', icon: UserCog, path: '/admin/users' },
       { id: 'markets', name: 'Marchés', icon: Store, path: '/admin/markets' },
+      { id: 'commerces', name: 'Commerces indépendants', icon: Building2, path: '/admin/commerces' },
       { id: 'places', name: 'Emplacements', icon: MapPin, path: '/admin/places' },
       { id: 'merchants', name: 'Commerçants', icon: Users, path: '/admin/merchants' },
     );

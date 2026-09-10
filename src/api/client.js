@@ -60,7 +60,12 @@ export function setToken(token) {
 }
 
 export function extractData(response) {
-  return response.data?.data ?? response.data;
+  const body = response?.data;
+  // API envelope { success, data, ... }: return data even when null (do not fall back to envelope).
+  if (body && typeof body === 'object' && 'success' in body && 'data' in body) {
+    return body.data;
+  }
+  return body?.data ?? body;
 }
 
 export function extractList(response) {
