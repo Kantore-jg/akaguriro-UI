@@ -1,6 +1,3 @@
-/**
- * Burundi administrative divisions derived from data.json.
- */
 
 export const BURUNDI_ADMIN_LOCATIONS = [
   {
